@@ -1,0 +1,10 @@
+database:
+  uri: mongodb://localhost:27017/knight-online
+  options:
+
+loginServer:
+  port: 15100
+  ip: 0.0.0.0
+  ftp: 
+    host: localhost
+    dir: /
