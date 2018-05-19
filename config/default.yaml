@@ -8,3 +8,13 @@ loginServer:
   ftp: 
     host: localhost
     dir: /
+  servers:
+    - ip: 127.0.0.1
+      lanip: 127.0.0.1
+      name: TEST SERVER
+      king:
+        karus: karus_king
+        elmorad: elmorad_king
+      notice:
+        karus: 'karus notice'
+        elmorad: 'elmorad notice'

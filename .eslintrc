@@ -1,0 +1,26 @@
+{
+  "env": {
+    "node": true,
+    "es6": true,
+    "commonjs": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
+  "plugins": [
+    "node"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:node/recommended"
+  ],
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": "warn"
+  },
+  "globals": {
+    "describe": true,
+    "it": true,
+    "document": true
+  }
+}

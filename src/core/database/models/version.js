@@ -19,7 +19,5 @@ const schema = new mongoose.Schema({
 
 
 
-module.exports = function (db) {
-  return db.model('Version', schema, 'version');
-}
+module.exports = db => db.model('Version', schema, 'version');
 

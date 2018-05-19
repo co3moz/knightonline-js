@@ -1,5 +1,5 @@
 module.exports = function () {
-  var privateKey = [0x8966, 0x2012, 0x5001, 0x1207];
+  var privateKey = [0x66, 0x89, 0x12, 0x20, 0x01, 0x50, 0x07, 0x12];
   var publicKey = null;
   var tKey = null;
   var enabled = false;
@@ -8,10 +8,14 @@ module.exports = function () {
     get public() {
       if (publicKey == null) {
         publicKey = [
-          Math.random() * 0xFFFF & 0xFFFF,
-          Math.random() * 0xFFFF & 0xFFFF,
-          Math.random() * 0xFFFF & 0xFFFF,
-          Math.random() * 0xFFFF & 0xFFFF
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF,
+          Math.random() * 0xFF & 0xFF
         ];
 
         tKey = publicKey.map((x, i) => privateKey[i] ^ x);

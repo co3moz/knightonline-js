@@ -5,19 +5,23 @@ exports.readShort = function readShort(data, i) {
 }
 
 exports.short = function short(i) {
-  return [i & 0xFF, (i >> 8) & 0xFF];
+  return [(i>>>0) & 0xFF, (i >>> 8) & 0xFF];
 }
 
-exports.readString = function readString(data, i) {
+exports.readStringArray = function readText(data, i, maxlen) {
   let str = [];
 
   for (; ; i++) {
-    if (!data[i]) break;
+    if (!data[i] || str.length == maxlen) break;
 
     str.push(String.fromCharCode(data[i]));
   }
 
-  return str.join('');
+  return str;
+}
+
+exports.readString = function readText(data, i, maxlen) {
+  return exports.readStringArray(data, i, maxlen).join('');
 }
 
 exports.string = function string(i) {
