@@ -8,7 +8,7 @@ const loadVersions = require('./utils/load_versions');
 const opCodes = require('./utils/op_codes');
 
 
-async function main() {
+module.exports = async function () {
   console.log('login server is going to start...');
   let db = await database();
   await connectRedis();
@@ -20,7 +20,7 @@ async function main() {
 
   await server({
     ip: config.get('loginServer.ip'),
-    port: config.get('loginServer.port'),
+    ports: config.get('loginServer.ports'),
     debug: true,
 
     sendWithHeaders: function (response) {
@@ -47,9 +47,3 @@ function doesProtocolHeaderValid(data) {
 function doesProtocolFooterValid(data, length) {
   return data[4 + length] != 0x55 || data[5 + length] != 0xAA
 }
-
-main().catch(x => {
-  /* eslint-disable no-process-exit */
-  console.error(x.stack);
-  process.exit(1);
-});
