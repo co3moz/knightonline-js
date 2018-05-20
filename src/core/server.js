@@ -7,12 +7,12 @@ const net = require('net');
 module.exports = ({ ip, port, onConnected, onData, onError, debug, sendWithHeaders }) => {
   return new Promise(resolve => {
     var id = 0;
-
+    var debugFn;
 
     if (!debug) {
-      debug = function () { }
+      debugFn = function () { }
     } else if (debug === true) {
-      debug = (session, ...params) => console.log('DEBUG (session:%d)', session, ...params);
+      debugFn = (session, ...params) => console.log('DEBUG (session:%d)', session, ...params);
     }
 
     var server = net.createServer(socket => {
@@ -21,24 +21,40 @@ module.exports = ({ ip, port, onConnected, onData, onError, debug, sendWithHeade
       socket.sendWithHeaders = sendWithHeaders.bind(socket);
 
       socket.writeb = (data) => {
+        if (debug) {
+          socket.debug('data out | ' + data.map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+        }
+
         socket.write(Buffer.from(data));
       }
 
-      socket.debug = (...params) => debug(session, ...params);
+      socket.terminate = message => {
+        socket.debug(message);
+        socket.end();
+      }
+
+      socket.debug = (...params) => debugFn(session, ...params);
 
       socket.setTimeout(60000);
       socket.on('timeout', () => {
-        debug(session, 'socket timeout');
+        socket.debug(session, 'socket timeout');
         socket.end();
       });
 
-      debug(session, 'new connection');
+      socket.debug(session, 'new connection');
       if (onConnected) onConnected(socket);
 
 
       if (onData) {
         socket.on('data', data => {
-          onData(data, socket);
+          socket.debug('data in | ' + Array.from(data).map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+
+          try {
+            onData(data, socket);
+          } catch (e) {
+            console.error(e);
+            console.log('onData has some error that did not catched before!');
+          }
         });
       }
 
