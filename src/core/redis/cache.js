@@ -33,11 +33,15 @@ async function waitLock(name) {
   if (!_locks[name]) {
     return false;
   }
-
+  let timeout = 120; // 30 sec
   for (; ;) {
     await delay(250);
     if (!_locks[name]) {
       return true;
+    }
+
+    if (timeout-- <= 0) {
+      return false;
     }
   }
 }
