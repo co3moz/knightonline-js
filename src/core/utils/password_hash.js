@@ -62,5 +62,5 @@ module.exports = function hash(password) {
     }
   }
 
-  return outBytes;
+  return Buffer.from(outBytes, 'utf8').toString('utf8');
 }
