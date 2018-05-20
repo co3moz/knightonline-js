@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "config": "^1.30.0",
     "glob": "^7.1.2",
     "js-yaml": "^3.11.0",
     "long": "^4.0.0",
-    "mongoose": "^5.1.1"
+    "mongoose": "^5.1.1",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1",

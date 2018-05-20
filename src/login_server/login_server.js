@@ -2,15 +2,18 @@ const config = require('config');
 const server = require('../core/server');
 const unit = require('../core/unit');
 const database = require('../core/database');
+const connectRedis = require('../core/redis/connect');
+const cache = require('../core/redis/cache');
 
-const getLatestVersions = require('./utils/getLatestVersions');
+const getLatestVersions = require('./utils/get_latest_versions');
 const crypt = require('./utils/crypt');
-const errorCodes = require('./utils/errorCodes');
+const errorCodes = require('./utils/error_codes');
 
 
 async function main() {
   console.log('login server is going to start...');
   let db = await database();
+  await connectRedis();
 
   let versions = await getLatestVersions(db);
   let { version: serverVersion } = versions[0];
@@ -84,6 +87,7 @@ async function main() {
           socket.cryption = crypt();
         }
 
+        /*TODO: şifrelemeyi dahil et*/
         /*socket.sendWithHeaders([
           0xF2,
           ...socket.cryption.public
@@ -139,8 +143,19 @@ async function main() {
         }
 
         if (resultCode == errorCodes.AUTH_SUCCESS) {
+          let premiumHours = -1;
+
+          if (account.premium) {
+            premiumHours = (Date.now() - account.premiumEndsAt) / 1000 / 3600;
+            if (premiumHours < 0) {
+              premiumHours = -1
+            } else {
+              premiumHours = premiumHours >>> 0;
+            }
+          }
+
           socket.sendWithHeaders([
-            0xF3, ...unit.short(0), resultCode, ...unit.short(-1 /* TODO: premium day remaining */), ...unit.string(accountName)
+            0xF3, ...unit.short(0), resultCode, ...unit.short(premiumHours), ...unit.string(accountName)
           ]);
         } else if (resultCode == errorCodes.AUTH_BANNED) {
           socket.sendWithHeaders([
@@ -157,38 +172,56 @@ async function main() {
       if (opcode == 0xF5) {
         let echo = unit.readShort(data, 5);
 
-        let servers = config.get('loginServer.servers');
+        let servers = await cache('servers', async () => {
+          let { Server } = db.models;
+
+          let servers = await Server.find().exec();
+
+          return {
+            length: servers.length,
+            data: [].concat(...servers.map(server => {
+              return [
+                ...unit.string(server.ip),
+                ...unit.string(server.lanip),
+                ...unit.string(server.name),
+                ...unit.short(server.onlineCount),
+                ...unit.short(1),
+                ...unit.short(1),
+                ...unit.short(server.userPremiumLimit),
+                ...unit.short(server.userFreeLimit),
+                0,
+                ...unit.string(server.karusKing),
+                ...unit.string(server.karusNotice),
+                ...unit.string(server.elmoradKing),
+                ...unit.string(server.elmoradNotice)
+              ];
+            }))
+          }
+        });
 
         socket.sendWithHeaders([
           0xF5,
           ...unit.short(echo),
           servers.length,
-          ...[].concat(...servers.map(server => {
-            return [
-              ...unit.string(server.ip),
-              ...unit.string(server.lanip),
-              ...unit.string(server.name),
-              ...unit.short(-1 /* TODO: user count */),
-              ...unit.short(0 /* TODO: server id */),
-              ...unit.short(0 /* TODO: group id */),
-              ...unit.short(0 /* TODO: player cap */),
-              ...unit.short(0 /* TODO: free player cap */),
-              0,
-              ...unit.string(server.king.karus),
-              ...unit.string(server.notice.karus),
-              ...unit.string(server.king.elmorad),
-              ...unit.string(server.notice.elmorad)
-            ];
-          }))
+          ...servers.data
+
         ]);
         return;
       }
 
       if (opcode == 0xF6) {
+        let news = await cache('news', async () => {
+          let { News } = db.models;
+
+          let news = await News.find().exec();
+
+          return unit.string(news.map(x => x.title + '#' + x.message + '#').join(''));
+        });
+
         socket.sendWithHeaders([
           0xF6,
           ...unit.string('Login Notice'),
-          ...unit.string('hello')
+          ...news
         ]);
       }
 

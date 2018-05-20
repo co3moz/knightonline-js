@@ -24,8 +24,18 @@ exports.readString = function readText(data, i, maxlen) {
   return exports.readStringArray(data, i, maxlen).join('');
 }
 
+exports.stringFromArray = function string(i) {
+  return [...exports.short(i.length), ...i];
+}
+
 exports.string = function string(i) {
-  return [...exports.short(i.length), ...i.split('').map(x => x.charCodeAt(0))];
+  i = Array.from(Buffer.from(i, 'utf8'));
+
+  return [...exports.short(i.length), ...i];
+}
+
+exports.stringWithoutLength = function stringWithoutLength(i) {
+  return Array.from(Buffer.from(i, 'utf8'));
 }
 
 exports.config = function (name) {
