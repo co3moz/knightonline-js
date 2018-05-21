@@ -8,8 +8,6 @@ module.exports = async function ({ socket, data, db }) {
   let passwordLength = unit.readShort(data, 7 + accountLength);
   let password = unit.readString(data, 9 + accountLength);
 
-  console.log(accountName, password);
-
   var resultCode = 0;
   let account;
 

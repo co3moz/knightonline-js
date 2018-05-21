@@ -25,6 +25,7 @@ module.exports = (params) => {
 
           server.maxConnections = 3000;
 
+          server.port = port;
           server.listen(port, ip, function () {
             resolve(server);
           });
@@ -71,13 +72,15 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
       socket.end();
     });
 
-    socket.debug(session, 'new connection');
+    socket.debug('new connection');
     if (onConnected) onConnected(socket);
 
 
     if (onData) {
       socket.on('data', data => {
-        socket.debug('data in | ' + Array.from(data).map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+        if (debug) {
+          socket.debug('data in | ' + Array.from(data).map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+        }
 
         try {
           onData(data, socket);

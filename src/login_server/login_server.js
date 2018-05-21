@@ -33,6 +33,14 @@ module.exports = async function () {
 
       if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
       if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
+
+
+
+      /* TODO: Not working please fix */
+      // if (socket.cryption) {
+      //   console.log(socket.cryption.decrypt(data.slice(5, 5 + length)));
+      // }
+
       if (!opCodes[opcode]) return socket.debug('unknown opcode!');
 
       await require('./ops/' + opCodes[opcode])({ socket, data, versions, length, opcode, db, serverVersion });

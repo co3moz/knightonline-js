@@ -2,7 +2,7 @@ module.exports = async function (db) {
   let testServer = {
     ip: '127.0.0.1',
     lanip: '127.0.0.1',
-    name: 'TEST|SERVER',
+    name: 'TEST|SERVER 1',
     karusKing: 'KARUS KING',
     karusNotice: 'KARUS NOTICE',
     elmoradKing: 'ELMORAD KING',
@@ -12,7 +12,7 @@ module.exports = async function (db) {
   let { Server } = db.models;
 
   let data = await Server.findOne({
-    name: 'TEST|SERVER'
+    name: testServer.name
   }).exec();
 
   if (data) {
