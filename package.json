@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint src/**",
     "login_server": "node src/login_server",
-    "game_server": "node src/game_server"
+    "game_server": "node src/game_server",
+    "start": "node src"
   },
   "keywords": [],
   "author": "",

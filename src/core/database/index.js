@@ -1,14 +1,16 @@
 module.exports = async function () {
   let db = require('./utils/connect');
 
-  db = await db();
+  if (db.constructor == Function) { // create only one per one cluster
+    db = await db();
 
-  const modelLoader = require('./utils/model_loader');
+    const modelLoader = require('./utils/model_loader');
 
-  await modelLoader(db);
+    await modelLoader(db);
 
-  const defaultChecker = require('./utils/default_checker');
-  await defaultChecker(db);
-  
+    const defaultChecker = require('./utils/default_checker');
+    await defaultChecker(db);
+  }
+
   return module.exports = db;
 }
