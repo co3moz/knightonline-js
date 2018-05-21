@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src/**",
-    "login_server": "node src/login_server"
+    "login_server": "node src/login_server",
+    "game_server": "node src/game_server"
   },
   "keywords": [],
   "author": "",

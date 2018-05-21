@@ -1,4 +1,4 @@
-const crypt = require('../utils/crypt');
+const crypt = require('../../core/utils/crypt');
 
 module.exports = async function ({ socket }) {
   if (!socket.cryption) {

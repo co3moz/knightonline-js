@@ -1,4 +1,5 @@
 const net = require('net');
+const unit = require('./utils/unit');
 
 /**
  * Creates a tcp server
@@ -49,7 +50,9 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
   return socket => {
     var session = socket.session = shared.id++;
 
-    socket.sendWithHeaders = sendWithHeaders.bind(socket);
+    socket.sendWithHeaders = function (response) {
+      socket.writeb([0xAA, 0x55, ...unit.short(response.length), ...response, 0x55, 0xAA]);
+    }
 
     socket.writeb = (data) => {
       if (debug) {
@@ -83,7 +86,20 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
         }
 
         try {
-          onData(data, socket);
+
+          const length = unit.readShort(data, 2);
+          const opcode = data[4];
+
+          if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
+          if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
+
+          /* TODO: Not working please fix */
+          // if (socket.cryption) {
+          //   console.log(socket.cryption.decrypt(data.slice(5, 5 + length)));
+          // }
+
+
+          onData({ data, socket, opcode, length });
         } catch (e) {
           console.error(e);
           console.log('onData has some error that did not catched before!');
@@ -95,4 +111,13 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
       if (onError) onError(error, socket);
     });
   }
+}
+
+
+function doesProtocolHeaderValid(data) {
+  return data[0] != 0xAA || data[1] != 0x55;
+}
+
+function doesProtocolFooterValid(data, length) {
+  return data[4 + length] != 0x55 || data[5 + length] != 0xAA
 }
