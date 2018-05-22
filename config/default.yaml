@@ -27,3 +27,11 @@ gameServer:
   ip: 0.0.0.0
   ports: 
     - 15001
+  clientExeVersion: 2195
+
+testClient:
+  ip: '127.0.0.1'
+  port: 15100
+  version: 2195
+  user: 'test'
+  password: '1'
