@@ -5,14 +5,16 @@ exports.readShort = function readShort(data, i) {
 }
 
 exports.short = function short(i) {
-  return [(i>>>0) & 0xFF, (i >>> 8) & 0xFF];
+  return [(i >>> 0) & 0xFF, (i >>> 8) & 0xFF];
 }
 
-exports.readStringArray = function readText(data, i, maxlen) {
+exports.readStringArray = function readText(data, i, len) {
+  (len || (len = 32000)); //max len
+  
   let str = [];
 
   for (; ; i++) {
-    if (!data[i] || str.length == maxlen) break;
+    if (data[i] == undefined || str.length == len) break;
 
     str.push(String.fromCharCode(data[i]));
   }
@@ -30,7 +32,6 @@ exports.stringFromArray = function string(i) {
 
 exports.string = function string(i) {
   i = Array.from(Buffer.from(i, 'utf8'));
-
   return [...exports.short(i.length), ...i];
 }
 
@@ -40,4 +41,27 @@ exports.stringWithoutLength = function stringWithoutLength(i) {
 
 exports.config = function (name) {
   return exports.string(config.get(name));
+}
+
+exports.queue = function (data) {
+  var array = Array.from(data);
+  return {
+    byte() {
+      return array.shift();
+    },
+
+    short() {
+      var data = exports.readShort(array, 0);
+      array.splice(0, 2);
+      return data;
+    },
+
+    string() {
+      let len = this.short();
+      let data = exports.readStringArray(array, 0, len);
+
+      array.splice(0, data.length);
+      return data.join('');
+    }
+  };
 }
