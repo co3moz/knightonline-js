@@ -86,7 +86,6 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
         }
 
         try {
-
           const length = unit.readShort(data, 2);
           const opcode = data[4];
 
@@ -98,8 +97,7 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
           //   console.log(socket.cryption.decrypt(data.slice(5, 5 + length)));
           // }
 
-
-          onData({ data, socket, opcode, length });
+          if (onData) onData({ data, socket, opcode, length });
         } catch (e) {
           console.error(e);
           console.log('onData has some error that did not catched before!');
