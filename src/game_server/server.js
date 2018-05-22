@@ -15,10 +15,16 @@ module.exports = async function () {
     ports: config.get('gameServer.ports'),
     debug: true,
 
-    onData: async ({ socket, opcode, length, data }) => {
+    onData: async ({ socket, opcode, length, body }) => {
       if (!opCodes[opcode]) return socket.debug('unknown opcode!');
 
-      await require('./ops/' + opCodes[opcode])({ socket, data, length, opcode, db });
+
+      if (!socket.cryption || !socket.cryption.enabled) {
+        // dont allow uncrypted messages 
+        if (opCodes[opcode] != opCodes.VERSION_CHECK) return;
+      }
+
+      await require('./ops/' + opCodes[opcode])({ socket, body, length, opcode, db });
     }
   });
 }

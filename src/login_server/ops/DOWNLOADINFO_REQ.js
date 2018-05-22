@@ -1,8 +1,8 @@
 const unit = require('../../core/utils/unit');
 
-module.exports = async function ({ socket, data, versions }) {
+module.exports = async function ({ socket, body, versions, opcode }) {
   let downloadSet = [];
-  let clientVersion = unit.readShort(data, 5);
+  let clientVersion = body.short();
 
   for (let version of versions) {
     if (version.version > clientVersion) {
@@ -13,7 +13,7 @@ module.exports = async function ({ socket, data, versions }) {
   downloadSet.reverse(); // VERSION DESC => ASC
 
   socket.sendWithHeaders([
-    0x2,
+    opcode,
     ...unit.config('loginServer.ftp.host'),
     ...unit.config('loginServer.ftp.dir'),
     ...unit.short(downloadSet.length),

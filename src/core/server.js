@@ -17,7 +17,7 @@ module.exports = (params) => {
       debugFn = (session, ...params) => console.log('DEBUG (session:%d)', session, ...params);
     }
 
-    var shared = { id: 0, debugFn };
+    var shared = { id: 0, debugFn, pool: {} };
 
     try {
       await Promise.all(ports.map(function (port) {
@@ -49,7 +49,8 @@ module.exports = (params) => {
 function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders }, shared) {
   return socket => {
     var session = socket.session = shared.id++;
-
+    shared.pool[session] = socket;
+    socket.pool = shared.pool;
     socket.sendWithHeaders = function (response) {
       socket.writeb([0xAA, 0x55, ...unit.short(response.length), ...response, 0x55, 0xAA]);
     }
@@ -97,13 +98,19 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
           //   console.log(socket.cryption.decrypt(data.slice(5, 5 + length)));
           // }
 
-          if (onData) onData({ data, socket, opcode, length });
+
+          if (onData) onData({ body: unit.queue(data.slice(5, 5 + length)), socket, opcode, length });
         } catch (e) {
           console.error(e);
           console.log('onData has some error that did not catched before!');
         }
       });
     }
+
+    socket.on('close', data => {
+      socket.debug('connection closed');
+      delete shared.pool[session];
+    });
 
     socket.on('error', error => {
       if (onError) onError(error, socket);

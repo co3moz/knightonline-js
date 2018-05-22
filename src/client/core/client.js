@@ -33,7 +33,7 @@ module.exports = (params) => {
       client.writeb([0xAA, 0x55, ...unit.short(response.length), ...response, 0x55, 0xAA]);
     }
 
-    client.sendAndWait = function(data) {
+    client.sendAndWait = function (data) {
       client.sendWithHeaders(data);
       return client.waitNextData();
     }
@@ -65,10 +65,9 @@ module.exports = (params) => {
 
       const onlyBody = data.slice(4, 4 + length);
 
-
-      waitingTasks.forEach(task => {
-        task.resolve(onlyBody);
-      });
+      for (var i = 0; i < waitingTasks.length; i++) {
+        waitingTasks[i].resolve(onlyBody);
+      }
 
       waitingTasks = [];
     });

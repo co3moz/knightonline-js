@@ -22,10 +22,10 @@ module.exports = async function () {
     ports: config.get('loginServer.ports'),
     debug: true,
 
-    onData: async ({ socket, opcode, length, data }) => {
+    onData: async ({ socket, opcode, length, body }) => {
       if (!opCodes[opcode]) return socket.debug('unknown opcode!');
 
-      await require('./ops/' + opCodes[opcode])({ socket, data, versions, length, opcode, db, serverVersion });
+      await require('./ops/' + opCodes[opcode])({ socket, body, versions, length, opcode, db, serverVersion });
     }
   });
 }

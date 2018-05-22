@@ -1,8 +1,8 @@
 const unit = require('../../core/utils/unit');
 const cache = require('../../core/redis/cache');
 
-module.exports = async function ({ socket, db, data }) {
-  let echo = unit.readShort(data, 5);
+module.exports = async function ({ socket, db, body, opcode }) {
+  let echo = body.short();
 
   let servers = await cache('servers', async () => {
     let { Server } = db.models;
@@ -27,7 +27,7 @@ module.exports = async function ({ socket, db, data }) {
   });
 
   socket.sendWithHeaders([
-    0xF5,
+    opcode,
     ...unit.short(echo),
     ...servers
   ]);

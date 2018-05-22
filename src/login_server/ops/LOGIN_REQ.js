@@ -1,17 +1,14 @@
 const unit = require('../../core/utils/unit');
 const errorCodes = require('../utils/error_codes');
 
-module.exports = async function ({ socket, data, db }) {
-  let accountLength = unit.readShort(data, 5);
-  let accountName = unit.readString(data, 7, accountLength);
-
-  let passwordLength = unit.readShort(data, 7 + accountLength);
-  let password = unit.readString(data, 9 + accountLength, passwordLength);
+module.exports = async function ({ socket, body, db, opcode }) {
+  let accountName = body.string();
+  let password = body.string();
 
   var resultCode = 0;
   let account;
 
-  if (accountLength > 20 || passwordLength > 28) {
+  if (accountName.length > 20 || password.length > 28) {
     resultCode = errorCodes.AUTH_INVALID;
   } else {
     try {
@@ -53,15 +50,15 @@ module.exports = async function ({ socket, data, db }) {
     }
 
     socket.sendWithHeaders([
-      0xF3, ...unit.short(0), resultCode, ...unit.short(premiumHours), ...unit.string(accountName)
+      opcode, ...unit.short(0), resultCode, ...unit.short(premiumHours), ...unit.string(accountName)
     ]);
   } else if (resultCode == errorCodes.AUTH_BANNED) {
     socket.sendWithHeaders([
-      0xF3, ...unit.short(0), resultCode, ...unit.short(-1), ...unit.string(accountName), ...unit.string(account.bannedMessage)
+      opcode, ...unit.short(0), resultCode, ...unit.short(-1), ...unit.string(accountName), ...unit.string(account.bannedMessage)
     ]);
   } else {
     socket.sendWithHeaders([
-      0xF3, ...unit.short(0), resultCode, ...unit.short(-1), ...unit.string(accountName)
+      opcode, ...unit.short(0), resultCode, ...unit.short(-1), ...unit.string(accountName)
     ]);
   }
 }

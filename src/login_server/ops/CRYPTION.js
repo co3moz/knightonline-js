@@ -1,12 +1,12 @@
 const crypt = require('../../core/utils/crypt');
 
-module.exports = async function ({ socket }) {
+module.exports = async function ({ socket, opcode }) {
   if (!socket.cryption) {
     socket.cryption = crypt();
   }
 
   socket.sendWithHeaders([
-    0xF2,
+    opcode,
     ...socket.cryption.public
   ]);
 

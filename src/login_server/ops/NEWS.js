@@ -1,7 +1,7 @@
 const unit = require('../../core/utils/unit');
 const cache = require('../../core/redis/cache');
 
-module.exports = async function ({ socket, db }) {
+module.exports = async function ({ socket, db, opcode }) {
   let news = await cache('news', async () => {
     let { News } = db.models;
 
@@ -11,7 +11,7 @@ module.exports = async function ({ socket, db }) {
   });
 
   socket.sendWithHeaders([
-    0xF6,
+    opcode,
     ...unit.string('Login Notice'),
     ...news
   ]);
