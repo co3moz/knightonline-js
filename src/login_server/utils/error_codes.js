@@ -8,3 +8,6 @@ module.exports = {
   AUTH_AGREEMENT: 0xF,
   AUTH_FAILED: 0xFF
 };
+
+
+Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);
