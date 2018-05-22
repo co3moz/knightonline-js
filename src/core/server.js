@@ -88,18 +88,21 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
 
         try {
           const length = unit.readShort(data, 2);
-          const opcode = data[4];
+          let opcode = data[4];
 
           if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
           if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
 
-          /* TODO: Not working please fix */
-          // if (socket.cryption) {
-          //   console.log(socket.cryption.decrypt(data.slice(5, 5 + length)));
-          // }
+          let onlyBody = data.slice(5, 5 + length);
 
+          if (socket.cryption) {
+            onlyBody = socket.cryption.decrypt(data.slice(4, 5 + length));
+            opcode = onlyBody.shift();
+          }
 
-          if (onData) onData({ body: unit.queue(data.slice(5, 5 + length)), socket, opcode, length });
+          let body = unit.queue(onlyBody);
+
+          if (onData) onData({ body, socket, opcode, length });
         } catch (e) {
           console.error(e);
           console.log('onData has some error that did not catched before!');
