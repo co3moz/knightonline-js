@@ -16,7 +16,7 @@ module.exports = async function (db) {
   }).exec();
 
   if (data) {
-    await data.remove();
+    return;
   }
 
   let server = new Server(testServer);

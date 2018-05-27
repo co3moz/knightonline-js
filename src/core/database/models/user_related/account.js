@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const hash = require('../../utils/password_hash');
+const hash = require('../../../utils/password_hash');
 
 const schema = new mongoose.Schema({
   account: { type: String, maxlength: 30 },
@@ -9,7 +9,12 @@ const schema = new mongoose.Schema({
   bannedMessage: { type: String, maxlength: 50 },
 
   premium: { type: Boolean },
-  premiumEndsAt: { type: Date }
+  premiumEndsAt: { type: Date },
+
+  nation: { type: String, enum: ['KARUS', 'ELMORAD', 'NONE'] },
+  characters: [{ type: String }],
+
+  warehouse: { type: String }
 }, {
     timestamps: true
   });

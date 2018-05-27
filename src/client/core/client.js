@@ -58,7 +58,6 @@ module.exports = (params) => {
       }
 
       const length = unit.readShort(data, 2);
-      const opcode = data[4];
 
       if (doesProtocolHeaderValid(data)) return client.terminate('invalid protocol begin')
       if (doesProtocolFooterValid(data, length)) return client.terminate('invalid protocol end');
@@ -66,7 +65,8 @@ module.exports = (params) => {
       const onlyBody = data.slice(4, 4 + length);
 
       for (var i = 0; i < waitingTasks.length; i++) {
-        waitingTasks[i].resolve(onlyBody);
+        const body = unit.queue(onlyBody);
+        waitingTasks[i].resolve(body);
       }
 
       waitingTasks = [];

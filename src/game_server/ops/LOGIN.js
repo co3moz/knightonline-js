@@ -1,16 +1,55 @@
 const unit = require('../../core/utils/unit');
-const crypt = require('../../core/utils/crypt');
-const config = require('config');
 
-module.exports = async function ({ socket, opcode, body }) {
+module.exports = async function ({ socket, opcode, body, db }) {
   let accountName = body.string();
   let password = body.string();
 
-  let status = false;
+  if (socket.user) {
+    return; // don't allow this request if user already login
+  }
+
+
   if (!(accountName.length > 20 || password.length > 28)) {
-    /** TODO: YOU LEFT HERE */
-  } 
+    let { Account } = db.models;
 
-  socket.pool;
+    let account = await Account.findOne({
+      account: accountName
+    }).exec();
 
+    if (account.password == password) {
+      let shared = socket.shared;
+
+
+      if (!shared.userMap) {
+        shared.userMap = {};
+      }
+
+      let userMap = shared.userMap;
+      let activeSocket = userMap[accountName];
+      if (activeSocket) {
+        userMap[accountName].terminate('another login request');
+        delete userMap[accountName];
+      }
+
+      socket.user = account;
+      userMap[accountName] = socket;
+
+      let nation = 0;
+      if (account.nation == 'KARUS') {
+        nation = 1;
+      } else if (account.nation == 'ELMORAD') {
+        nation = 2;
+      } else if (account.nation == 'NONE') {
+        nation = 3;
+      }
+
+      socket.sendWithHeaders([
+        opcode,
+        nation & 0xFF
+      ]);
+      return;
+    }
+  }
+
+  socket.terminate('invalid credentails');
 }

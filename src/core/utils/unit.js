@@ -4,13 +4,27 @@ exports.readShort = function readShort(data, i) {
   return data[i] + (data[i + 1] << 8);
 }
 
+
+exports.readInt = function readInt(data, i) {
+  return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >> 0;
+}
+
+exports.readUInt = function readInt(data, i) {
+  return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >>> 0;
+}
+
 exports.short = function short(i) {
   return [(i >>> 0) & 0xFF, (i >>> 8) & 0xFF];
 }
 
+exports.int = function int(i) {
+  return [(i >>> 0) & 0xFF, (i >>> 8) & 0xFF, (i >>> 16) & 0xFF, (i >>> 24) & 0xFF];
+}
+
+
 exports.readStringArray = function readText(data, i, len) {
   (len || (len = 32000)); //max len
-  
+
   let str = [];
 
   for (; ; i++) {
@@ -54,6 +68,22 @@ exports.queue = function (data) {
       var data = exports.readShort(array, 0);
       array.splice(0, 2);
       return data;
+    },
+
+    int() {
+      var data = exports.readInt(array, 0);
+      array.splice(0, 4);
+      return data;
+    },
+
+    uint() {
+      var data = exports.readUInt(array, 0);
+      array.splice(0, 4);
+      return data;
+    },
+
+    skip(l) {
+      array.splice(0, l);
     },
 
     string() {

@@ -46,11 +46,12 @@ module.exports = (params) => {
   });
 }
 
-function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders }, shared) {
+function serverHandler({ timeout, onConnected, onData, onError, debug, onDisconnect }, shared) {
   return socket => {
     var session = socket.session = shared.id++;
     shared.pool[session] = socket;
-    socket.pool = shared.pool;
+    socket.shared = shared;
+
     socket.sendWithHeaders = function (response) {
       socket.writeb([0xAA, 0x55, ...unit.short(response.length), ...response, 0x55, 0xAA]);
     }
@@ -70,7 +71,7 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
 
     socket.debug = (...params) => shared.debugFn(session, ...params);
 
-    socket.setTimeout(60000);
+    socket.setTimeout(timeout || 60000);
     socket.on('timeout', () => {
       socket.debug(session, 'socket timeout');
       socket.end();
@@ -93,12 +94,14 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
           if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
           if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
 
-          let onlyBody = data.slice(5, 5 + length);
+          let onlyBody;
 
-          if (socket.cryption) {
-            onlyBody = socket.cryption.decrypt(data.slice(4, 5 + length));
-            opcode = onlyBody.shift();
-          }
+          // if (socket.cryption) {
+          //   onlyBody = socket.cryption.decrypt(data.slice(4, 5 + length));
+          //   opcode = onlyBody.shift();
+          // } else {
+            onlyBody = data.slice(5, 5 + length);
+          // }
 
           let body = unit.queue(onlyBody);
 
@@ -110,7 +113,8 @@ function serverHandler({ onConnected, onData, onError, debug, sendWithHeaders },
       });
     }
 
-    socket.on('close', data => {
+    socket.on('close', () => {
+      if (onDisconnect) onDisconnect(socket);
       socket.debug('connection closed');
       delete shared.pool[session];
     });

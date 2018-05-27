@@ -14,7 +14,6 @@ module.exports = async function () {
   let data;
   con.debug('VERSION_REQ');
   data = await con.sendAndWait([0x01, ...unit.short(1299)]);
-  data = unit.queue(data);
 
   if (data.byte() != 0x01) throw new Error('VERSION_REQ must return 0x1');
   con.debug('Hmm.. server version is ' + data.short());
@@ -22,7 +21,6 @@ module.exports = async function () {
 
   con.debug('DOWNLOADINFO_REQ');
   data = await con.sendAndWait([0x02, ...unit.short(config.get('testClient.version'))]);
-  data = unit.queue(data);
 
   if (data.byte() != 0x02) throw new Error('DOWNLOADINFO_REQ must return 0x2');
 
@@ -39,7 +37,6 @@ module.exports = async function () {
 
   con.debug('LOGIN_REQ');
   data = await con.sendAndWait([0xF3, ...unit.string(config.get('testClient.user')), ...unit.string(hash(config.get('testClient.password')))]);
-  data = unit.queue(data);
 
   if (data.byte() != 0xF3) throw new Error('LOGIN_REQ must return 0xF3');
   data.short(); // 0
@@ -55,7 +52,6 @@ module.exports = async function () {
 
   con.debug('NEWS');
   data = await con.sendAndWait([0xF6]);
-  data = unit.queue(data);
 
   if (data.byte() != 0xF6) throw new Error('NEWS must return 0xF6');
 
@@ -64,7 +60,6 @@ module.exports = async function () {
 
   con.debug('SERVERLIST');
   data = await con.sendAndWait([0xF5, 1, 0]);
-  data = unit.queue(data);
 
   if (data.byte() != 0xF5) throw new Error('SERVERLIST must return 0xF5');
   if (data.short() != 1) throw new Error('echo must equal to 1');

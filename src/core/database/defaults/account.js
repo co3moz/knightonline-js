@@ -17,7 +17,7 @@ module.exports = async function (db) {
     }).exec();
 
     if (data) {
-      await data.remove();
+      continue;
     }
 
     let account = new Account(user);

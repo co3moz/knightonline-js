@@ -112,7 +112,7 @@ function JvEncryptionFast(len, datain, tKey) {
   for (let i = 0; i < len; i++) {
     var rsk = (rkey >>> 8) & 0xFF;
     dataout.push(((datain[i] ^ rsk) ^ tKey[(i % 8)]) ^ lkey);
-    rkey = (rkey * 2157) >> 0;
+    rkey = (rkey * 2171) >> 0;
   }
 
   console.log(crc32(dataout, len));
