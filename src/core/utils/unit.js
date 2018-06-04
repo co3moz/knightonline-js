@@ -46,8 +46,23 @@ exports.stringFromArray = function string(i) {
 
 exports.string = function string(i) {
   i = Array.from(Buffer.from(i, 'utf8'));
+
+  if (i.length > 65536) {
+    i = i.slice(0, 65535);
+  }
+
   return [...exports.short(i.length), ...i];
 }
+
+exports.byte_string = function string(i) {
+  i = Array.from(Buffer.from(i, 'utf8'));
+
+  if (i.length > 256) {
+    i = i.slice(0, 255);
+  }
+  return [i.length, ...i];
+}
+
 
 exports.stringWithoutLength = function stringWithoutLength(i) {
   return Array.from(Buffer.from(i, 'utf8'));
@@ -59,6 +74,9 @@ exports.config = function (name) {
 
 exports.queue = function (data) {
   var array = Array.from(data);
+
+  // very long arrays may create performance issues
+
   return {
     byte() {
       return array.shift();
@@ -88,6 +106,14 @@ exports.queue = function (data) {
 
     string() {
       let len = this.short();
+      let data = exports.readStringArray(array, 0, len);
+
+      array.splice(0, data.length);
+      return data.join('');
+    },
+
+    byte_string() {
+      let len = this.byte();
       let data = exports.readStringArray(array, 0, len);
 
       array.splice(0, data.length);

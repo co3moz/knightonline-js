@@ -19,7 +19,8 @@ module.exports = async function ({ socket, opcode, body, db }) {
 
     socket.user.nation = nation == 1 ? 'KARUS' : 'ELMORAD';
     await socket.user.save();
-
+    
+    result = nation;
   } catch (e) { // if anything goes wrong
     result = 0;
   }

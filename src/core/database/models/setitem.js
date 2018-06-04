@@ -1,0 +1,45 @@
+const mongoose = require('mongoose');
+
+const schema = new mongoose.Schema({
+  id: { type: Number, index: true },
+  name: { type: String },
+  acBonus: { type: Number },
+  hpBonus: { type: Number },
+  mpBonus: { type: Number },
+  statstrBonus: { type: Number },
+  stathpBonus: { type: Number },
+  statdexBonus: { type: Number },
+  statintBonus: { type: Number },
+  statmpBonus: { type: Number },
+  flameResistance: { type: Number },
+  glacierResistance: { type: Number },
+  lightningResistance: { type: Number },
+  poisonResistance: { type: Number },
+  magicResistance: { type: Number },
+  curseResistance: { type: Number },
+  XPBonusPercent: { type: Number },
+  coinBonusPercent: { type: Number },
+  APBonusPercent: { type: Number },
+  APBonusClassType: { type: Number },
+  APBonusClassPercent: { type: Number },
+  ACBonusClassType: { type: Number },
+  ACBonusClassPercent: { type: Number },
+  maxWeightBonus: { type: Number },
+  NPBonus: { type: Number },
+  unk10: { type: Number },
+  unk11: { type: Number },
+  unk12: { type: Number },
+  unk13: { type: Number },
+  unk14: { type: Number },
+  unk15: { type: Number },
+  unk16: { type: Number },
+  unk17: { type: Number },
+  unk18: { type: Number },
+  unk19: { type: Number },
+  unk20: { type: Number },
+  unk21: { type: Number },
+}, {
+    timestamps: false
+  });
+
+module.exports = db => db.model('SetItem', schema, 'set_items');

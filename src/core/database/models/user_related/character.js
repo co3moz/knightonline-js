@@ -4,6 +4,7 @@ const schema = new mongoose.Schema({
   name: { type: String, index: true },
   race: { type: Number },
   klass: { type: Number },
+  strKlass: { type: String },
   hair: { type: Number },
   rank: { type: Number, default: 0 },
   title: { type: Number, default: 0 },
@@ -14,7 +15,9 @@ const schema = new mongoose.Schema({
   loyaltyMonthly: { type: Number, default: 0 },
   face: { type: Number },
   city: { type: Number, default: 0 },
-  knights: { type: Number, default: 0 },
+  gm: { type: Boolean, default: false }, // char based gm
+
+  clan: { type: Number, default: 0 },
   fame: { type: Number, default: 0 },
 
   hp: { type: Number, default: 100 },
@@ -29,16 +32,32 @@ const schema = new mongoose.Schema({
   statRemaining: { type: Number, default: 0 },
 
   money: { type: Number, default: 0 },
-
   zone: { type: Number, default: 21 },
-  x: { type: Number, default: 81700 },
+
+  x: { type: Number, default: 817 },
   y: { type: Number, default: 0 },
-  z: { type: Number, default: 43500 },
+  z: { type: Number, default: 435 },
 
   skills: { type: Buffer },
-  items: { type: Buffer },
-  quests: { type: Buffer },
-  questCount: { type: Number, default: 0  }
+  items: [{
+    id: { type: Number },
+    durability: { type: Number },
+    amount: { type: Number },
+    serial: { type: String },
+    expire: { type: Number },
+    flag: { type: Number },
+    detail: mongoose.SchemaTypes.Mixed,
+    setItem: mongoose.SchemaTypes.Mixed
+  }],
+  quests: [{
+    id: { type: Number },
+    state: { type: Number }
+  }],
+
+  magic: [{
+    id: { type: Number },
+    expiry: { type: Date }
+  }]
 }, {
     timestamps: true
   });

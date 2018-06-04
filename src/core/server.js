@@ -46,7 +46,7 @@ module.exports = (params) => {
   });
 }
 
-function serverHandler({ timeout, onConnected, onData, onError, debug, onDisconnect }, shared) {
+function serverHandler({ timeout, onConnect, onData, onError, debug, onDisconnect }, shared) {
   return socket => {
     var session = socket.session = shared.id++;
     shared.pool[session] = socket;
@@ -78,36 +78,41 @@ function serverHandler({ timeout, onConnected, onData, onError, debug, onDisconn
     });
 
     socket.debug('new connection');
-    if (onConnected) onConnected(socket);
+    if (onConnect) onConnect(socket);
 
 
     if (onData) {
-      socket.on('data', data => {
+      socket.on('data', async data => {
         if (debug) {
           socket.debug('data in | ' + Array.from(data).map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
         }
 
         try {
-          const length = unit.readShort(data, 2);
-          let opcode = data[4];
+          while (data.length > 0) { // multiple data
+            let time = Date.now();
+            if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
+            const length = unit.readShort(data, 2);
+            if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
 
-          if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
-          if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
 
-          let onlyBody;
+            let onlyBody;
 
-          // if (socket.cryption) {
-          //   onlyBody = socket.cryption.decrypt(data.slice(4, 5 + length));
-          //   opcode = onlyBody.shift();
-          // } else {
-            onlyBody = data.slice(5, 5 + length);
-          // }
+            // if (socket.cryption) {
+            //   onlyBody = socket.cryption.decrypt(data.slice(4, 5 + length));
+            //   opcode = onlyBody.shift();
+            // } else {
+            onlyBody = data.slice(5, 4 + length);
+            // }
 
-          let body = unit.queue(onlyBody);
+            let body = unit.queue(onlyBody);
 
-          if (onData) onData({ body, socket, opcode, length });
+            let opcode = data[4];
+            if (onData) await onData({ body, socket, opcode, length });
+            data = data.slice(6 + length);
+            socket.debug('It took ' + (Date.now() - time) + 'ms to handle 0x' + (opcode < 16 ? "0" : "") + opcode.toString(16));
+          }
         } catch (e) {
-          console.error(e);
+          console.error(e.stack);
           console.log('onData has some error that did not catched before!');
         }
       });

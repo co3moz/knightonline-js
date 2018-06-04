@@ -26,7 +26,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
 
       let userMap = shared.userMap;
       let activeSocket = userMap[accountName];
-      if (activeSocket) {
+      if (activeSocket && activeSocket != socket) {
         userMap[accountName].terminate('another login request');
         delete userMap[accountName];
       }

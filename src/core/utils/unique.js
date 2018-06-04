@@ -1,0 +1,1 @@
+module.exports = () => (Math.random() * 16 >>> 0).toString(16) + Date.now().toString(16) + Array(14).fill(0).map(x => (Math.random() * 255 >>> 0).toString(16)).map(x => x.length == 1 ? "0" + x : x).join('')

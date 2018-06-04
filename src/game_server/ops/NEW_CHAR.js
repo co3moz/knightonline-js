@@ -13,13 +13,19 @@ module.exports = async function ({ socket, opcode, body, db }) {
   let int = body.byte();
   let mp = body.byte();
 
-  if (index > 2) {
+  if (index > 3 || index < 0) { // invalid request
     return socket.sendWithHeaders([
       opcode, 1 // NO_MORE
     ]);
   }
 
   if (!isKlassValid(klass) || (str + hp + dex + int + mp) > 300) {
+    return socket.sendWithHeaders([
+      opcode, 2 // NEWCHAR_INVALID_DETAILS
+    ]);
+  }
+
+  if (socket.user.characters[index]) { // you have already created at this index dude
     return socket.sendWithHeaders([
       opcode, 2 // NEWCHAR_INVALID_DETAILS
     ]);
@@ -50,10 +56,13 @@ module.exports = async function ({ socket, opcode, body, db }) {
 
   var error = false;
   try {
+    let sklass = simplifyKlass(klass);
+
     let character = new Character({
       name,
       race,
       klass,
+      strKlass: sklass,
       hair,
       level: 1,
       face,
@@ -62,8 +71,8 @@ module.exports = async function ({ socket, opcode, body, db }) {
       statDex: dex,
       statMp: mp,
       statInt: int,
-      gold: 10, // 10 noah start
-      items: startingItems(klass)
+      money: 10, // 10 noah start
+      items: Array(75).fill(null)
     });
 
 
@@ -73,7 +82,8 @@ module.exports = async function ({ socket, opcode, body, db }) {
       socket.user.characters = [];
     }
 
-    socket.user.characters.push(character._id);
+    socket.user.characters[index] = character.name;
+    socket.user.markModified('characters');
 
     socket.user.save();
   } catch (e) {
@@ -114,7 +124,7 @@ function simplifyKlass(klass) {
   } else if (klass >= 200 && klass < 300) {
     klass -= 200;
   } else {
-    return '';
+    return '(unknown class)';
   }
 
   if (klass == 1 || klass == 5 || klass == 6) {
@@ -136,19 +146,6 @@ function simplifyKlass(klass) {
   if (klass == 5 || klass == 13 || klass == 14) {
     return 'kurian';
   }
-}
 
-function startingItems(klass) {
-  try {
-    klass = simplifyKlass(klass);
-    let data = config.get('gameServer.startItems.' + klass);
-    if (!data) {
-      throw 1;
-    }
-
-    return Buffer.from(data, 'hex');
-
-  } catch (e) {
-    return Buffer.alloc(8 * 150); // 1200 byte0
-  }
+  return '(unknown class)';
 }

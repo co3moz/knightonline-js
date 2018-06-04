@@ -1,7 +1,7 @@
 module.exports = async function (db) {
   let testUsers = [{
     account: 'test',
-    password: '1',
+    password: '1'
   }, {
     account: 'banned',
     password: '1',

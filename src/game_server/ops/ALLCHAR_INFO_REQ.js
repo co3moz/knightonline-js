@@ -1,6 +1,7 @@
 const unit = require('../../core/utils/unit');
+const { HEAD, BREAST, SHOULDER, RIGHTHAND, LEFTHAND, LEG, GLOVE, FOOT } = require('../var/item_slot');
 
-module.exports = async function ({ socket, opcode, body, db }) {
+module.exports = async function ({ socket, opcode, db }) {
   if (!socket.user.characters) {
     socket.user.characters = [];
   }
@@ -9,9 +10,9 @@ module.exports = async function ({ socket, opcode, body, db }) {
 
   let { Character } = db.models;
   for (var i = 0; i < 4; i++) {
-    let characterId = socket.user.characters[i];
+    let characterName = socket.user.characters[i];
 
-    let data = { 
+    let data = {
       name: '',
       hair: 0,
       klass: 0,
@@ -21,9 +22,9 @@ module.exports = async function ({ socket, opcode, body, db }) {
       zone: 0
     };
 
-    if (characterId) {
+    if (characterName) {
       let character = await Character.findOne({
-        _id: characterId
+        name: characterName
       }).select([
         'name', 'race', 'klass', 'hair', 'level', 'face', 'zone', 'items'
       ]).exec();
@@ -37,25 +38,19 @@ module.exports = async function ({ socket, opcode, body, db }) {
         data.face = character.face;
         data.zone = character.zone;
 
-        var items = [];
-        var itemQueue = unit.queue(character.items);
+        data.items = [];
 
         for (var m = 0; m < 14; m++) {
-          if (m == 1 || m == 4 || m == 5 || m == 6 || m == 8 || m == 10 || m == 12 || m == 13) {
-            let itemId = itemQueue.uint();
-            let durability = itemQueue.short();
-            itemQueue.skip(2); // skip count
-
-            items.push([
-              ...unit.int(itemId),
-              ...unit.short(durability)
-            ])
-          } else {
-            itemQueue.skip(8);
+          if (m == HEAD || m == BREAST || m == SHOULDER || m == RIGHTHAND || m == LEFTHAND || m == LEG || m == GLOVE || m == FOOT) {
+            let item = character.items[m];
+            
+            if (item) {
+              data.items.push(...unit.int(item.id), ...unit.short(item.durability));
+            } else {
+              data.items.push(0, 0, 0, 0, 0, 0);
+            }
           }
         }
-
-        data.items = [].concat(...items);
       }
     }
 
