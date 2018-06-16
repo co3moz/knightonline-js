@@ -32,6 +32,7 @@ module.exports = async function () {
         shared.setItems = setItems;
       }
 
+      socket.tail = [];
     },
 
     onDisconnect: (socket) => {
@@ -52,10 +53,13 @@ module.exports = async function () {
           delete characterMap[socket.character.name];
         }
       }
+
+      console.log('opcode tail: \n' + socket.tail.map(x => x.map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' ')).join('\n'));
     },
 
     onData: async ({ socket, opcode, length, body }) => {
-      if (!opCodes[opcode]) return socket.debug('unknown opcode! 0x' + opcode.toString(16));
+      socket.tail.push([opcode, ...body.array()]);
+      if (!opCodes[opcode]) return socket.debug('unknown opcode! 0x' + opcode.toString(16).padStart(2, '0'));
 
 
       // if (!socket.cryption || !socket.cryption.enabled) {
@@ -64,6 +68,7 @@ module.exports = async function () {
       // }
 
       // TODO: Dont allow if user didnt login
+
 
       await require('./ops/' + opCodes[opcode])({ socket, body, length, opcode, db });
     }
