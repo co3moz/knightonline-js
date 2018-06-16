@@ -1,4 +1,5 @@
 const config = require('config');
+const long = require('long');
 
 exports.readShort = function readShort(data, i) {
   return data[i] + (data[i + 1] << 8);
@@ -21,10 +22,18 @@ exports.int = function int(i) {
   return [(i >>> 0) & 0xFF, (i >>> 8) & 0xFF, (i >>> 16) & 0xFF, (i >>> 24) & 0xFF];
 }
 
+exports.long = function long(i) {
+  if (i > Number.MAX_SAFE_INTEGER) return [255, 255, 255, 255, 255, 255, 31, 0];
+  let l = i % 0x100000000 | 0;
+  let h = i / 0x100000000 | 0;
+  return [
+    (l >>> 0) & 0xFF, (l >>> 8) & 0xFF, (l >>> 16) & 0xFF, (l >>> 24) & 0xFF,
+    (h >>> 0) & 0xFF, (h >>> 8) & 0xFF, (h >>> 16) & 0xFF, (h >>> 24) & 0xFF
+  ];
+}
+
 
 exports.readStringArray = function readText(data, i, len) {
-  (len || (len = 32000)); //max len
-
   let str = [];
 
   for (; ; i++) {
@@ -77,47 +86,59 @@ exports.queue = function (data) {
 
   // very long arrays may create performance issues
 
-  return {
-    byte() {
-      return array.shift();
-    },
+  return new queue(array)
+}
 
-    short() {
-      var data = exports.readShort(array, 0);
-      array.splice(0, 2);
-      return data;
-    },
+function queue(array) {
+  this._ = array;
+}
 
-    int() {
-      var data = exports.readInt(array, 0);
-      array.splice(0, 4);
-      return data;
-    },
+queue.prototype.byte = function () {
+  return this._.shift();
+}
 
-    uint() {
-      var data = exports.readUInt(array, 0);
-      array.splice(0, 4);
-      return data;
-    },
+queue.prototype.short = function () {
+  var data = exports.readShort(this._, 0);
+  this._.splice(0, 2);
+  return data;
+}
 
-    skip(l) {
-      array.splice(0, l);
-    },
+queue.prototype.int = function () {
+  var data = exports.readInt(this._, 0);
+  this._.splice(0, 4);
+  return data;
+}
 
-    string() {
-      let len = this.short();
-      let data = exports.readStringArray(array, 0, len);
+queue.prototype.uint = function () {
+  var data = exports.readUInt(this._, 0);
+  this._.splice(0, 4);
+  return data;
+}
 
-      array.splice(0, data.length);
-      return data.join('');
-    },
+queue.prototype.skip = function (l) {
+  return this._.splice(0, l);
+}
 
-    byte_string() {
-      let len = this.byte();
-      let data = exports.readStringArray(array, 0, len);
+queue.prototype.string = function () {
+  let len = this.short();
+  let data = exports.readStringArray(this._, 0, len);
 
-      array.splice(0, data.length);
-      return data.join('');
-    }
-  };
+  this._.splice(0, data.length);
+  return data.join('');
+}
+
+queue.prototype.byte_string = function () {
+  let len = this.byte();
+  let data = exports.readStringArray(this._, 0, len);
+
+  this._.splice(0, data.length);
+  return data.join('');
+}
+
+queue.prototype.array = function () {
+  return this._;
+}
+
+queue.prototype.long = function () {
+  return long.fromBytesLE(this.skip(8)).toNumber();
 }

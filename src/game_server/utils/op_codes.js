@@ -13,6 +13,10 @@ module.exports = {
   HACK_TOOL: 0x72,
   SERVER_INDEX: 0x6B,
   GAME_START: 0x0D,
+  KNIGHT: 0x3C,
+  QUEST: 0x64,
+  FRIEND: 0x49,
+  SKILLDATA: 0x79
 };
 
 Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);

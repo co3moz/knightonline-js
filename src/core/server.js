@@ -15,6 +15,8 @@ module.exports = (params) => {
       debugFn = function () { }
     } else if (debug === true) {
       debugFn = (session, ...params) => console.log('DEBUG (session:%d)', session, ...params);
+    } else {
+      debugFn = debug;
     }
 
     var shared = { id: 0, debugFn, pool: {} };

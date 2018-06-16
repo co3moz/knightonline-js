@@ -61,7 +61,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
       character: socket.character.name,
       status: 1,
       deleted: letterOperation == 3
-    }).sort(['createdAt', -1]).limit(letterOperation == 3 ? 20 : 12).exec()
+    }).sort([['createdAt', -1]]).limit(letterOperation == 3 ? 20 : 12).exec()
 
     return socket.sendWithHeaders([
       opcode,
