@@ -46,8 +46,7 @@ const schema = new mongoose.Schema({
     serial: { type: String },
     expire: { type: Number },
     flag: { type: Number },
-    detail: mongoose.SchemaTypes.Mixed,
-    setItem: mongoose.SchemaTypes.Mixed
+    detail: mongoose.SchemaTypes.Mixed
   }],
   quests: [{
     id: { type: Number },
@@ -57,7 +56,10 @@ const schema = new mongoose.Schema({
   magic: [{
     id: { type: Number },
     expiry: { type: Date }
-  }]
+  }],
+
+  friends: [String],
+  skillBar: [Number]
 }, {
     timestamps: true
   });
