@@ -22,7 +22,6 @@ module.exports = async (db) => {
         return;
       }
 
-      console.log('model loader ok!');
       resolve();
     });
   });

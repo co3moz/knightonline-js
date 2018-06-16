@@ -20,7 +20,6 @@ module.exports = async (db) => {
         return;
       }
 
-      console.log('default checker ok!');
       resolve();
     });
   });

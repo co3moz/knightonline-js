@@ -24,6 +24,4 @@ module.exports = async function (db) {
 
     await account.save();
   }
-
-  console.log('Test users have been defined!')
 }
