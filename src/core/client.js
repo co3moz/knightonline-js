@@ -7,7 +7,7 @@ module.exports = (params) => {
   var debugFn;
 
   if (!debug) {
-    debugFn = function () { }
+    debugFn = () => {}
   } else if (debug === true) {
     debugFn = (...params) => console.log('DEBUG (client:' + name + ')', ...params);
   }
@@ -16,6 +16,7 @@ module.exports = (params) => {
   return new Promise(async (resolve, reject) => {
     const client = new net.Socket();
     client.debug = debugFn;
+    client.connected = false;
 
     let waitingTasks = [];
     let waitingSignals = [];
@@ -24,6 +25,7 @@ module.exports = (params) => {
       var task = Task();
       task.opcode = opcode;
       task.subopcode = subopcode;
+
 
       for (let i = 0; i < waitingSignals.length; i++) {
         if (opcode) {
@@ -80,7 +82,10 @@ module.exports = (params) => {
     }
 
     client.connect(port, ip, function () {
-      debugFn('Connected at ' + ip + ':' + port);
+      client.connected = true;
+      if (debug) {
+        client.debug('Connected at ' + ip + ':' + port);
+      }
       if (onConnected) onConnected(client);
       resolve(client);
     });
@@ -103,7 +108,7 @@ module.exports = (params) => {
 
         if (doesProtocolHeaderValid(data)) return client.terminate('invalid protocol begin')
         if (doesProtocolFooterValid(data, length)) {
-          if (fragCount > 5) {
+          if (fragCount > 10) {
             return client.terminate('too much fragmentation not allowed');
           }
           frag = data;
@@ -159,7 +164,10 @@ module.exports = (params) => {
     })
 
     client.on('close', function () {
-      debugFn('Connection closed');
+      client.connected = false;
+      if (debug) {
+        client.debug('Connection closed');
+      }
     });
   });
 }

@@ -22,6 +22,8 @@ loginServer:
   ftp: 
     host: localhost
     dir: /
+  otp: 'knightonline'
+  maxOTPTry: 5
 
 gameServer:
   ip: 0.0.0.0

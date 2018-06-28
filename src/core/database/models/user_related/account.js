@@ -11,6 +11,12 @@ const schema = new mongoose.Schema({
   premium: { type: Boolean },
   premiumEndsAt: { type: Date },
 
+  otp: { type: Boolean, default: false },
+  otpSecret: { type: String },
+  otpLastFail: { type: Date },
+  otpTryCount: { type: Number, default: 0 },
+
+
   nation: { type: String, enum: ['KARUS', 'ELMORAD', 'NONE'] },
   characters: [{ type: String }],
 

@@ -7,6 +7,11 @@ module.exports = async function (db) {
     password: '1',
     banned: true,
     bannedMessage: 'banli hesap'
+  }, {
+    account: 'otp',
+    password: '1',
+    otp: true,
+    otpSecret: 'AAAAAAAAAAAAAAAA'
   }];
 
   let { Account } = db.models;

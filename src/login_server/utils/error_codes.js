@@ -5,7 +5,8 @@ module.exports = {
   AUTH_BANNED: 0x04,
   AUTH_IN_GAME: 0x05,
   AUTH_ERROR: 0x06,
-  AUTH_AGREEMENT: 0xF,
+  AUTH_AGREEMENT: 0x0F,
+  AUTH_OTP: 0x10,
   AUTH_FAILED: 0xFF
 };
 
