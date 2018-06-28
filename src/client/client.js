@@ -13,11 +13,13 @@ module.exports = async function () {
   let debug = true;
 
   try {
+    console.log('connecting...');
     db = await dbConnect();
+    console.log('connected to db');
 
     lcon = await client({
       ip: config.get('testClient.ip'),
-      port: config.get('testClient.port') + (Math.random() * 9 >>> 0),
+      port: config.get('testClient.port') /*+ (Math.random() * 9 >>> 0)*/,
       debug,
       name: 'loginServer'
     });
@@ -377,7 +379,8 @@ module.exports = async function () {
     });
 
     gcon.sendWithHeaders([0x0D, 0x02, ...unit.byte_string(selectedChar)]); // game start 0x02
-    
+
+    await delay(1000);
 
     data = await gcon.sendAndWait([0x98, 0x1], 0x98, 0x1);
     data.skip(1); // 1
@@ -405,7 +408,7 @@ module.exports = async function () {
       });
 
       for (let field in userList[i]) {
-        if(userList[i][field] == 0) {
+        if (userList[i][field] == 0) {
           delete userList[i][field];
         }
       }
@@ -419,9 +422,48 @@ module.exports = async function () {
       ...unit.short(player.x * 10), ...unit.short(player.z * 10), ...unit.short(player.y * 10),
       0x00, 0x00, 0x00, // speed and echo thing
       ...unit.short(player.x * 10), ...unit.short(player.z * 10), ...unit.short(player.y * 10)]); // send movement
-      
 
-    await delay(5000);
+
+    await delay(500);
+
+    data = await gcon.waitNextData(0x1c); // npc data
+
+    let npcCount = data.short();
+    let npcInRegion = [];
+
+    for (let i = 0; i < npcCount; i++) {
+      npcInRegion.push(data.short());
+    }
+
+    table({
+      npcInRegion: npcInRegion
+    });
+
+    while (gcon.connected) {
+      data = await gcon.waitNextData(); // get next waiting
+
+      let opcode = data.byte();
+
+      if (opcode == 0x15) {
+        let subOpcode = data.byte();
+
+        if (subOpcode == 1) {
+          let userCount = data.short();
+          let userIds = [];
+
+          for (let i = 0; i < userCount; i++) {
+            userIds.push(data.short());
+          }
+
+          table({
+            userInRegion: userIds
+          })
+        }
+      } else {
+        console.log(opcode.toString(16).padStart(2, '0'));
+      }
+
+    }
 
     console.log(gcon.getWaitingSignals());
 
