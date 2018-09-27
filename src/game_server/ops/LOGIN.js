@@ -1,7 +1,7 @@
 const unit = require('../../core/utils/unit');
 
 module.exports = async function ({ socket, opcode, body, db }) {
-  let accountName = body.string();
+  let sessionCode = body.string();
   let password = body.string();
 
   if (socket.user) {
@@ -9,43 +9,38 @@ module.exports = async function ({ socket, opcode, body, db }) {
   }
 
 
-  if (!(accountName.length > 20 || password.length > 28)) {
+  if (!(sessionCode.length != 30 || password.length > 28)) {
     let { Account } = db.models;
 
-    let account = await Account.findOne({
-      account: accountName
+    let user = await Account.findOne({
+      _id: sessionCode.substring(6, 30)
     }).exec();
 
-    if (account.password == password) {
+    if (user && user.session == sessionCode && user.password == password) {
       let shared = socket.shared;
-
-
-      if (!shared.userMap) {
-        shared.userMap = {};
-      }
-
       let userMap = shared.userMap;
-      let activeSocket = userMap[accountName];
+      let activeSocket = userMap[user.account];
+
+      socket.setTimeout(10 * 60 * 1000); // 10 mins
+
       if (activeSocket && activeSocket != socket) {
-        userMap[accountName].terminate('another login request');
-        delete userMap[accountName];
+        let um = userMap[user.account];
+        um.send([
+          0x10, 7, um.user.nation, 0, 0, 0,
+          ...unit.string('[SERVER] Hesabiniza ' + socket.remoteAddress + ' ip adresinden yeni bir baglanti yapildi!', 'ascii')
+        ]);
+
+        await new Promise(r => setTimeout(r, 100));
+        await um.terminate('another login request');
       }
 
-      socket.user = account;
-      userMap[accountName] = socket;
+      socket.user = user;
+      userMap[user.account] = socket;
 
-      let nation = 0;
-      if (account.nation == 'KARUS') {
-        nation = 1;
-      } else if (account.nation == 'ELMORAD') {
-        nation = 2;
-      } else if (account.nation == 'NONE') {
-        nation = 3;
-      }
 
-      socket.sendWithHeaders([
+      socket.send([
         opcode,
-        nation & 0xFF
+        user.characters.length == 0 ? 0 : (user.nation & 0xFF) // if there is no character available, then allow user to change nation
       ]);
       return;
     }

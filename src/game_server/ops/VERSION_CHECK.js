@@ -7,7 +7,7 @@ module.exports = async function ({ socket, opcode }) {
     socket.cryption = crypt();
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     0,
     ...unit.short(config.get('gameServer.clientExeVersion')), /** required client version */

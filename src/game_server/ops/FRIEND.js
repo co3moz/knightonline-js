@@ -7,7 +7,7 @@ module.exports = async function ({ socket, opcode, body }) {
 
   switch (subOpcode) {
     case 1: // REQUEST FRIEND LIST
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         2,
         ...unit.short(c.friends.length),
@@ -22,7 +22,7 @@ module.exports = async function ({ socket, opcode, body }) {
       let newFriendName = body.string();
       let socket = map[newFriendName];
       if (!socket || !socket.character || socket.character.name != newFriendName) {
-        return socket.sendWithHeaders([
+        return socket.send([
           opcode,
           3,
           1,
@@ -36,7 +36,7 @@ module.exports = async function ({ socket, opcode, body }) {
       c.markModified('friends');
       await c.save();
 
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         3,
         0,
@@ -49,7 +49,7 @@ module.exports = async function ({ socket, opcode, body }) {
       let friendName = body.string();
       let index = c.friends.findIndex(friend => friend == friendName);
       if (index == -1) {
-        return socket.sendWithHeaders([
+        return socket.send([
           opcode,
           4,
           1,
@@ -63,7 +63,7 @@ module.exports = async function ({ socket, opcode, body }) {
       c.markModified('friends');
       await c.save();
 
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         4,
         0,

@@ -53,8 +53,8 @@ exports.stringFromArray = function string(i) {
   return [...exports.short(i.length), ...i];
 }
 
-exports.string = function string(i) {
-  i = Array.from(Buffer.from(i, 'utf8'));
+exports.string = function string(i, encoding) {
+  i = Array.from(Buffer.from(i, encoding || 'utf8'));
 
   if (i.length > 65536) {
     i = i.slice(0, 65535);
@@ -63,10 +63,10 @@ exports.string = function string(i) {
   return [...exports.short(i.length), ...i];
 }
 
-exports.byte_string = function string(i) {
-  i = Array.from(Buffer.from(i, 'utf8'));
+exports.byte_string = function string(i, encoding) {
+  i = Array.from(Buffer.from(i, encoding || 'utf8'));
 
-  if (i.length > 256) {
+  if (i.length > 255) {
     i = i.slice(0, 255);
   }
   return [i.length, ...i];

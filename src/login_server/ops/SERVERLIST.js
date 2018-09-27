@@ -26,7 +26,7 @@ module.exports = async function ({ socket, db, body, opcode }) {
     ]));
   });
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     ...unit.short(echo),
     ...servers

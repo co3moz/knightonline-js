@@ -5,7 +5,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
   let hair = body.uint();
 
   if (!socket.user || !socket.user.characters.find(x => charName)) {
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 0
     ]);
   }
@@ -24,7 +24,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     result = 0;
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode, result
   ]);
 }

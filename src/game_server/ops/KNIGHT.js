@@ -6,7 +6,7 @@ module.exports = async function ({ socket, opcode, body }) {
   switch (subOpcode) {
     case ops.KNIGHTS_TOP10:
       // this is dummy, implement it later
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         ops.KNIGHTS_TOP10,
         0, 0,

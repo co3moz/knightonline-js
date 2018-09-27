@@ -5,7 +5,7 @@ module.exports = async function ({ socket, opcode }) {
     socket.cryption = crypt();
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     ...socket.cryption.public
   ]);

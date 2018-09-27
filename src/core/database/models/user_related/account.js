@@ -4,6 +4,7 @@ const hash = require('../../../utils/password_hash');
 const schema = new mongoose.Schema({
   account: { type: String, maxlength: 30 },
   password: { type: String, maxlength: 100 },
+  session: { type: String },
 
   banned: { type: Boolean, default: false },
   bannedMessage: { type: String, maxlength: 50 },
@@ -17,7 +18,7 @@ const schema = new mongoose.Schema({
   otpTryCount: { type: Number, default: 0 },
 
 
-  nation: { type: String, enum: ['KARUS', 'ELMORAD', 'NONE'] },
+  nation: { type: Number },
   characters: [{ type: String }],
 
   warehouse: { type: String }

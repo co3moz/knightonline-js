@@ -37,6 +37,7 @@ const schema = new mongoose.Schema({
   x: { type: Number, default: 817 },
   y: { type: Number, default: 0 },
   z: { type: Number, default: 435 },
+  direction: { type: Number, default: 0 },
 
   skills: { type: Buffer },
   items: [{

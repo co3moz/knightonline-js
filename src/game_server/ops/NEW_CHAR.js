@@ -14,31 +14,38 @@ module.exports = async function ({ socket, opcode, body, db }) {
   let mp = body.byte();
 
   if (index > 3 || index < 0) { // invalid request
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 1 // NO_MORE
     ]);
   }
 
+  if (!/^[a-zA-Z0-9]{3,20}$/.test(name)) {
+    return socket.send([
+      opcode, 5 // NEWCHAR_BAD_NAME
+    ]);
+  }
+
+
   if (!isKlassValid(klass) || (str + hp + dex + int + mp) > 300) {
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 2 // NEWCHAR_INVALID_DETAILS
     ]);
   }
 
   if (socket.user.characters[index]) { // you have already created at this index dude
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 2 // NEWCHAR_INVALID_DETAILS
     ]);
   }
 
   if (str < 50 || hp < 50 || dex < 50 || int < 50 || mp < 50) {
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 11 // NEWCHAR_STAT_TOO_LOW
     ]);
   }
 
-  if ((socket.user.nation == 'KARUS' && race > 10) || (socket.user.nation == 'ELMORAD' && race < 10)) {
-    return socket.sendWithHeaders([
+  if ((socket.user.nation == 1 && race > 10) || (socket.user.nation == 2 && race < 10)) {
+    return socket.send([
       opcode, 2 // NEWCHAR_INVALID_DETAILS
     ]);
   }
@@ -49,7 +56,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
   }).exec();
 
   if (nameControl) {
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 3 // NEWCHAR_EXISTS
     ]);
   }
@@ -85,18 +92,18 @@ module.exports = async function ({ socket, opcode, body, db }) {
     socket.user.characters[index] = character.name;
     socket.user.markModified('characters');
 
-    socket.user.save();
+    await socket.user.save();
   } catch (e) {
     error = true;
   }
 
   if (error) {
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 4 // NEWCHAR_DB_ERROR
     ]);
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode, 0 // NEWCHAR_SUCCESS
   ]);
 }

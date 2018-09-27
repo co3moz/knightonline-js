@@ -59,7 +59,7 @@ module.exports = async function ({ socket, body, db, opcode }) {
     }
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode, ok, 0, ...unit.byte_string(otpCode)
   ]);
 }

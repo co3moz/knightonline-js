@@ -2,8 +2,7 @@ const config = require('config');
 const server = require('../core/server');
 const database = require('../core/database');
 const connectRedis = require('../core/redis/connect');
-
-const opCodes = require('./utils/op_codes');
+const region = require('./utils/region');
 
 module.exports = async function () {
   console.log('game server is going to start...');
@@ -12,54 +11,40 @@ module.exports = async function () {
 
   let setItems = await loadSetItems(db); // find all
 
+  let shared = {};
+  let userMap = shared.userMap = {};
+  let characterMap = shared.characterMap = {};
+  shared.setItems = setItems;
+  shared.region = region();
+
   await server({
     ip: config.get('gameServer.ip'),
     ports: config.get('gameServer.ports'),
     debug: true,
-    timeout: 10 * 60 * 1000, // 10 mins
+    timeout: 5000, // 5 second at start
 
-    onConnect: (socket) => {
-      let shared = socket.shared;
-      if (!shared.userMap) {
-        shared.userMap = {};
-      }
-
-      if (!shared.characterMap) {
-        shared.characterMap = {};
-      }
-
-      if (!shared.setItems) {
-        shared.setItems = setItems;
-      }
-
-      socket.tail = [];
+    onConnect: socket => {
     },
 
     onDisconnect: (socket) => {
-      let shared = socket.shared;
-
-      if (socket.user && shared.userMap) {
-        let userMap = shared.userMap;
-
-        if (userMap[socket.user.accountName]) {
-          delete userMap[socket.user.accountName];
+      if (socket.user) {
+        if (userMap[socket.user.account]) {
+          delete userMap[socket.user.account];
         }
       }
 
-      if (socket.character && shared.characterMap) {
-        let characterMap = shared.characterMap;
-
+      if (socket.character) {
+        shared.region.remove(socket);
         if (characterMap[socket.character.name]) {
           delete characterMap[socket.character.name];
         }
       }
-
-      console.log('opcode tail: \n' + socket.tail.map(x => x.map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' ')).join('\n'));
     },
 
     onData: async ({ socket, opcode, length, body }) => {
-      socket.tail.push([opcode, ...body.array()]);
-      if (!opCodes[opcode]) return socket.debug('unknown opcode! 0x' + opcode.toString(16).padStart(2, '0'));
+      require.cache[require.resolve('./utils/op_codes')] = undefined;
+      let opCodes = require('./utils/op_codes');
+      if (!opcode || !opCodes[opcode]) return socket.debug('unknown opcode! 0x' + (opcode ? opcode.toString(16).padStart(2, '0') : 'null'));
 
 
       // if (!socket.cryption || !socket.cryption.enabled) {
@@ -69,10 +54,11 @@ module.exports = async function () {
 
       // TODO: Dont allow if user didnt login
 
-
+      require.cache[require.resolve('./ops/' + opCodes[opcode])] = undefined;
       await require('./ops/' + opCodes[opcode])({ socket, body, length, opcode, db });
     }
-  });
+  }, shared);
+
 }
 
 async function loadSetItems(db) {

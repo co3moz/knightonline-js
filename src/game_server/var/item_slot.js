@@ -15,6 +15,17 @@ module.exports = {
   FOOT: 13,
   RESERVED: 14,
 
+  PET: 20,
+  CWING: 42,
+  CHELMET: 43,
+  CLEFT: 44,
+  CRIGHT: 45,
+  CTOP: 46,
+  BAG1: 47,
+  BAG2: 48,
+  FAIRY: 49,
+
+
 
   ItemSlot1HEitherHand: 0,
   ItemSlot1HRightHand: 1,

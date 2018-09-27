@@ -12,7 +12,7 @@ module.exports = async function ({ socket, body, versions, opcode }) {
 
   downloadSet.reverse(); // VERSION DESC => ASC
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     ...unit.config('loginServer.ftp.host'),
     ...unit.config('loginServer.ftp.dir'),

@@ -6,14 +6,14 @@ module.exports = async function ({ socket, opcode, body }) {
 
   if (subOpcode == 2) { // load
     if (c.skillBar.length == 0) {
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         2, // load
         0, 0 // 0
       ])
     }
 
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       2, // load
       ...unit.short(c.skillBar.length),

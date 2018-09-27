@@ -6,7 +6,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
 
   if (subOpcode == 1) { // STORE_OPEN
     // TODO: do later
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       subOpcode,
       1, // error code
@@ -35,7 +35,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
       }
     }
 
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       subOpcode,
       ...data
@@ -47,7 +47,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
   let letterOperation = body.byte();
 
   if (letterOperation == 1) { // LETTER_UNREAD
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       subOpcode,
       letterOperation,
@@ -63,7 +63,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
       deleted: letterOperation == 3
     }).sort([['createdAt', -1]]).limit(letterOperation == 3 ? 20 : 12).exec()
 
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       subOpcode,
       letterOperation,
@@ -86,7 +86,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     }).exec();
 
     if (!mail) {
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         subOpcode,
         letterOperation,
@@ -97,7 +97,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     mail.status = 2;
     await mail.save();
 
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       subOpcode,
       letterOperation,
@@ -111,7 +111,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     let count = body.byte();
 
     if (count > 5) {
-      return socket.sendWithHeaders([
+      return socket.send([
         opcode,
         subOpcode,
         letterOperation,
@@ -120,7 +120,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     }
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     subOpcode,
     0, 0, 0, 0 //unit.int(0)

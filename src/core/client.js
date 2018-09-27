@@ -1,5 +1,7 @@
 const net = require('net');
 const unit = require('./utils/unit');
+const lzfjs = require('lzfjs');
+const crc32 = require('crc-32');
 
 module.exports = (params) => {
   let { ip, port, debug, onConnected, name } = params;
@@ -7,7 +9,7 @@ module.exports = (params) => {
   var debugFn;
 
   if (!debug) {
-    debugFn = () => {}
+    debugFn = () => { }
   } else if (debug === true) {
     debugFn = (...params) => console.log('DEBUG (client:' + name + ')', ...params);
   }
@@ -58,12 +60,12 @@ module.exports = (params) => {
       client.end();
     }
 
-    client.sendWithHeaders = function (response) {
+    client.send = function (response) {
       client.writeb([0xAA, 0x55, ...unit.short(response.length), ...response, 0x55, 0xAA]);
     }
 
     client.sendAndWait = function (data, opcode, subopcode) {
-      client.sendWithHeaders(data);
+      client.send(data);
       return client.waitNextData(opcode, subopcode);
     }
 
@@ -104,7 +106,7 @@ module.exports = (params) => {
       }
 
       while (data.length > 0) { // multiple data control
-        const length = unit.readShort(data, 2);
+        let length = unit.readShort(data, 2);
 
         if (doesProtocolHeaderValid(data)) return client.terminate('invalid protocol begin')
         if (doesProtocolFooterValid(data, length)) {
@@ -121,9 +123,29 @@ module.exports = (params) => {
         }
 
         let onlyBody;
-        const opcode = data[4];
-        const subopcode = data[5];
+        let opcode = data[4];
+        let subopcode = data[5];
         let didSent = false;
+
+        if (opcode == 0x42) { // COMPRESSED_PACKAGE
+          const body = unit.queue(data.slice(5, 4 + length));
+          let len = body.int();
+          let realLen = body.int();
+          let crc = body.int();
+          let compressedData = body.skip(len);
+          let uncompressedData = lzfjs.decompress(new Uint8Array(compressedData));
+          let crcUncompressedData = crc32.buf(uncompressedData, ~-1);
+          if (crcUncompressedData != crc || uncompressedData.length != realLen || compressedData.length != len) {
+            throw new Error('invalid compressed data!');
+          }
+
+          data = [0xAA, 0x55, ...unit.short(realLen), ...Array.from(uncompressedData), 0x55, 0xAA, ...data.slice(6 + length)]
+          client.debug('data uncompressed | ' + Array.from(data).map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' '));
+          opcode = data[4];
+          subopcode = data[5];
+          length = realLen;
+        }
+
 
         for (let i = 0; i < waitingTasks.length; i++) {
           let task = waitingTasks[i];
@@ -165,8 +187,10 @@ module.exports = (params) => {
 
     client.on('close', function () {
       client.connected = false;
-      if (debug) {
-        client.debug('Connection closed');
+      console.log('Connection closed');
+
+      for (let i of waitingTasks) {
+        i.reject(new Error('connection is closed!'));
       }
     });
   });

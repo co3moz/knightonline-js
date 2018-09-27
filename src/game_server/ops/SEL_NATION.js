@@ -2,7 +2,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
   let nation = body.byte();
 
   if (!(nation == 1 || nation == 2)) { // invalid
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode,
       0
     ]);
@@ -17,15 +17,19 @@ module.exports = async function ({ socket, opcode, body, db }) {
       socket.user.warehouse = warehouse._id;
     }
 
-    socket.user.nation = nation == 1 ? 'KARUS' : 'ELMORAD';
+    if (socket.user.characters.length > 0) {
+      throw 1; // cant change your nation, if you have a character
+    }
+
+    socket.user.nation = nation;
     await socket.user.save();
-    
+
     result = nation;
   } catch (e) { // if anything goes wrong
     result = 0;
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     result
   ]);

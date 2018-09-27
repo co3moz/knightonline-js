@@ -1,25 +1,107 @@
 const unit = require('../../core/utils/unit');
 const config = require('config');
 const levelUp = config.get('gameServer.levelUp');
+const { BREAST, LEG, HEAD, GLOVE, FOOT, SHOULDER, RIGHTHAND, LEFTHAND, CWING, CHELMET, CLEFT, CRIGHT, CTOP, FAIRY } = require('../var/item_slot');
 
 module.exports = async function ({ socket, opcode, body }) {
   let subOpCode = body.byte();
 
-  if (subOpCode == 1) {
-    quests(socket);
-    myInfo(socket);
-    sendTempOtherUserData(socket); // temp data
+  if (socket.ingame) {
+    return;
+  }
 
-    socket.sendWithHeaders([
+  if (subOpCode == 1) {
+    socket.shared.region.update(socket);
+
+    quests(socket);
+    notice(socket);
+    time(socket);
+    weather(socket);
+    myInfo(socket);
+    sendUserInOutData(socket); // temp data
+    sendZoneAbility(socket);
+
+    socket.send([
       opcode
     ]);
+  } else if (subOpCode == 2) {
+    socket.ingame = true;
   }
+}
+
+let notices = [
+  ['KO-JS', 'Welcome to Knight Online Javascript Server']
+];
+
+let weather = socket => {
+  socket.send([
+    0x14, // WEATHER
+    1, // rain
+    0, // amount 0-100
+    0
+  ]);
+}
+
+let time = socket => {
+  let now = new Date();
+  socket.send([
+    0x13,
+    ...unit.short(now.getFullYear()),
+    ...unit.short(now.getMonth() + 1),
+    ...unit.short(now.getDate()),
+    ...unit.short(now.getHours()),
+    ...unit.short(now.getMinutes())
+  ]);
+}
+
+let notice = socket => {
+  let u = socket.user;
+  let c = socket.character;
+
+  let nation = u.nation;
+
+  socket.send([
+    0x2E,
+    2,
+    notices.length,
+    ...[].concat(...notices.map(notice => [
+      ...unit.string(notice[0]),
+      ...unit.string(notice[1])
+    ]))
+  ]);
+
+  socket.send([
+    0x2E,
+    1,
+    notices.length,
+    ...[].concat(...notices.map(notice => [
+      ...unit.byte_string(notice[1] + ' ' + notice[1])
+    ]))
+  ]);
+
+  socket.send([
+    0x10, // CHAT
+    5,
+    nation,
+    ...unit.short(socket.session & 0xFFFF),
+    0,
+    ...unit.string(`[SERVER] Server Time: ${new Date().toLocaleString('en-GB')}`)
+  ]);
+
+  socket.send([
+    0x10, // CHAT
+    5,
+    nation,
+    ...unit.short(socket.session & 0xFFFF),
+    0,
+    ...unit.string(`[SERVER] Welcome ${c.name}, ko-js is really working :)`)
+  ]);
 }
 
 let quests = socket => {
   let quests = socket.character.quests;
 
-  socket.sendWithHeaders([
+  socket.send([
     0x64, // QUEST
     1,
     ...unit.short(quests.length),
@@ -31,8 +113,11 @@ let quests = socket => {
 }
 
 let myInfo = socket => {
+  let u = socket.user;
   let c = socket.character;
   let v = socket.variables;
+
+  let nation = u.nation;
 
   let items = [];
 
@@ -52,7 +137,7 @@ let myInfo = socket => {
         ...unit.short(item.amount),
         item.flag,
         0, 0, // rental time,
-        0, 0, 0, 0, // unknown
+        0, 0, 0, 0, // TODO: seal serial data
         0, 0, 0, 0 // unix expiration time
       );
     } else {
@@ -60,14 +145,15 @@ let myInfo = socket => {
     }
   }
 
-  socket.sendWithHeaders([
+
+  socket.sendCompressed([
     0x0E, // MYINFO
     ...unit.short(socket.session & 0xFFFF),
     ...unit.byte_string(c.name),
     ...unit.short(c.x * 10),
     ...unit.short(c.z * 10),
     ...unit.short(c.y * 10),
-    c.nation == 'KARUS' ? 1 : 2,
+    nation,
     c.race,
     ...unit.short(c.klass),
     c.face,
@@ -109,13 +195,17 @@ let myInfo = socket => {
     0, 0, // genie time
     c.rebirth,
     0, 0, 0, 0, 0, // rebirth stats
-    0, 0, 0, 0, 0, 0, 0, 0 // unknown
+    0, 0, 0, 0, 0, 0, 0, 0, // unknown
+    0, 0, // cover title
+    0, 0, // skill title
+    1, 0, 0, 0, // return symbol //FIX: LATER
+    0, 0
   ]);
 }
 
 let sendZoneAbility = socket => {
   // TODO: load zone abilities
-  socket.sendWithHeaders([
+  socket.send([
     0x5E, // ZONEABILITY
     1,
     1, // trade with other nation
@@ -125,44 +215,64 @@ let sendZoneAbility = socket => {
 }
 
 
-let sendTempOtherUserData = socket => { // TODO: change this later
-  let c = socket.character;
-  let v = socket.variables;
-
+let sendUserInOutData = socket => { // TODO: change this later
   // TODO: load zone abilities
-  socket.sendWithHeaders([
-    0x16, // REQ_USERIN
-    1, 0, // user count
-    0,
-    99, 0, // session id
-    ...unit.byte_string('dummy_char'),
-    1, 0, // karus
-    0xFF, 0xFF, // clan id
-    0, //fame
-    0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0, 0, // clan details
-    31, // level
-    2, // race
-    ...unit.short(102), // klass
-    ...unit.short(8170), ...unit.short(4350), 0, 0, // x z y
-    0, 0, 0, 0, 0, // face and hair data
-    1, // standing
-    1, 0, 0, 0, //  user state (giant / dwarf vs)
-    1, // need party 
-    1, // GM OR USER
-    0, // party leader
-    0, // visibility state
-    0, // team color (1 blue 2 red)
-    0, // is helmet hiding
-    0, // is cospre hiding
-    0, 0, // direction
-    0, 0, 0, // unknown
-    0, // chicken thing
-    0, // rank
-    0, 0, // np rank shit,
 
-    ...Array(7 /* byte */ * 14 /* item */).fill(0), // item data
-    21, // zone id
-    0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 1, //unknown shit
-    0 // is genie active
-  ]);
+  let result = [0x16, 0, 0];
+
+  let userCount = 0;
+  for (let userSocket of socket.shared.region.query(socket)) {
+    userCount++;
+    let uu = userSocket.user;
+    let uc = userSocket.character;
+    result.push(0);
+    result.push(...unit.short(userSocket.session));
+    result.push(...unit.byte_string(uc.name));
+    result.push(...unit.short(uu.nation));
+    result.push(...unit.short(-1)); // clan Id
+    result.push(0); // fame
+    result.push(0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0, 0); // clan_details..
+    result.push(uc.level);
+    result.push(uc.race);
+    result.push(...unit.short(uc.klass));
+    result.push(...unit.short(uc.x * 10));
+    result.push(...unit.short(uc.z * 10));
+    result.push(...unit.short(uc.y * 10));
+    result.push(uc.face);
+    result.push(...unit.int(uc.hair));
+    result.push(uc.hptype || 0);
+    result.push(...unit.int(uc.abnormalType || 0));
+    result.push(0); // need party
+    result.push(uc.gm ? 0 : 1);
+    result.push(0); // party leader?
+    result.push(1); // invisibility state
+    result.push(0); // teamcolor
+    result.push(0); // helmet hiding
+    result.push(0); // cospre hiding
+    result.push(...unit.short(uc.direction));
+    result.push(0); // chicken?
+    result.push(uc.rank);
+    result.push(1, 0);
+    result.push(0, 0); // np rank
+
+    for (let m of [BREAST, LEG, HEAD, GLOVE, FOOT, SHOULDER, RIGHTHAND, LEFTHAND, CWING, CHELMET, CLEFT, CRIGHT, CTOP, FAIRY]) {
+
+      let item = uc.items[m];
+
+      if (item) {
+        result.push(...unit.int(item.id), ...unit.short(item.durability), item.flag);
+      } else {
+        result.push(0, 0, 0, 0, 0, 0, 0);
+      }
+    }
+
+    result.push(uc.zone);
+    result.push(0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0/* genie */); //?
+    result.push(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); //?
+  }
+
+  result[1] = userCount & 0xFF;
+  result[2] = userCount >>> 8;
+
+  socket.sendCompressed(result);
 }

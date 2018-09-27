@@ -37,6 +37,8 @@ module.exports = async function ({ socket, body, db, opcode }) {
                     resultCode = errorCodes.AUTH_OTP;
                   } else {
                     resultCode = errorCodes.AUTH_SUCCESS;
+                    account.session = generateSession() + account._id;
+                    await account.save();
                   }
                 } else {
                   resultCode = errorCodes.AUTH_OTP;
@@ -44,6 +46,8 @@ module.exports = async function ({ socket, body, db, opcode }) {
               }
             } else {
               resultCode = errorCodes.AUTH_SUCCESS;
+              account.session = generateSession() + account._id;
+              await account.save();
             }
           }
         } else {
@@ -68,20 +72,24 @@ module.exports = async function ({ socket, body, db, opcode }) {
       }
     }
 
-    socket.sendWithHeaders([
-      opcode, 0, 0, 0x01, ...unit.short(premiumHours), ...unit.string(accountName)
+    socket.send([
+      opcode, 0, 0, 0x01, ...unit.short(premiumHours), ...unit.string(account.session)
     ]);
   } else if (resultCode == errorCodes.AUTH_BANNED) {
-    socket.sendWithHeaders([
+    socket.send([
       opcode, 0, 0, 0x04, 0xFF, 0xFF, ...unit.string(accountName), ...unit.string(account.bannedMessage)
     ]);
   } else if (resultCode == 0xDD) {
-    socket.sendWithHeaders([
+    socket.send([
       opcode, 0, 0, 0x04, 0xFF, 0xFF, ...unit.string(accountName), ...unit.string('OTP invalid ban. Account is locked for 30 mins.')
     ]);
   } else {
-    socket.sendWithHeaders([
+    socket.send([
       opcode, 0, 0, resultCode, 0xFF, 0xFF, ...unit.string(accountName)
     ]);
   }
+}
+
+function generateSession() {
+  return Array(3).fill(0).map(x => (Math.random() * 256 >>> 0).toString(16).padStart(2, '0')).join('')
 }

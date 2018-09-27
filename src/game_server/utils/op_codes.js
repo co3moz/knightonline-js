@@ -1,4 +1,6 @@
 module.exports = {
+  _INTERNAL_QUERY: 0xF1, // internal call
+
   VERSION_CHECK: 0x2B,
   LOGIN: 0x1,
   LOAD_GAME: 0x9F,
@@ -16,7 +18,12 @@ module.exports = {
   KNIGHT: 0x3C,
   QUEST: 0x64,
   FRIEND: 0x49,
-  SKILLDATA: 0x79
+  SKILLDATA: 0x79,
+  CHAT: 0x10,
+  HOME: 0x48,
+  MOVE: 0x06,
+  ROTATE: 0x09,
+  USER_INFO: 0x98
 };
 
 Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);

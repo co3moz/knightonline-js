@@ -10,7 +10,7 @@ module.exports = async function ({ socket, db, opcode }) {
     return unit.string(news.map(x => x.title + '#' + x.message + '#').join(''));
   });
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     ...unit.string('Login Notice'),
     ...news

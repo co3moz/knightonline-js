@@ -20,6 +20,7 @@ module.exports = async function () {
   await server({
     ip: config.get('loginServer.ip'),
     ports: config.get('loginServer.ports'),
+    timeout: 5000,
     debug: true,
 
     onData: async ({ socket, opcode, length, body }) => {

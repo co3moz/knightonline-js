@@ -30,6 +30,7 @@ gameServer:
   ports: 
     - 15001
   clientExeVersion: 2195
+  internalCommunicationSecret: 'very important text :)'
   levelUp:
     - 50 
     - 100 

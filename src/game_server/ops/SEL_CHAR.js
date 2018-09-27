@@ -3,14 +3,14 @@ const unique = require('../../core/utils/unique');
 const ability = require('../utils/ability');
 
 module.exports = async function ({ socket, opcode, body, db }) {
-  let account = body.string();
+  let session = body.string();
   let charName = body.string();
   let init = body.byte();
 
   let user = socket.user;
   let { Character, Warehouse, Item } = db.models;
 
-  if (!user || user.account != account) {
+  if (!user || user.session != session) {
     return socket.terminate('illegal access to another account');
   }
 
@@ -18,7 +18,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     return socket.terminate('banned account');
   }
 
-  if (!charName) return socket.sendWithHeaders([
+  if (!charName) return socket.send([
     opcode, 0
   ]);
 
@@ -26,12 +26,12 @@ module.exports = async function ({ socket, opcode, body, db }) {
     name: charName
   }).exec();
 
-  if (!character) return socket.sendWithHeaders([
+  if (!character) return socket.send([
     opcode, 0
   ]);
 
   if (!socket.user.characters.find(x => x == charName)) {
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 0
     ]);
   }
@@ -43,7 +43,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
     characterMap[charName].terminate('another character select request');
     delete characterMap[charName];
 
-    return socket.sendWithHeaders([
+    return socket.send([
       opcode, 0
     ]);
   }
@@ -108,7 +108,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
   await character.save();
 
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     1,
     character.zone,

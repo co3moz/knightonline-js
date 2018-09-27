@@ -61,7 +61,7 @@ module.exports = async function ({ socket, opcode, db }) {
     characters.push(data);
   }
 
-  socket.sendWithHeaders([
+  socket.send([
     opcode,
     1,
     1,
