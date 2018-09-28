@@ -7,24 +7,11 @@ module.exports = async function ({ body, socket, opcode }) {
   let type = body.byte();
   let message = body.string();
   // is message contain '+' sign and character has gm rights?
-  let IS_GM_COMMAND = message.substr(0, 1) === '+' && socket.character.gm;
+  let IS_GM_COMMAND = socket.character.gm && message[0] === '+';
 
   if (IS_GM_COMMAND) {
-    // get first 3 characters for gm chat command
-    let command = message.substr(1,3);
-
-    if (message.length > 128) {
-      message = message.substring(0, 128)
-    }
-
-    socket.shared.region.regionSend(socket, [
-      opcode,
-      gmCommands[command],
-      socket.user.nation,
-      ...unit.short(socket.session & 0xFFFF),
-      ...unit.byte_string(socket.character.name),
-      ...unit.string(message.substr(4, message.length), 'ascii')
-    ]);
+    let command = message.split(" ")[0].substr(1, message.split(" ")[0].length);
+    gmCommands[command](message, socket, opcode);
   }
 
   // don't send message as public if it is valid gm command
