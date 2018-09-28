@@ -105,6 +105,12 @@ module.exports = function () {
       }
     },
 
+    allSend(socket, message) {
+      for (let s of this.query(socket, { all: true })) {
+        s.send(message);
+      }
+    },
+
     regions,
     users
   }
