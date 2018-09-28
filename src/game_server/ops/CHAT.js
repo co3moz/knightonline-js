@@ -1,7 +1,6 @@
 const unit = require('../../core/utils/unit');
 const crypt = require('../../core/utils/crypt');
 const config = require('config');
-const gmCommands = require('../../game_server/var/gm_commands');
 
 module.exports = async function ({ body, socket, opcode }) {
   let type = body.byte();
@@ -11,7 +10,7 @@ module.exports = async function ({ body, socket, opcode }) {
 
   if (IS_GM_COMMAND) {
     let command = message.split(" ")[0].substr(1, message.split(" ")[0].length);
-    gmCommands[command](message, socket, opcode);
+    GM_METHODS[command](message, socket, opcode);
   }
 
   // don't send message as public if it is valid gm command
@@ -34,4 +33,16 @@ module.exports = async function ({ body, socket, opcode }) {
 
 const MESSAGE_TYPES = {
   GENERAL: 1
+}
+
+const GM_METHODS = {
+  notice: (message, socket, opcode) => {
+    // get first 3 characters for gm chat command
+      socket.shared.region.regionSend(socket, [
+        opcode,
+        8,
+        0, 0, 0, 0,
+        ...unit.string(message.substr(7, message.length), 'ascii')
+      ]);
+  }
 }
