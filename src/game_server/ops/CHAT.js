@@ -10,7 +10,7 @@ module.exports = async function ({ body, socket, opcode }) {
 
   if (IS_GM_COMMAND) {
     let command = message.split(" ")[0].substr(1, message.split(" ")[0].length);
-    GM_METHODS[command](message, socket, opcode);
+    GM_COMMANDS[command](message, socket, opcode);
   }
 
   // don't send message as public if it is valid gm command
@@ -35,7 +35,7 @@ const MESSAGE_TYPES = {
   GENERAL: 1
 }
 
-const GM_METHODS = {
+const GM_COMMANDS = {
   notice: (message, socket, opcode) => {
     // get first 3 characters for gm chat command
       socket.shared.region.regionSend(socket, [
