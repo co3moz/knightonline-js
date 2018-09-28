@@ -7,7 +7,7 @@ module.exports = async function ({ body, socket, opcode }) {
   let type = body.byte();
   let message = body.string();
   // is message contain '+' sign and character has gm rights?
-  let IS_GM_COMMAND = message.substr(0, 1) === '+' && !socket.character.gm;
+  let IS_GM_COMMAND = message.substr(0, 1) === '+' && socket.character.gm;
 
   if (IS_GM_COMMAND) {
     // get first 3 characters for gm chat command
