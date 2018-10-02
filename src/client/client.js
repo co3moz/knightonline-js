@@ -423,7 +423,7 @@ module.exports = async function () {
           let op35 = await gcon.sendAndWait([opCodes.CHAT_TARGET, 0x01, ...unit.string(message.name)], 0x35, 0x01);
           let canI = op35.short();
           if (canI == 0) {
-            console.log('Cannot echo chat, because user are not seem online');
+            console.log('Cannot echo chat, because user is not seem online');
             console.break();
           } else if (canI == 0xFF) {
             console.log('Cannot echo chat, because user blocked private messages');
