@@ -33,6 +33,24 @@ module.exports = async function ({ body, socket, opcode }) {
     ]);
   }
 
+  if (type == MESSAGE_TYPES.PRIVATE) {
+    if (!socket.variables.chatTo) {
+      return;
+    }
+
+    let userSocket = socket.shared.region.users[socket.variables.chatTo];
+
+    if (!userSocket) return;
+
+    userSocket.socket.send([
+      opcode,
+      MESSAGE_TYPES.PRIVATE,
+      socket.user.nation,
+      ...unit.short(socket.session & 0xFFFF),
+      ...unit.byte_string(socket.character.name),
+      ...unit.string(message, 'ascii')
+    ]);
+  }
 }
 
 const GM_COMMANDS = {
@@ -59,6 +77,12 @@ const GM_COMMANDS = {
 
     socket.shared.region.allSend(socket, [
       opcode, MESSAGE_TYPES.PUBLIC, 0, 0, 0, 0, ...unit.string(`### NOTICE: ${text} ###`, 'ascii')
+    ]);
+  },
+
+  notice_pm: (args, socket, opcode) => {
+    return socket.send([
+      opcode, MESSAGE_TYPES.PRIVATE, 0, 0, 0, ...unit.byte_string('[SERVER]'), ...unit.string(args.join(' '), 'ascii')
     ]);
   },
 

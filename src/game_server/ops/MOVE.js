@@ -40,5 +40,5 @@ module.exports = async function ({ body, socket, opcode }) {
     ...unit.short(newY)
   ]);
 
-  console.log('MOVE REAL ' + realX + ' ' + realZ + ' '+ realY + ' WILL ' + willX+ ' '+ willZ+ ' '+ willY+ ' ');
+  console.log('MOVE REAL ' + realX + ' ' + realZ + ' ' + realY + ' | WILL ' + willX + ' ' + willZ + ' ' + willY + ' | ' + speed);
 }

@@ -15,20 +15,22 @@ module.exports = async function () {
   let debug = false;
   let loadItems = false;
 
+  console.break = x => console.log('-'.repeat(50));
+
   try {
     console.log('loading test client for testing ko-js');
-    console.log('-'.repeat(50));
+    console.break();
     table({
       debug,
       loadItems
     });
-    console.log('-'.repeat(50));
+    console.break();
 
     if (loadItems) {
       console.log('connecting to db...');
       db = await dbConnect();
       console.log('connected to db');
-      console.log('-'.repeat(50));
+      console.break();
     }
 
 
@@ -40,7 +42,7 @@ module.exports = async function () {
       name: 'loginServer'
     });
     console.log('connected to login server!');
-    console.log('-'.repeat(50));
+    console.break();
 
     data = await lcon.sendAndWait([0x01, ...unit.short(1299)], 0x01);
 
@@ -120,14 +122,14 @@ module.exports = async function () {
 
     console.log('connecting to game server...');
     gcon = await client({
-      ip: servers[3].ip,
+      ip: servers[0].ip,
       port: 15001,
       debug,
       name: 'gameServer'
     });
     console.log('connected to game server!');
-    console.log('-'.repeat(50));
-    
+    console.break();
+
     // data = await gcon.sendAndWait([opCodes._INTERNAL_QUERY, ...crypto.createHmac('sha1', config.get('gameServer.internalCommunicationSecret')).update(Buffer.from([0x01])).digest(), ...[0x01]], opCodes._INTERNAL_QUERY);
     // table({
     //   _internal_query_opcode: data.byte(),
@@ -407,14 +409,31 @@ module.exports = async function () {
           })
         }
       } else if (opcode == opCodes.CHAT) { // chat
-        table({
+        let message = {
           op: 'chat',
           type: data.byte(),
           nation: data.byte() == 1 ? 'KARUS' : 'ELMORAD',
           session: data.short(),
           name: data.byte_string(),
           message: data.string('ascii')
-        })
+        };
+        table(message);
+
+        if (message.type == 2) { // private message
+          let op35 = await gcon.sendAndWait([opCodes.CHAT_TARGET, 0x01, ...unit.string(message.name)], 0x35, 0x01);
+          let canI = op35.short();
+          if (canI == 0) {
+            console.log('Cannot echo chat, because user are not seem online');
+            console.break();
+          } else if (canI == 0xFF) {
+            console.log('Cannot echo chat, because user blocked private messages');
+            console.break();
+          } else {
+            gcon.send([opCodes.CHAT, message.type, ...unit.string(message.message, 'ascii')])
+            console.log('Echo sent to ' + message.name);
+            console.break();
+          }
+        }
       } else if (opcode == 0x2E) { // notice
 
         let subOpcode = data.byte();
@@ -665,7 +684,7 @@ const table = function (data, name) {
     }
   }
 
-  console.log('-'.repeat(50));
+  console.break();
 }
 
 function keep(data) {

@@ -3,6 +3,9 @@ module.exports = async function (db) {
     account: 'test',
     password: '1'
   }, {
+    account: 'test2',
+    password: '1'
+  }, {
     account: 'banned',
     password: '1',
     banned: true,
