@@ -7,7 +7,10 @@
     "lint": "eslint src/**",
     "login_server": "node src/login_server",
     "game_server": "node src/game_server",
-    "start": "node src"
+    "both_start": "node src",
+    "smd_test": "mocha test/smd.test.js",
+    "test": "mocha test/**/*.test.js",
+    "start": "npm both_start"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +31,8 @@
   },
   "devDependencies": {
     "eslint": "^4.19.1",
-    "eslint-plugin-node": "^6.0.1"
+    "eslint-plugin-node": "^6.0.1",
+    "mocha": "^5.2.0"
   },
   "engines": {
     "node": ">=8.9.4"

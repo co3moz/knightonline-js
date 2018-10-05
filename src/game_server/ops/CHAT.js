@@ -4,15 +4,17 @@ module.exports = async function ({ body, socket, opcode }) {
   let type = body.byte();
   let message = body.string();
 
+  if (socket.character.gm && type == 1 && message == '+') {
+    return GM_SEND(socket, 'hello master, type help :)');
+  }
 
-  if (socket.character.gm && message[0] === '+') { // is message contain '+' sign and character has gm rights?
-    let args = message.substring(1).split(' ');
+  if ((type == 2 && socket.character.gm && socket.variables.chatTo == GM_COMMANDS_HEADER) ||
+    (type == 1 && socket.character.gm && message[0] == '+')) {
+    let args = (type == 1 ? message.substring(1) : message).split(' ');
     let command = args.shift();
 
     if (!GM_COMMANDS[command]) {
-      return socket.send([
-        opcode, MESSAGE_TYPES.GM, 0, 0, 0, 0, ...unit.string(`### ERROR: Invalid command "${command}" ###`, 'ascii')
-      ]);
+      return GM_SEND(socket, `ERROR: Invalid command "${command}"`);
     }
 
     return GM_COMMANDS[command](args, socket, opcode);
@@ -57,9 +59,7 @@ const GM_COMMANDS = {
   notice: (args, socket, opcode) => {
     let text = args.join(' ');
     if (text.length == 0) {
-      return socket.send([
-        opcode, MESSAGE_TYPES.GM, 0, 0, 0, 0, ...unit.string(`### ERROR: notice requires text! ###`, 'ascii')
-      ]);
+      return GM_SEND(socket, `USAGE: notice text`);
     }
 
     socket.shared.region.allSend(socket, [
@@ -67,12 +67,10 @@ const GM_COMMANDS = {
     ]);
   },
 
-  notice_chat: (args, socket, opcode) => {
+  chat: (args, socket, opcode) => {
     let text = args.join(' ');
     if (text.length == 0) {
-      return socket.send([
-        opcode, MESSAGE_TYPES.GM, 0, 0, 0, 0, ...unit.string(`### ERROR: notice_chat requires text! ###`, 'ascii')
-      ]);
+      return GM_SEND(socket, `USAGE: chat text`);
     }
 
     socket.shared.region.allSend(socket, [
@@ -80,21 +78,46 @@ const GM_COMMANDS = {
     ]);
   },
 
-  notice_pm: (args, socket, opcode) => {
-    return socket.send([
-      opcode, MESSAGE_TYPES.PRIVATE, 0, 0, 0, ...unit.byte_string('[SERVER]'), ...unit.string(args.join(' '), 'ascii')
-    ]);
+  pm: (args, socket, opcode) => {
+    let text = args.join(' ');
+    if (text.length == 0) {
+      return GM_SEND(socket, `USAGE: pm text`);
+    }
+
+    let message = [
+      opcode, MESSAGE_TYPES.PRIVATE, 0, 0, 0, ...unit.byte_string('[SERVER]'), ...unit.string(text, 'ascii')
+    ];
+
+    for (let s of socket.shared.region.query(socket, { all: true })) {
+      message[2] = s.user.nation;
+      s.send(message);
+    }
   },
 
-  help: (args, socket, opcode) => {
-    return socket.send([
-      opcode, MESSAGE_TYPES.GM, 0, 0, 0, 0, ...unit.string(`### HELP: ${GM_COMMANDS_LIST.join(', ')} ###`, 'ascii')
-    ]);
+  count: (args, socket) => {
+    GM_SEND(socket, `count: ${Object.keys(socket.shared.region.users).length}`);
+  },
+
+  near: (args, socket) => {
+    for (let s of socket.shared.region.query(socket)) {
+      GM_SEND(socket, s.character.name + ': ' + ((s.character.x * 10 >>> 0) / 10) + ' ' + ((s.character.z * 10 >>> 0) / 10));
+    }
+  },
+
+  help: (args, socket) => {
+    GM_SEND(socket, `HELP: ${GM_COMMANDS_LIST.join(', ')}`);
   }
 }
 
+const GM_COMMANDS_HEADER = '[GM CONTROLLER]';
 const GM_COMMANDS_LIST = Object.keys(GM_COMMANDS);
-
+const GM_SEND = (socket, message) => {
+  socket.send([
+    0x10, MESSAGE_TYPES.PRIVATE, socket.user.nation, 0, 0,
+    ...unit.byte_string(GM_COMMANDS_HEADER),
+    ...unit.string(message, 'ascii')
+  ]);
+}
 
 const MESSAGE_TYPES = {
   GENERAL: 1,
@@ -125,3 +148,5 @@ const MESSAGE_TYPES = {
   CHATROM: 33,
   NOAH_KNIGHTS: 34
 }
+
+module.exports.GM_COMMANDS_HEADER = GM_COMMANDS_HEADER;

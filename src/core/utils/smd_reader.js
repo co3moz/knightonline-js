@@ -105,7 +105,9 @@ module.exports = async function (file) { // TODO: finish this
   }
 
   let ppn = await short_array(fd, mapSize * mapSize);
-  console.timeEnd("time");
+
+
+  await fse.close(fd);
   console.log(file + '.smd map size ' + mapSize + ' unit distance ' + mapUnitDistance);
 }
 

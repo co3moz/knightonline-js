@@ -16,7 +16,7 @@ module.exports = async function ({ body, socket, opcode }) {
     if (v.lastHome > now) return;
   }
 
-  v.lastHome = now + 1000;
+  v.lastHome = now + 1;
 
 
   let startPosition = startPositions[c.zone];
@@ -34,6 +34,9 @@ module.exports = async function ({ body, socket, opcode }) {
     x = startPosition['elmorad'][0];
     z = startPosition['elmorad'][1];
   }
+
+  x += (Math.random() - 0.5) * startPosition['range'][0];
+  z += (Math.random() - 0.5) * startPosition['range'][1];
 
   c.x = x;
   c.z = z;

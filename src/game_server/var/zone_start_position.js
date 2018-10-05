@@ -1,4 +1,6 @@
 // zone_id -> field -> [x, z]
+// range makes you get randomized location.
+// (Math.random() - 0.5) * range
 
 module.exports = {
   "1": {

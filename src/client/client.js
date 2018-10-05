@@ -372,6 +372,8 @@ module.exports = async function () {
 
     await delay(500);
 
+    gcon.send([0x48]); // zone home
+
     // data = await gcon.waitNextData(0x1c); // npc data
 
     // let npcCount = data.short();

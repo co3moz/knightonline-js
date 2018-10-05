@@ -58,7 +58,6 @@ module.exports = async function () {
       await require('./ops/' + opCodes[opcode])({ socket, body, length, opcode, db });
     }
   }, shared);
-
 }
 
 async function loadSetItems(db) {
