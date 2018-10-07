@@ -2,6 +2,7 @@ const unit = require('../../core/utils/unit');
 const config = require('config');
 const levelUp = config.get('gameServer.levelUp');
 const { BREAST, LEG, HEAD, GLOVE, FOOT, SHOULDER, RIGHTHAND, LEFTHAND, CWING, CHELMET, CLEFT, CRIGHT, CTOP, FAIRY } = require('../var/item_slot');
+const zoneRules = require('../var/zone_rules');
 
 module.exports = async function ({ socket, opcode, body }) {
   let subOpCode = body.byte();
@@ -204,20 +205,21 @@ let myInfo = socket => {
 }
 
 let sendZoneAbility = socket => {
-  // TODO: load zone abilities
+  let userZone = zoneRules.rules[socket.character.zone];
+
+  if (!userZone) return;
+
   socket.send([
-    0x5E, // ZONEABILITY
-    1,
-    1, // trade with other nation
-    0, // no pvp, no attack to other nation (fix here later this is for moradon)
-    ...unit.short(20) // tariff
+    0x5E, 1, // ZONEABILITY
+    +!!(userZone.flag & zoneRules.flags.TRADE_OTHER_NATION),
+    userZone.type,
+    +!!(userZone.flag & zoneRules.flags.TALK_OTHER_NATION),
+    ...unit.short(userZone.tariff) //TODO: dynamic tariff's for later
   ]);
 }
 
 
 let sendUserInOutData = socket => { // TODO: change this later
-  // TODO: load zone abilities
-
   let result = [0x16, 0, 0];
 
   let userCount = 0;

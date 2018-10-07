@@ -115,6 +115,20 @@ module.exports = {
     "elmoradGate": [0, 0],
     "range": [10, 10]
   },
+  "24": {
+    "karus": [817, 530],
+    "elmorad": [817, 530],
+    "karusGate": [0, 0],
+    "elmoradGate": [0, 0],
+    "range": [10, 10]
+  },
+  "25": {
+    "karus": [817, 530],
+    "elmorad": [817, 530],
+    "karusGate": [0, 0],
+    "elmoradGate": [0, 0],
+    "range": [10, 10]
+  },
   "28": {
     "karus": [455, 1955],
     "elmorad": [1630, 410],

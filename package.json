@@ -7,10 +7,9 @@
     "lint": "eslint src/**",
     "login_server": "node src/login_server",
     "game_server": "node src/game_server",
-    "both_start": "node src",
     "smd_test": "mocha test/smd.test.js",
     "test": "mocha test/**/*.test.js",
-    "start": "npm both_start"
+    "start": "node src"
   },
   "keywords": [],
   "author": "",

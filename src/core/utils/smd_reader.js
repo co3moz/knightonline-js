@@ -2,7 +2,7 @@ const fse = require('fs-extra');
 const path = require('path');
 
 // for testing use this ->   await require('./core/utils/smd_reader')('elmo2004')
-module.exports = async function (file) { // TODO: finish this
+module.exports = async function (file, onlySmall) { // TODO: finish this
   let fd = await fse.open(path.resolve(__dirname, '../../../data/' + file + '.smd'), "r");
   let mapSize = await int(fd);
   let mapUnitDistance = await float(fd);
@@ -11,7 +11,7 @@ module.exports = async function (file) { // TODO: finish this
   let mapWidth = (mapSize - 1) * mapUnitDistance;
 
   if (mapWidth <= 0.0 || mapWidth > 4096 * 16) {
-    return null;
+    throw new Error('map width does not look correct!');
   }
 
   let collisionWidth = await float(fd);
@@ -20,11 +20,11 @@ module.exports = async function (file) { // TODO: finish this
 
   if (collisionWidth <= 0.0 || collisionWidth > 4096 * 16 ||
     collisionLength <= 0.0 || collisionLength > 4096 * 16) {
-    return null;
+      throw new Error('colection sizes does not look correct!');
   }
 
   if ((mapSize - 1) * mapUnitDistance != collisionWidth) {
-    return null;
+    throw new Error('collision and map width does not match');
   }
 
   let regionX = collisionWidth / 48 + 1;
@@ -84,6 +84,7 @@ module.exports = async function (file) { // TODO: finish this
     }
   }
 
+
   let eventObjectCount = await int(fd);
   let eventObjects = [];
 
@@ -100,15 +101,62 @@ module.exports = async function (file) { // TODO: finish this
       x: buf.readFloatLE(18),
       /*y: buf.readFloatLE(22),
       z: buf.readFloatLE(26),
-      byLife: buf.readUInt8(30),*/
+      byLife: buf.readUInt8(30)*/
     })
   }
 
   let ppn = await short_array(fd, mapSize * mapSize);
 
 
+  let eventRegeneObjectCount = await int(fd);
+  let eventRegeneObjects = [];
+
+  for (let i = 0; i < eventRegeneObjectCount; i++) {
+    let buf = await read_array(fd, 20);
+    eventRegeneObjects.push({
+      posX: buf.readFloatLE(0),
+      posY: buf.readFloatLE(4),
+      posZ: buf.readFloatLE(8),
+      areaZ: buf.readFloatLE(12),
+      areaX: buf.readFloatLE(16),
+      regenePoint: i
+    });
+  }
+
+
+  let warpCount = await int(fd);
+  let warps = [];
+
+  for (let i = 0; i < warpCount; i++) {
+    let buf = await read_array(fd, 320);
+    warps.push({
+      id: buf.readInt16LE(0),
+      name: trimmed_string(buf, 2),
+      announce: trimmed_string(buf, 34),
+      pay: buf.readUInt32LE(292),
+      zone: buf.readInt16LE(296),
+      x: buf.readFloatLE(300),
+      y: buf.readFloatLE(304),
+      z: buf.readFloatLE(308),
+      range: buf.readFloatLE(312),
+      nation: buf.readInt16LE(316)
+    });
+  }
+
+
   await fse.close(fd);
-  console.log(file + '.smd map size ' + mapSize + ' unit distance ' + mapUnitDistance);
+
+  return {
+    file,
+    mapSize, mapUnitDistance,
+    collisionWidth, collisionLength, collisions,
+    cells,
+    height,
+    ppn,
+    eventObjects,
+    eventRegeneObjects,
+    warps
+  }
 }
 
 
@@ -169,4 +217,14 @@ async function short_array(fd, size) {
   let array = [];
   for (var i = 0; i < size; i++) array.push(buf.readInt16LE(i * 2));
   return array;
+}
+
+function trimmed_string(buffer, start) {
+  for (let i = start; i < buffer.length; i++) {
+    if (buffer[i] == 0) {
+      return buffer.slice(start, i).toString();
+    }
+  }
+
+  return buffer.slice(start).toString();
 }
