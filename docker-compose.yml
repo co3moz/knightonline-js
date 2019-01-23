@@ -30,6 +30,7 @@ services:
   adminmongo:
     image: mrvautin/adminmongo
     environment:
+      HOST: '0.0.0.0'
       CONN_NAME: '10.0.0.51'
       DB_HOST: 'knight-online'
     ports: 
