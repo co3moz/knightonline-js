@@ -1,0 +1,41 @@
+version: '3'
+services:
+  ko-js:
+    build: .
+    ports:
+      - "15100:15100/udp"
+      - "15101:15101/udp"
+      - "15102:15102/udp"
+      - "15103:15103/udp"
+      - "15104:15104/udp"
+      - "15105:15105/udp"
+      - "15106:15106/udp"
+      - "15107:15107/udp"
+      - "15108:15108/udp"
+      - "15109:15109/udp"
+      - "15001:15001/udp"
+    networks:
+      application:
+        ipv4_address: 10.0.0.50
+    restart: always
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - /container/ko-js/mongo:/data/db
+    networks:
+      application:
+        ipv4_address: 10.0.0.51
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+  redis:
+    image: "redis:alpine"
+    networks:
+      application:
+        ipv4_address: 10.0.0.52
+networks:
+  application:
+    external:
+      name: application

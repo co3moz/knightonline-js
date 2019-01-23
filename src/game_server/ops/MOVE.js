@@ -1,6 +1,5 @@
 const unit = require('../../core/utils/unit');
 const { sendMessageToPlayer } = require('../functions/sendChatMessage');
-const sendRegionPlayer = require('../functions/sendRegionPlayer');
 const region = require('../region');
 
 module.exports = async function ({ body, socket, opcode }) {
@@ -32,17 +31,7 @@ module.exports = async function ({ body, socket, opcode }) {
 
   // TODO: do this right way :)
 
-  if (region.update(socket)) { // region changed?
-    let s = region.getRegionName(socket);
-
-    let names = [];
-    for (let userSocket of region.query(socket)) {
-      names.push(userSocket.character.name);
-    }
-
-    sendMessageToPlayer(socket, 7, 'REGION', `${s} users: ${names.join(', ')}`);
-    sendRegionPlayer(socket);
-  }
+  region.update(socket);
 
   region.regionSend(socket, [
     opcode,

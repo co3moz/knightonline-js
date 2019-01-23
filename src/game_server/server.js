@@ -13,8 +13,9 @@ module.exports = async function () {
   let shared = {};
   let userMap = shared.userMap = {};
   let characterMap = shared.characterMap = {};
+  let region = require('./region');
   shared.setItems = setItems;
-  shared.region = require('./region');
+  shared.region = region;
 
   await server({
     ip: config.get('gameServer.ip'),

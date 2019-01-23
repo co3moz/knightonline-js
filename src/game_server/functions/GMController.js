@@ -5,7 +5,7 @@ const { MESSAGE_TYPES, sendMessageToPlayer } = require('./sendChatMessage');
 const GM_COMMANDS_HEADER = exports.GM_COMMANDS_HEADER = '[GM CONTROLLER]';
 
 const sendMessageToGM = exports.sendMessageToGM = (socket, message) => {
-  sendMessageToPlayer(socket, MESSAGE_TYPES.SHOUT, GM_COMMANDS_HEADER, message);
+  sendMessageToPlayer(socket, MESSAGE_TYPES.PRIVATE, GM_COMMANDS_HEADER, message);
 }
 
 const GM_COMMANDS = exports.GM_COMMANDS = {
@@ -59,6 +59,16 @@ const GM_COMMANDS = exports.GM_COMMANDS = {
 
   help: (args, socket) => {
     sendMessageToGM(socket, `HELP: ${GM_COMMANDS_LIST.join(', ')}`);
+  },
+
+  warp: (args, socket) => {
+    let text = args.join(' ');
+    if (text.length == 0) {
+      return sendMessageToGM(socket, `USAGE: warp id`);
+    }
+
+    
+
   },
 
   test: (args, socket) => {

@@ -132,3 +132,4 @@ testClient:
   version: 2195
   user: 'test'
   password: '1'
+  server: 'TEST|SERVER 1'

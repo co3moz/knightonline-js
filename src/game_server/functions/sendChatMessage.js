@@ -50,7 +50,7 @@ exports.sendMessageToPlayerFromPlayer = (socket, fromSocket, type, message) => {
   socket.send([
     0x10, type, fromSocket.user.nation,
     ...unit.short(fromSocket.session),
-    ...unit.byte_string(fromSocket.user.name),
+    ...unit.byte_string(fromSocket.character.name),
     ...unit.string(message, 'ascii')
   ]);
 }

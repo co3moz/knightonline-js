@@ -1,4 +1,4 @@
-module.exports = function () {
+module.exports = function (onchange) {
   let regions = {};
   let users = {};
   let zones = {};
@@ -38,11 +38,13 @@ module.exports = function () {
         zones[c.zone] = [];
       }
 
-      console.log('REGION CHANGE ' + c.name + ' ' + s);
       regions[s].push(socket);
       zones[c.zone].push(socket);
       users[c.name] = { s, zone: c.zone, x, z, socket };
       sessions[socket.session] = socket;
+      if (onchange) {
+        onchange(this, socket, s);
+      }
       return true;
     },
 

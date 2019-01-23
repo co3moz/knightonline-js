@@ -1,6 +1,5 @@
 const region = require('../region');
 
-const sendRegionPlayer = require('../functions/sendRegionPlayer');
 const sendQuests = require('../functions/sendQuests');
 const sendNotices = require('../functions/sendNotices');
 const sendTime = require('../functions/sendTime');
@@ -28,7 +27,6 @@ module.exports = async function ({ socket, opcode, body }) {
     ]);
   } else if (subOpCode == 2) {
     region.update(socket); // put user in region
-    sendRegionPlayer(socket);
     socket.ingame = true;
   }
 }
