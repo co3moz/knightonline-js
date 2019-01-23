@@ -7,6 +7,7 @@ services:
       - "15100-15109:15100-15109"
       - "15001:15001"
     networks:
+      outaccess:
       application:
         ipv4_address: 10.0.0.50
     restart: always
@@ -34,9 +35,13 @@ services:
     ports: 
       - '1234:1234'
     networks:
+      outaccess:
       application:
         ipv4_address: 10.0.0.53
 networks:
+  outaccess:
+    external:
+      name: outaccess
   application:
     external:
       name: application
