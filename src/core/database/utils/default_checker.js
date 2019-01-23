@@ -10,12 +10,14 @@ module.exports = async (db) => {
         return;
       }
 
+      let file;
       try {
-        for (let file of files) {
-          await require(file)(db);
+        for (file of files) {
+          let lib = require(file);
+          await lib(db);
         }
       } catch (e) {
-        console.log('default checker failed!');
+        console.error('default checker failed! at ' + file);
         reject(e);
         return;
       }

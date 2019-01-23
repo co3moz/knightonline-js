@@ -1,6 +1,8 @@
-const unit = require('../../core/utils/unit');
 const crypto = require('crypto');
 const config = require('config');
+
+const unit = require('../../core/utils/unit');
+const region = require('../region');
 const internalCommunicationSecret = config.get('gameServer.internalCommunicationSecret')
 
 module.exports = async function ({ body, socket, opcode }) {
@@ -23,7 +25,7 @@ module.exports = async function ({ body, socket, opcode }) {
   let result = null;
 
   if (subOpcode == 1) { // get user count
-    let users = Object.keys(socket.shared.region.users);
+    let users = Object.keys(region.users);
     result = [
       subOpcode,
       ...unit.short(users.length)

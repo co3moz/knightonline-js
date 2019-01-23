@@ -6,20 +6,15 @@ const path = require('path');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-module.exports = async function ({ db, modelName, file, transfer, expected }) {
-  let model = db.models[modelName];
-
-  if (await model.findOne({}).exec()) {
-    return false;
-  }
-
-  return await new Promise(resolve => {
+module.exports = function ({ file, transfer, expected }) {
+  return new Promise(resolve => {
     let extract = unzip.Extract({ path: path.resolve(__dirname, '../../../../data/') })
     fs.createReadStream(path.resolve(__dirname, '../../../../data/' + file + '.zip')).pipe(extract);
     extract.on('close', function () {
-      console.log(file + '.zip unzipped');
+      console.log(file + '.zip unzipped for reading');
 
       var arr = [];
+      let patch = []
 
       const parser = csv({ columns: true, newline: '\r\n', })
 
@@ -28,7 +23,7 @@ module.exports = async function ({ db, modelName, file, transfer, expected }) {
 
         validObj(obj, data, transfer);
 
-        arr.push(new model(obj));
+        arr.push(obj);
       });
 
 
@@ -40,20 +35,20 @@ module.exports = async function ({ db, modelName, file, transfer, expected }) {
 
         while (arr.length) {
           parser.pause();
-          await model.insertMany(arr);
+          patch = patch.concat(arr);
           total += arr.length;
-          console.log(file + ' patch sent %d status: %f %', total, parseInt(total / expected * 1000) / 10);
+          console.log(file + ' patch read %d status: %f %', total, parseInt(total / expected * 1000) / 10);
           arr = [];
           parser.resume();
           await delay(500);
         }
 
-        console.log(file + '.csv completed');
+        console.log(file + '.csv read completed');
 
         fs.unlink(path.resolve(__dirname, '../../../../data/' + file + '.csv'), function () {
           console.log(file + '.csv removed');
 
-          resolve(true);
+          resolve(patch);
         });
       })()
     });

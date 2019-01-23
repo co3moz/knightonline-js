@@ -2,7 +2,13 @@ const config = require('config');
 const long = require('long');
 
 exports.readShort = function readShort(data, i) {
-  return data[i] + (data[i + 1] << 8);
+  let sign = data[i + 1] & (1 << 7);
+  let x = (((data[i + 1] & 0xFF) << 8) | (data[i] & 0xFF));
+  if (sign) {
+    return 0xFFFF0000 | x;
+  }
+
+  return x;
 }
 
 

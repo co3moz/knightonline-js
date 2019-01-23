@@ -1,5 +1,7 @@
 const unit = require('../../core/utils/unit');
-const zoneCodes = require('../var/zone_codes');
+const { sendMessageToPlayer } = require('../functions/sendChatMessage');
+const sendRegionPlayer = require('../functions/sendRegionPlayer');
+const region = require('../region');
 
 module.exports = async function ({ body, socket, opcode }) {
   let u = socket.user;
@@ -19,15 +21,30 @@ module.exports = async function ({ body, socket, opcode }) {
   let realZ = newZ / 10;
   let realY = newY / 10;
 
+
+  let rwillX = willX / 10;
+  let rwillZ = willZ / 10;
+  let rwillY = willY / 10;
+
   c.x = realX;
   c.z = realZ;
   c.y = realY;
 
   // TODO: do this right way :)
 
-  socket.shared.region.update(socket);
+  if (region.update(socket)) { // region changed?
+    let s = region.getRegionName(socket);
 
-  socket.shared.region.regionSend(socket, [
+    let names = [];
+    for (let userSocket of region.query(socket)) {
+      names.push(userSocket.character.name);
+    }
+
+    sendMessageToPlayer(socket, 7, 'REGION', `${s} users: ${names.join(', ')}`);
+    sendRegionPlayer(socket);
+  }
+
+  region.regionSend(socket, [
     opcode,
     ...unit.short(socket.session),
     ...unit.short(willX),
@@ -40,5 +57,9 @@ module.exports = async function ({ body, socket, opcode }) {
     ...unit.short(newY)
   ]);
 
-  console.log('MOVE REAL ' + realX + ' ' + realZ + ' ' + realY + ' | WILL ' + willX + ' ' + willZ + ' ' + willY + ' | ' + speed);
+
+
+  let text = (realX + ' ' + realZ + ' ' + realY + ' | W ' + rwillX + ' ' + rwillZ + ' ' + rwillY + ' | ' + speed);
+  console.log('MOVE REAL ' + text);
+  sendMessageToPlayer(socket, 7, 'MOVE', text);
 }

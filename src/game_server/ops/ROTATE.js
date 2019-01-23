@@ -1,4 +1,6 @@
 const unit = require('../../core/utils/unit');
+const region = require('../region');
+
 const zoneCodes = require('../var/zone_codes');
 
 module.exports = async function ({ body, socket, opcode }) {
@@ -9,7 +11,7 @@ module.exports = async function ({ body, socket, opcode }) {
   let direction = body.short();
   c.direction = direction;
 
-  socket.shared.region.regionSend(socket, [
+  region.regionSend(socket, [
     opcode,
     ...unit.short(socket.session),
     ...unit.short(direction),

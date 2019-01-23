@@ -374,22 +374,9 @@ module.exports = async function () {
 
     gcon.send([0x48]); // zone home
 
-    // data = await gcon.waitNextData(0x1c); // npc data
-
-    // let npcCount = data.short();
-    // let npcInRegion = [];
-
-    // for (let i = 0; i < npcCount; i++) {
-    //   npcInRegion.push(data.short());
-    // }
-
-    // table({
-    //   npcInRegion: npcInRegion
-    // });
-
     setInterval(function () {
       gcon.send([0, 0, 0]);
-    }, 5000)
+    }, 120000)
 
     while (gcon.connected) {
       data = await gcon.waitNextData(); // get next waiting
@@ -536,8 +523,55 @@ module.exports = async function () {
         table({
           itemWeightChangedTo: data.int()
         });
+      } else if (opcode == 0x1C) { // NPCs IN RANGE
+        let npcCount = data.short();
+        let npcInRegion = [];
+
+        for (let i = 0; i < npcCount; i++) {
+          npcInRegion.push(data.short());
+        }
+
+        table({
+          npcInRegion: npcInRegion
+        });
+
+        gcon.send([ // ASK FOR MORE INFO
+          0x1D,
+          ...unit.short(npcInRegion.length),
+          ...[].concat(...npcInRegion.map(x => unit.short(x)))
+        ]);
+      } else if(opcode == 0x1D) { // NPC MORE INFO COMING
+        let npcCount = data.short();
+        let npcs = [];
+
+        for (let i = 0; i < npcCount; i++) {
+          npcs.push({
+            id: data.short(),
+            pid: data.short(),
+            isMonster: data.byte() == 1 ? 'true' : 'false',
+            sid: data.short(),
+            sellingGroup: data.int(),
+            type: data.byte(),
+            unk: data.int(),
+            size: data.short(),
+            weapon1: data.int(),
+            weapon2: data.int(),
+            nation: data.byte(),
+            level: data.byte(),
+            x: data.short(),
+            z: data.short(),
+            y: data.short(),
+            state: data.int(),
+            oType: data.byte(),
+            unk2: data.short(),
+            unk3: data.short(),
+            direction: data.short(),
+          });
+        }
+
+        table(npcs, 'INCOMING_NPC_INFO');
       } else {
-        console.log('unhandled opcode has arrived! (' + opcode + ') body: ' + data.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+        console.log('unhandled opcode has arrived! (0x' + opcode.toString(16) + ') body: ' + data.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
       }
 
     }

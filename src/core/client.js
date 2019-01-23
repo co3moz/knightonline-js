@@ -135,9 +135,9 @@ module.exports = (params) => {
           let compressedData = body.skip(len);
           let uncompressedData = lzfjs.decompress(new Uint8Array(compressedData));
           let crcUncompressedData = crc32.buf(uncompressedData, ~-1);
-          if (crcUncompressedData != crc || uncompressedData.length != realLen || compressedData.length != len) {
-            throw new Error('invalid compressed data!');
-          }
+          // if (crcUncompressedData != crc || uncompressedData.length != realLen || compressedData.length != len) {
+          //   throw new Error('invalid compressed data!');
+          // }
 
           data = [0xAA, 0x55, ...unit.short(realLen), ...Array.from(uncompressedData), 0x55, 0xAA, ...data.slice(6 + length)]
           client.debug('data uncompressed | ' + Array.from(data).map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' '));

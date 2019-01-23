@@ -1,11 +1,12 @@
 const unit = require('../../core/utils/unit');
-const GM_COMMANDS_HEADER = require('./CHAT.js').GM_COMMANDS_HEADER;
+const region = require('../region');
+const { GM_COMMANDS_HEADER } = require('../functions/GMController');
 
 module.exports = async function ({ body, socket, opcode }) {
   let type = body.byte();
-  let user = body.string();
 
   if (type == 1) {
+    let user = body.string();
     if (user == GM_COMMANDS_HEADER && socket.character.gm) { // allow gm chat with server
       socket.variables.chatTo = user;
       return socket.send([
@@ -13,7 +14,7 @@ module.exports = async function ({ body, socket, opcode }) {
       ]);
     }
 
-    let userSocket = socket.shared.region.users[user];
+    let userSocket = region.users[user];
     if (!userSocket) {
       socket.variables.chatTo = null;
       return socket.send([
@@ -31,5 +32,5 @@ module.exports = async function ({ body, socket, opcode }) {
   }
 
 
-  console.error('CHAT_TARGET type#' + type);
+  console.error('CHAT_TARGET type#' + type + ' data#' + body.array().join(', '));
 }

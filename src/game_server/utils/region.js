@@ -2,14 +2,26 @@ module.exports = function () {
   let regions = {};
   let users = {};
   let zones = {};
+  let sessions = {};
 
   return {
+    getRegionName(socket) {
+      let c = socket.character;
+      if (!c) return '';
+
+      let q = users[c.name];
+      if (q) {
+        return q.s;
+      }
+
+      return '';
+    },
+
     update(socket) {
-      if (!socket) return false;
       let c = socket.character;
       if (!c) return false;
-      let x = c.x / 10 >> 0;
-      let z = c.z / 10 >> 0;
+      let x = c.x / 20 >> 0;
+      let z = c.z / 20 >> 0;
       let s = `${c.zone}x${x}z${z}`;
 
       if (users[c.name]) {
@@ -30,11 +42,12 @@ module.exports = function () {
       regions[s].push(socket);
       zones[c.zone].push(socket);
       users[c.name] = { s, zone: c.zone, x, z, socket };
+      sessions[socket.session] = socket;
       return true;
     },
 
     remove(socket) {
-      if (!socket) return;
+      delete sessions[socket.session];
       let c = socket.character;
       if (!c) return;
 
@@ -58,7 +71,6 @@ module.exports = function () {
     },
 
     *query(socket, opts = { zone: false, all: false, d: 1 }) {
-      if (!socket) return;
       let c = socket.character;
       if (!c) return;
 
@@ -93,25 +105,26 @@ module.exports = function () {
       }
     },
 
-    regionSend(socket, message) {
+    regionSend(socket, packet) {
       for (let s of this.query(socket)) {
-        s.send(message);
+        s.send(packet);
       }
     },
 
-    zoneSend(socket, message) {
+    zoneSend(socket, packet) {
       for (let s of this.query(socket, { zone: true })) {
-        s.send(message);
+        s.send(packet);
       }
     },
 
-    allSend(socket, message) {
+    allSend(socket, packet) {
       for (let s of this.query(socket, { all: true })) {
-        s.send(message);
+        s.send(packet);
       }
     },
 
     regions,
-    users
+    users,
+    sessions
   }
 }

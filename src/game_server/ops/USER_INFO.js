@@ -1,4 +1,5 @@
 const unit = require('../../core/utils/unit');
+const region = require('../region');
 
 module.exports = async function ({ body, socket, opcode }) {
   let c = socket.character;
@@ -7,7 +8,7 @@ module.exports = async function ({ body, socket, opcode }) {
   if (subOpcode == 0x01) { // send all user data in same zone
     let result = [opcode, subOpcode, 1, c.zone, 0, 0, 0]; // last 0, 0 is count
     let userCount = 0;
-    for (let userSocket of socket.shared.region.query(socket, { zone: true })) { // request all users in the zone
+    for (let userSocket of region.query(socket, { zone: true })) { // request all users in the zone
       userCount++;
 
       let uc = userSocket.character;
@@ -24,5 +25,8 @@ module.exports = async function ({ body, socket, opcode }) {
     result[6] = userCount >>> 8;
 
     socket.sendCompressed(result);
+  } else {
+    console.error('HANDLE THIS REQUEST USER_INFO ' + subOpcode); 
+    // TODO: do this
   }
 }

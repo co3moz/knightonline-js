@@ -24,7 +24,8 @@ module.exports = {
   MOVE: 0x06,
   ROTATE: 0x09,
   USER_INFO: 0x98,
-  CHAT_TARGET: 0x35
+  CHAT_TARGET: 0x35,
+  REGION_PLAYER_DETAIL: 0x16
 };
 
 Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);

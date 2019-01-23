@@ -1,4 +1,6 @@
 const unit = require('../../core/utils/unit');
+const region = require('../region');
+
 const zoneCodes = require('../var/zone_codes');
 const startPositions = require('../var/zone_start_position');
 
@@ -16,7 +18,7 @@ module.exports = async function ({ body, socket, opcode }) {
     if (v.lastHome > now) return;
   }
 
-  v.lastHome = now + 1;
+  v.lastHome = now + 1000;
 
 
   let startPosition = startPositions[c.zone];
@@ -41,7 +43,7 @@ module.exports = async function ({ body, socket, opcode }) {
   c.x = x;
   c.z = z;
 
-  socket.shared.region.update(socket);
+  region.update(socket);
 
   // TODO: HOME add health controls etc..
 

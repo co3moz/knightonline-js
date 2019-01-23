@@ -165,6 +165,10 @@ function serverHandler({ timeout, onConnect, onData, onError, debug, onDisconnec
             let body = unit.queue(onlyBody);
             let opcode = data[4];
 
+            if (!opcode) {
+              data = data.slice(6 + length);
+              continue;
+            }
 
             if (onData) await onData({ body, socket, opcode, length });
             data = data.slice(6 + length);
