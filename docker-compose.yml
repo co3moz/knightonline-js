@@ -4,8 +4,8 @@ services:
     build: .
     hostname: "kojs_sandbox"
     ports:
-      - "15100-15109:15100-15109/udp"
-      - "15001:15001/udp"
+      - "15100-15109:15100-15109"
+      - "15001:15001"
     networks:
       application:
         ipv4_address: 10.0.0.50
