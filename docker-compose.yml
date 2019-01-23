@@ -2,6 +2,7 @@ version: '3'
 services:
   ko-js:
     build: .
+    hostname: "kojs_sandbox"
     ports:
       - "15100:15100/udp"
       - "15101:15101/udp"

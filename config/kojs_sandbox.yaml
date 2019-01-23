@@ -1,0 +1,7 @@
+database:
+  uri: mongodb://10.0.0.51:27017/knight-online
+  options:
+
+redis:
+  host: '10.0.0.52'
+  port: 6379
