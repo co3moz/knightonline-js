@@ -61,7 +61,7 @@ module.exports = async db => {
   });
 
   let pos = await csvReader({
-    file: 'npc_pos',
+    file: 'npc_monster_pos',
     expected: 4647,
     transfer: {
       ZoneID: 'zone',

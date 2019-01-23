@@ -375,11 +375,11 @@ module.exports = async function () {
 
     await delay(500);
 
-    gcon.send([0x48]); // zone home
+    // gcon.send([0x48]); // zone home
 
     setInterval(function () {
       gcon.send([0x49, 0x01]);
-    }, 60000)
+    }, 5000)
 
     while (gcon.connected) {
       data = await gcon.waitNextData(); // get next waiting
@@ -400,11 +400,16 @@ module.exports = async function () {
             userInRegion: userIds
           })
 
+          /*console.log([ // ASK FOR MORE INFO
+            0x16,
+            ...unit.short(userIds.length),
+            ...[].concat(...userIds.map(x => unit.short(x)))
+          ])
           gcon.send([ // ASK FOR MORE INFO
             0x16,
             ...unit.short(userIds.length),
             ...[].concat(...userIds.map(x => unit.short(x)))
-          ]);
+          ]);*/
         } else if (subOpcode == 0) {
           table({
             userInRegion: 'reset'
@@ -414,54 +419,7 @@ module.exports = async function () {
             userInRegion: 'end'
           });
         }
-      } /*else if (opcode == 0x16) {
-        let userCount = data.short();
-        let users = [];
-
-        for (let i = 0; i < userCount; i++) {
-          let user = {};
-
-          data.byte();
-          user.session = data.short();
-          user.name = data.byte_string();
-          user.nation = data.short();
-          user.clanId = data.short();
-          user.fame = data.byte();
-
-          data.skip(14);
-
-          user.level = data.byte();
-          user.race = data.byte();
-          user.klass = data.short();
-          user.x = data.short();
-          user.z = data.short();
-          user.y = data.short();
-          user.face = data.byte();
-          user.hair = data.int();
-          user.hpType = data.byte();
-          user.abnormalType = data.int();
-          user.needParty = data.byte();
-          user.normalUser = data.byte();
-          user.partyLeader = data.byte();
-          user.invisibilityState = data.byte();
-          user.teamColor = data.byte();
-          user.helmet = data.byte();
-          user.cospre = data.byte();
-          user.direction = data.short();
-          user.chicken = data.byte();
-          user.rank = data.byte();
-
-          data.skip(4 + 7 * 14);
-
-          user.zone = data.byte();
-
-          data.skip()
-
-          users.push(user);
-        }
-
-        table(users, 'INCOMING_USER');
-      }*/ else if (opcode == opCodes.CHAT) { // chat
+      } else if (opcode == opCodes.CHAT) { // chat
         let message = {
           op: 'chat',
           type: data.byte(),
