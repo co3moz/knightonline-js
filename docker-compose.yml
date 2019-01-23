@@ -7,7 +7,6 @@ services:
       - "15100-15109:15100-15109"
       - "15001:15001"
     networks:
-      bridge:
       application:
         ipv4_address: 10.0.0.50
     restart: always
@@ -35,13 +34,9 @@ services:
     ports: 
       - '1234:1234'
     networks:
-      bridge:
       application:
         ipv4_address: 10.0.0.53
 networks:
-  bridge:
-    external:
-      name: bridge
   application:
     external:
       name: application
