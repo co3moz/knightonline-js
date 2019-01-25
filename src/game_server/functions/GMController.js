@@ -2,6 +2,7 @@
 const unit = require('../../core/utils/unit');
 const region = require('../region');
 const { MESSAGE_TYPES, sendMessageToPlayer } = require('./sendChatMessage');
+const { sendWarp } = require('./sendWarp');
 const GM_COMMANDS_HEADER = exports.GM_COMMANDS_HEADER = '[GM CONTROLLER]';
 
 const sendMessageToGM = exports.sendMessageToGM = (socket, message) => {
@@ -61,20 +62,45 @@ const GM_COMMANDS = exports.GM_COMMANDS = {
     sendMessageToGM(socket, `HELP: ${GM_COMMANDS_LIST.join(', ')}`);
   },
 
-  warp: (args, socket) => {
-    let text = args.join(' ');
-    if (text.length == 0) {
-      return sendMessageToGM(socket, `USAGE: warp id`);
+  zone: (args, socket) => {
+    let id = args.join(' ');
+    if (id.length == 0) {
+      return sendMessageToGM(socket, `USAGE: zone id`);
     }
 
-    
-
+    sendWarp(socket, +id);
   },
 
   test: (args, socket) => {
-    socket.send([
-      0x35, 3, 3, ...unit.byte_string('admin')
-    ])
+    function showImaginaryClient(id) {
+      socket.send([
+        0x07,  // USER_IN_OUT
+        1, 0, // show
+        ...unit.short(id),
+        ...require('./buildUserDetail')(socket)
+      ]);
+    }
+
+    function hideImaginaryClient(id) {
+      socket.send([
+        0x07,  // USER_IN_OUT
+        2, 0, // hide
+        ...unit.short(id)
+      ]);
+    }
+
+
+    for (let i = 10; i < 500; i++) {
+      showImaginaryClient(i);
+    }
+
+    setTimeout(function () {
+      for (let i = 10; i < 500; i++) {
+        hideImaginaryClient(i);
+      }
+    }, 10000);
+
+    sendMessageToPlayer(socket, 1, '[SERVER]', 'ok', undefined, -1);
   }
 }
 

@@ -7,7 +7,7 @@ module.exports = async function (db) {
     console.log('looks like there is no version on database, creating one');
 
     let version = new Version({
-      version: 2195,
+      version: 2228,
       fileName: 'none'
     });
 

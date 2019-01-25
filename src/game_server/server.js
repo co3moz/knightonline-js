@@ -16,6 +16,8 @@ module.exports = async function () {
   let region = require('./region');
   shared.setItems = setItems;
   shared.region = region;
+  region.setOnChange(require('./functions/onRegionUpdate'));
+  region.setOnExit(require('./functions/onUserExit'));
 
   await server({
     ip: config.get('gameServer.ip'),
@@ -34,7 +36,7 @@ module.exports = async function () {
       }
 
       if (socket.character) {
-        shared.region.remove(socket);
+        shared.region.exit(socket);
         if (characterMap[socket.character.name]) {
           delete characterMap[socket.character.name];
         }

@@ -6,6 +6,7 @@ const sendTime = require('../functions/sendTime');
 const sendWeather = require('../functions/sendWeather');
 const sendMyInfo = require('../functions/sendMyInfo');
 const sendZoneAbility = require('../functions/sendZoneAbility');
+const sendRegionPlayers = require('../functions/sendRegionPlayers');
 
 module.exports = async function ({ socket, opcode, body }) {
   let subOpCode = body.byte();
@@ -28,6 +29,8 @@ module.exports = async function ({ socket, opcode, body }) {
   } else if (subOpCode == 2) {
     region.update(socket); // put user in region
     socket.ingame = true;
+
+    sendRegionPlayers(socket);
   }
 }
 

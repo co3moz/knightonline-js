@@ -120,7 +120,7 @@ module.exports = async function () {
     lcon = null;
 
     let pickedConfig = config.get('testClient.server');
-    let picked = servers.filter(x=> x.name == pickedConfig);
+    let picked = servers.filter(x => x.name == pickedConfig);
 
 
     console.log('connecting to game server...' + picked[0].name);
@@ -334,7 +334,7 @@ module.exports = async function () {
     gcon.send([0x6A, 0x06, 0x01]); // request letter count
     gcon.send([0x0D, 0x02, ...unit.byte_string(selectedChar)]); // game start 0x02
 
-    await delay(1000);
+    // await delay(1000);
 
     data = await gcon.sendAndWait([0x98, 0x1], 0x98, 0x1);
     data.skip(1); // 1
@@ -373,13 +373,14 @@ module.exports = async function () {
     ]); // send movement
 
 
-    await delay(500);
 
     // gcon.send([0x48]); // zone home
 
+    let d = 0;
     setInterval(function () {
-      gcon.send([0x49, 0x01]);
-    }, 5000)
+      d += 5;
+      gcon.send([0x09, ...unit.short(d % 500)]);
+    }, 60000)
 
     while (gcon.connected) {
       data = await gcon.waitNextData(); // get next waiting
@@ -400,16 +401,11 @@ module.exports = async function () {
             userInRegion: userIds
           })
 
-          /*console.log([ // ASK FOR MORE INFO
-            0x16,
-            ...unit.short(userIds.length),
-            ...[].concat(...userIds.map(x => unit.short(x)))
-          ])
           gcon.send([ // ASK FOR MORE INFO
             0x16,
             ...unit.short(userIds.length),
             ...[].concat(...userIds.map(x => unit.short(x)))
-          ]);*/
+          ]);
         } else if (subOpcode == 0) {
           table({
             userInRegion: 'reset'
@@ -516,16 +512,11 @@ module.exports = async function () {
         }
       } else if (opcode == 0x14) { // weather data
         table({
-          weather: data.byte(),
-          weather_amount: data.short(),
+          weather: [data.byte(), data.short()]
         });
       } else if (opcode == 0x13) { // time data
         table({
-          year: data.short(),
-          month: data.short(),
-          day: data.short(),
-          hour: data.short(),
-          min: data.short()
+          time: [data.short(), data.short(), data.short(), data.short(), data.short()]
         });
       } else if (opcode == 0x71) { // premium shit
         table({
@@ -592,6 +583,123 @@ module.exports = async function () {
         }
 
         table(npcs, 'INCOMING_NPC_INFO');
+      } else if (opcode == 0xA) { // NPC IN_OUT
+        /*let type = data.byte();
+        let id = data.short();
+
+        if(type == 1) {
+          table({
+            id,
+            pid: data.short(),
+            isMonster: data.byte() == 1 ? 'true' : 'false',
+            sid: data.short(),
+            sellingGroup: data.int(),
+            type: data.byte(),
+            unk: data.int(),
+            size: data.short(),
+            weapon1: data.int(),
+            weapon2: data.int(),
+            nation: data.byte(),
+            level: data.byte(),
+            x: data.short(),
+            z: data.short(),
+            y: data.short(),
+            state: data.int(),
+            oType: data.byte(),
+            unk2: data.short(),
+            unk3: data.short(),
+            direction: data.short(),
+          });
+        }*/
+      } else if (opcode == 0xB) { // NPC MOVE
+        /*data.byte();
+
+        table({
+          id: data.short(),
+          x: data.short(),
+          z: data.short(),
+          y: data.short(),
+          speed: data.short()
+        });*/
+      } else if (opcode == 0x6) { // User MOVE
+        let move = [data.short(), data.short(), data.short(), data.short(), data.short()];
+        data.byte();
+        move.push(data.short(), data.short(), data.short());
+
+        table({
+          move
+        });
+      } else if (opcode == 0x9) { // User Rotate
+        table({
+          rotate: [data.short(), data.short()]
+        });
+      } else if (opcode == 0x7) { // User INOUT
+        let type = data.short();
+        let id = data.short();
+
+        if (type == 2) {
+          table({
+            type: 'out of view',
+            id
+          }, 'USER_INOUT');
+        } else {
+          table({
+            type,
+            id,
+            details: data.array()
+          }, 'USER_INOUT');
+        }
+      } else if (opcode == 0x81) {
+        table({
+          story: data.skip(6)
+        });
+      } else if (opcode == 0x16) {
+        let userCount = data.short();
+        let users = [];
+
+        for (let i = 0; i < userCount; i++) {
+          let user = {};
+
+          data.byte();
+          user.session = data.short();
+          user.name = data.byte_string();
+          user.nation = data.short();
+          user.clanId = data.short();
+          user.fame = data.byte();
+
+          data.skip(15);
+
+          user.level = data.byte();
+          user.race = data.byte();
+          user.klass = data.short();
+          user.x = data.short();
+          user.z = data.short();
+          user.y = data.short();
+          user.face = data.byte();
+          user.hair = data.int();
+          user.hpType = data.byte();
+          user.abnormalType = data.int();
+          user.needParty = data.byte();
+          user.normalUser = data.byte();
+          user.partyLeader = data.byte();
+          user.invisibilityState = data.byte();
+          user.teamColor = data.byte();
+          user.helmet = data.byte();
+          user.cospre = data.byte();
+          user.direction = data.short();
+          user.chicken = data.byte();
+          user.rank = data.byte();
+
+          user.items = data.skip(4 + 7 * 15);
+
+          user.zone = data.byte();
+
+          data.skip(21)
+
+          users.push(user);
+        }
+
+        table(users, 'INCOMING_USER');
       } else {
         console.log('unhandled opcode has arrived! (0x' + opcode.toString(16) + ') body: ' + data.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
       }
@@ -738,7 +846,7 @@ const table = function (data, name) {
     }
   } else {
     for (let key in data) {
-      console.log(key.padStart(30) + ':  ' + keep(data[key]));
+      console.log(((name ? name + '::' : '') + key).padStart(30) + ':  ' + keep(data[key]));
     }
   }
 
@@ -752,7 +860,7 @@ function keep(data) {
   }
 
   if (data.constructor == Array || data.constructor == Buffer) {
-    return `[${data.map(x => x.toString(16).padStart(2, "0").toUpperCase()).join(' ')}]`;
+    return `[${data.join(' ')}]`;
   }
 
   if (data.constructor == Boolean) {

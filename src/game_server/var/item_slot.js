@@ -1,19 +1,19 @@
 module.exports = {
-  RIGHTEAR: 0,
-  HEAD: 1,
-  LEFTEAR: 2,
-  NECK: 3,
-  BREAST: 4,
-  SHOULDER: 5,
-  RIGHTHAND: 6,
-  WAIST: 7,
-  LEFTHAND: 8,
-  RIGHTRING: 9,
-  LEG: 10,
-  LEFTRING: 11,
-  GLOVE: 12,
-  FOOT: 13,
-  RESERVED: 14,
+  RIGHTEAR: 0, // 0: sol küpe
+  HEAD: 1, // 1: kafalık
+  LEFTEAR: 2, // 2: sağ küpe
+  NECK: 3, // 3: kolye
+  BREAST: 4, // 4: göğüslük
+  SHOULDER: 5, // 5: omuzluk
+  RIGHTHAND: 6, // 6: sol el
+  WAIST: 7, // 7: kemer
+  LEFTHAND: 8, // 8: sağ kol
+  RIGHTRING: 9, // 9: sol yüzük
+  LEG: 10, // 10: pantolon
+  LEFTRING: 11, // 11: sağ yüzük
+  GLOVE: 12, // 12: kolluklar
+  FOOT: 13, // 13: ayaklıklar
+  RESERVED: 14, // 14: çöp kutusu
 
   PET: 20,
   CWING: 42,

@@ -66,3 +66,6 @@ module.exports = {
   ZONE_WINNER_CASTLE2: 98,
   ZONE_OLD_MORADON: 91
 }
+
+
+Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);

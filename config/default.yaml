@@ -29,7 +29,7 @@ gameServer:
   ip: 0.0.0.0
   ports: 
     - 15001
-  clientExeVersion: 2195
+  clientExeVersion: 2228
   internalCommunicationSecret: 'very important text :)'
   levelUp:
     - 50 
@@ -129,7 +129,7 @@ gameServer:
 testClient:
   ip: '127.0.0.1'
   port: 15100
-  version: 2195
+  version: 2227
   user: 'test'
   password: '1'
   server: 'TEST|SERVER 1'

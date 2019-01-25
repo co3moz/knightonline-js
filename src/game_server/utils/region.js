@@ -1,10 +1,16 @@
-module.exports = function (onchange) {
+module.exports = function (onchange, onexit) {
   let regions = {};
   let users = {};
   let zones = {};
   let sessions = {};
 
   return {
+    setOnChange(fn) {
+      onchange = fn;
+    },
+    setOnExit(fn) {
+      onexit = fn;
+    },
     getRegionName(socket) {
       let c = socket.character;
       if (!c) return '';
@@ -20,8 +26,8 @@ module.exports = function (onchange) {
     update(socket) {
       let c = socket.character;
       if (!c) return false;
-      let x = c.x / 20 >> 0;
-      let z = c.z / 20 >> 0;
+      let x = c.x / 50 >> 0;
+      let z = c.z / 50 >> 0;
       let s = `${c.zone}x${x}z${z}`;
 
       if (users[c.name]) {
@@ -70,6 +76,14 @@ module.exports = function (onchange) {
         let userZoneIndex = userZone.findIndex(x => x == socket);
         userZone.splice(userZoneIndex, 1);
       }
+    },
+
+    exit(socket) {
+      if (onexit) {
+        onexit(this, socket);
+      }
+
+      this.remove(socket);
     },
 
     *query(socket, opts = { zone: false, all: false, d: 1 }) {
