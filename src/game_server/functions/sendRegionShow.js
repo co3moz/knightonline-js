@@ -21,9 +21,17 @@ const sendRegionShow = (socket, session, onlyOneWay, cached) => {
       }
     }
 
+    let showType = 1;
+
+    if(onlyOneWay == 3) { // special case, when user login
+      showType = 3;
+    } else if(onlyOneWay == 4) { // special case, when user warps
+      showType = 4;
+    }
+
     socket.send([
       0x07,  // USER_IN_OUT
-      1, 0, // show
+      showType, 0, // show
       ...unit.short(session),
       ...cached
     ]);

@@ -4,6 +4,7 @@ const sendRegionShow = require('./sendRegionShow');
 const buildUserDetail = require('./buildUserDetail');
 
 module.exports = (region, socket, s) => {
+  if(!socket.ingame) return;
   let names = [];
   let newSessions = [];
   let oldSessions = (socket.knownSessions || []).slice();

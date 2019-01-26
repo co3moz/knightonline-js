@@ -1,23 +1,15 @@
 const unit = require('../../core/utils/unit');
 const region = require('../region');
-const sendRegionHide = require('./sendRegionHide');
+const sendRegionHideAll = require('./sendRegionHideAll');
 const sendRegionShow = require('./sendRegionShow');
 const buildUserDetail = require('./buildUserDetail');
 
-module.exports = (socket) => {
+module.exports = (socket, warp) => {
   socket.send([0x15, 0]);
 
-  let knownSessions = socket.knownSessions = [];
+  sendRegionHideAll(socket);
 
-  if (knownSessions.length) {
-    for (let session of knownSessions) {
-      let socket = region.sessions[session];
-
-      if (!socket) continue;
-
-      sendRegionHide(socket, session);
-    }
-  }
+  let knownSessions = [];
 
   let result = [0x15, 1, 0, 0];
   let userCount = 0;
@@ -28,8 +20,8 @@ module.exports = (socket) => {
     userCount++;
     knownSessions.push(userSocket.session);
     result.push(...unit.short(userSocket.session));
-
-    sendRegionShow(userSocket, socket.session, 1, userDetail);
+    
+    sendRegionShow(userSocket, socket.session, warp ? 4 : 3, userDetail);
   }
 
   result[2] = userCount & 0xFF;

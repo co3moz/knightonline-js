@@ -1,49 +1,45 @@
 const unit = require('../../core/utils/unit');
 const { sendMessageToPlayer } = require('../functions/sendChatMessage');
+const sendRegionPlayers = require('../functions/sendRegionPlayers');
+const sendRegionHideAll = require('../functions/sendRegionHideAll');
+const region = require('../region');
 
 const zoneCodes = require('../var/zone_codes');
 const startPositions = require('../var/zone_start_position');
 
-exports.sendWarp = (socket, zone, x, z) => {
-  if (zone) {
-    if (typeof x == 'undefined') {
-      let pos = exports.discover(socket, zone);
+exports.sendWarp = (socket, zone) => {
+  let pos = exports.discover(socket, zone);
 
-      if (!pos) {
-        return sendMessageToPlayer(socket, 1, '[SERVER]', 'Unknown zone!');
-      }
+  if (!pos) {
+    return sendMessageToPlayer(socket, 1, '[SERVER]', 'Unknown zone!');
+  }
 
-      socket.send([
-        0x27, // ZONE_CHANGE
-        3, // ZONE_CHANGE_TELEPORT
-        ...unit.short(zone),
-        ...unit.short(pos.x * 10),
-        ...unit.short(pos.z * 10),
-        0, 0, 0
-      ]);
-
-      socket.character.zone = zone;
-      socket.character.x = pos.x;
-      socket.character.z = pos.z;
-      socket.character.y = 0;
-    } else {
-      socket.send([
-        0x27, // ZONE_CHANGE
-        3, // ZONE_CHANGE_TELEPORT
-        ...unit.short(zone),
-        ...unit.short(x * 10),
-        ...unit.short(z * 10),
-        0, 0, 0
-      ])
-    }
-
-  } else {
+  if (socket.character.zone == zone) {
     socket.send([
       0x1E, // WARP
-      ...unit.short(x * 10),
-      ...unit.short(z * 10)
+      ...unit.short(pos.x * 10),
+      ...unit.short(pos.z * 10)
     ]);
+  } else {
+    socket.send([
+      0x27, // ZONE_CHANGE
+      3, // ZONE_CHANGE_TELEPORT
+      ...unit.short(zone),
+      ...unit.short(pos.x * 10),
+      ...unit.short(pos.z * 10),
+      0, 0, 0
+    ]);
+
+    socket.character.zone = zone;
   }
+
+  socket.character.x = pos.x;
+  socket.character.z = pos.z;
+  socket.character.y = 0;
+
+  region.update(socket, true);
+
+  sendRegionHideAll(socket);
 }
 
 exports.discover = (socket, zone) => {

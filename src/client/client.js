@@ -374,7 +374,10 @@ module.exports = async function () {
 
 
 
-    // gcon.send([0x48]); // zone home
+    setTimeout(function() {
+      gcon.send([0x48]); // zone home
+      console.log('home')
+    }, 5000);
 
     let d = 0;
     setInterval(function () {

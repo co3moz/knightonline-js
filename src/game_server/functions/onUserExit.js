@@ -12,4 +12,6 @@ module.exports = (region, socket) => {
       sendRegionHide(u, me, 1);
     }
   }
+
+  socket.character.save();
 }

@@ -5,6 +5,7 @@ module.exports = (socket) => {
   const result = [];
   let uu = socket.user;
   let uc = socket.character;
+  let uv = socket.variables;
 
   result.push(...unit.byte_string(uc.name));
   result.push(...unit.short(uu.nation));
@@ -19,8 +20,8 @@ module.exports = (socket) => {
   result.push(...unit.short(uc.y * 10));
   result.push(uc.face);
   result.push(...unit.int(uc.hair));
-  result.push(uc.hptype || 1);
-  result.push(...unit.int(uc.abnormalType || 1));
+  result.push(uv.hptype || 1);
+  result.push(...unit.int(uv.abnormalType || 1));
   result.push(0); // need party
   result.push(uc.gm ? 0 : 1);
   result.push(0); // party leader?

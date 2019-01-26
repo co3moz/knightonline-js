@@ -23,11 +23,11 @@ module.exports = function (onchange, onexit) {
       return '';
     },
 
-    update(socket) {
+    update(socket, disableEvent) {
       let c = socket.character;
       if (!c) return false;
-      let x = c.x / 50 >> 0;
-      let z = c.z / 50 >> 0;
+      let x = c.x / 35 >> 0;
+      let z = c.z / 35 >> 0;
       let s = `${c.zone}x${x}z${z}`;
 
       if (users[c.name]) {
@@ -48,7 +48,7 @@ module.exports = function (onchange, onexit) {
       zones[c.zone].push(socket);
       users[c.name] = { s, zone: c.zone, x, z, socket };
       sessions[socket.session] = socket;
-      if (onchange) {
+      if (!disableEvent && onchange) {
         onchange(this, socket, s);
       }
       return true;
