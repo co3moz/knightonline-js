@@ -20,9 +20,12 @@ module.exports = (socket, warp) => {
     userCount++;
     knownSessions.push(userSocket.session);
     result.push(...unit.short(userSocket.session));
-    
+
     sendRegionShow(userSocket, socket.session, warp ? 4 : 3, userDetail);
   }
+
+
+  socket.knownSessions = knownSessions;
 
   result[2] = userCount & 0xFF;
   result[3] = userCount >>> 8;

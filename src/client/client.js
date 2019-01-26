@@ -374,9 +374,8 @@ module.exports = async function () {
 
 
 
-    setTimeout(function() {
-      gcon.send([0x48]); // zone home
-      console.log('home')
+    setTimeout(function () {
+      gcon.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
     }, 5000);
 
     let d = 0;
@@ -656,6 +655,34 @@ module.exports = async function () {
         table({
           story: data.skip(6)
         });
+      } else if (opcode == 0x29) {
+        let session = data.short();
+        let type = data.byte();
+        let value = data.int();
+
+        if (type == 1) {
+          if (value == 1) {
+            table({
+              standUp: [session]
+            });
+          } else if (value == 2) {
+            table({
+              sitdown: [session]
+            });
+          }
+        } else if (type == 3) {
+          let z = 'unknown';
+          if (value == 1) z = 'normal';
+          else if (value == 2) z = 'giant';
+          else if (value == 3) z = 'dwarf';
+          else if (value == 4) z = 'blinking';
+          else if (value == 6) z = 'giant_target';
+
+          table({
+            abnormalChange: [session, z]
+          });
+        }
+
       } else if (opcode == 0x16) {
         let userCount = data.short();
         let users = [];

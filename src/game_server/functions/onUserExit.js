@@ -13,5 +13,11 @@ module.exports = (region, socket) => {
     }
   }
 
+  socket.knownSessions = [];
+
+  if (socket.variables.blinkExpiry) {
+    clearTimeout(socket.variables.blinkExpiry);
+  }
+
   socket.character.save();
 }

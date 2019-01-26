@@ -1,6 +1,7 @@
 const unit = require('../../core/utils/unit');
 const region = require('../region');
 const sendRegionPlayers = require('../functions/sendRegionPlayers');
+const { sendBlinkStart } = require('../functions/sendBlink');
 
 module.exports = async function ({ body, socket, opcode }) {
   let subOpcode = body.byte();
@@ -11,6 +12,7 @@ module.exports = async function ({ body, socket, opcode }) {
     ]);
   } else if (subOpcode == ZONE_CHANGE.LOADED) {
     sendRegionPlayers(socket, true);
+    sendBlinkStart(socket);
   }
 }
 
