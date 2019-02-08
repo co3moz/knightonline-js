@@ -3,6 +3,8 @@ module.exports = function (onchange, onexit) {
   let users = {};
   let zones = {};
   let sessions = {};
+  let npcRegions = {};
+  let npcs = {};
 
   return {
     setOnChange(fn) {
@@ -54,6 +56,26 @@ module.exports = function (onchange, onexit) {
       return true;
     },
 
+    updateNpc(npc) {
+      let x = npc.x / 35 >> 0;
+      let z = npc.z / 35 >> 0;
+      let s = `${npc.zone}x${x}z${z}`;
+
+      if (npcs[npc.uuid]) {
+        if (npcs[npc.uuid].s == s) return false; // no need to update
+
+        this.removeNpc(npc);
+      }
+
+      if (!npcRegions[s]) {
+        npcRegions[s] = [];
+      }
+
+      npcRegions[s].push(npc);
+      npcs[npc.uuid] = { s, zone: npc.zone, x, z, npc };
+      return true;
+    },
+
     remove(socket) {
       delete sessions[socket.session];
       let c = socket.character;
@@ -78,6 +100,22 @@ module.exports = function (onchange, onexit) {
       }
     },
 
+    removeNpc(npc) {
+      let n = npcs[npc.uuid];
+
+      if (n) {
+        delete npcs[npc.uuid];
+
+        let region = npcRegions[n.s];
+        let index = region.findIndex(x => x == npc);
+        region.splice(index, 1);
+
+        if (region.length == 0) {
+          delete npcRegions[n.s];
+        }
+      }
+    },
+
     exit(socket) {
       if (onexit) {
         onexit(this, socket);
@@ -86,21 +124,21 @@ module.exports = function (onchange, onexit) {
       this.remove(socket);
     },
 
-    *query(socket, opts = { zone: false, all: false, d: 1 }) {
+    *query(socket, opts = { zone: false, npcs: false, all: false, d: 1 }) {
       let c = socket.character;
       if (!c) return;
 
       let s = users[c.name];
       if (!s) return;
 
-      if (opts && opts.all) {
+      if (opts && opts.all) { // query users without caring location?
         for (let key in users) {
           yield users[key].socket;
         }
         return;
       }
 
-      if (opts && opts.zone) {
+      if (opts && opts.zone) { // query users by zone only?
         yield* zones[s.zone];
         return;
       }
@@ -110,6 +148,41 @@ module.exports = function (onchange, onexit) {
       let cx = s.x;
       let cz = s.z;
       let d = (opts ? opts.d : null) || 1;
+
+      if (opts && opts.npcs) { // query for npcs?
+        for (let x = -d; x <= d; x++) {
+          for (let y = -d; y <= d; y++) {
+            let s = `${fix}${cx + x}z${cz + y}`;
+            if (npcRegions[s]) {
+              yield* npcRegions[s];
+            }
+          }
+        }
+        return;
+      }
+
+      for (let x = -d; x <= d; x++) {
+        for (let y = -d; y <= d; y++) {
+          let s = `${fix}${cx + x}z${cz + y}`;
+          if (regions[s]) {
+            yield* regions[s];
+          }
+        }
+      }
+    },
+
+    *queryNpcs(socket) {
+      yield* this.query(socket, { npcs: true });
+    },
+
+
+    *queryUsersByNpc(regionNPC) {
+      let fix = `${regionNPC.zone}x`
+
+      let cx = regionNPC.x / 35 >> 0;
+      let cz = regionNPC.z / 35 >> 0;
+
+      let d = 1;
 
       for (let x = -d; x <= d; x++) {
         for (let y = -d; y <= d; y++) {
@@ -141,6 +214,8 @@ module.exports = function (onchange, onexit) {
 
     regions,
     users,
-    sessions
+    sessions,
+    npcs,
+    npcRegions
   }
 }

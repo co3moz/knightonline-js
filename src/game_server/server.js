@@ -2,10 +2,13 @@ const config = require('config');
 const server = require('../core/server');
 const database = require('../core/database');
 const connectRedis = require('../core/redis/connect');
+const AI = require('./ai');
 
 module.exports = async function () {
   console.log('game server is going to start...');
   let db = await database();
+
+  console.log('redis connection...');
   await connectRedis();
 
   let setItems = await loadSetItems(db); // find all
@@ -18,6 +21,8 @@ module.exports = async function () {
   shared.region = region;
   region.setOnChange(require('./functions/onRegionUpdate'));
   region.setOnExit(require('./functions/onUserExit'));
+
+  await AI(db, region);
 
   await server({
     ip: config.get('gameServer.ip'),

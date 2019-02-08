@@ -12,10 +12,28 @@ module.exports = (socket, echo, damage) => {
       socket.send([
         0x22, // TARGET_HP
         ...unit.short(socket.target),
-        echo, 
-        ...unit.int(v.maxHp || 0), 
+        echo,
+        ...unit.int(v.maxHp || 0),
         ...unit.int(c.hp),
-        ...unit.short(damage||0)
+        ...unit.short(damage || 0)
+      ]);
+    } else {
+      socket.target = null;
+      socket.targetType = 'notarget';
+    }
+  } else if (socket.targetType == 'npc') {
+    let targetNPC = region.npcs[socket.target];
+
+    if (targetNPC) {
+      let npc = targetNPC.npc;
+
+      socket.send([
+        0x22, // TARGET_HP
+        ...unit.short(socket.target),
+        echo,
+        ...unit.int(npc.maxHp || 0),
+        ...unit.int(npc.hp),
+        ...unit.short(damage || 0)
       ]);
     } else {
       socket.target = null;

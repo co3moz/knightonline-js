@@ -24,7 +24,6 @@ module.exports = (socket, warp) => {
     sendRegionShow(userSocket, socket.session, warp ? 4 : 3, userDetail);
   }
 
-
   socket.knownSessions = knownSessions;
 
   result[2] = userCount & 0xFF;
@@ -32,4 +31,17 @@ module.exports = (socket, warp) => {
 
   socket.send(result);
   socket.send([0x15, 2]);
+
+
+  result = [0x1C, 0, 0];
+  let npcSessions = [];
+  for (let npc of region.queryNpcs(socket)) {
+    npcSessions.push(npc.uuid);
+    result.push(...unit.short(npc.uuid));
+  }
+
+  result[1] = npcSessions.length & 0xFF;
+  result[2] = npcSessions.length >>> 8;
+
+  socket.send(result);
 }

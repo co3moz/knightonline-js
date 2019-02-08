@@ -9,7 +9,7 @@ module.exports = async db => {
 
   let npcs = await csvReader({
     file: 'npc',
-    expected: 939,
+    expected: 1326,
     transfer: {
       sSid: "id",
       strName: "name",
@@ -60,9 +60,63 @@ module.exports = async db => {
     db
   });
 
+  let monsters = await csvReader({
+    file: 'monster',
+    expected: 1398,
+    transfer: {
+      sSid: "id",
+      strName: "name",
+      sPid: "pid",
+      sSize: "size",
+      iWeapon1: "weapon1",
+      iWeapon2: "weapon2",
+      byGroup: "group",
+      byActType: "actType",
+      byType: "type",
+      byFamily: "family",
+      byRank: "rank",
+      byTitle: "title",
+      iSellingGroup: "sellingGroup",
+      sLevel: "level",
+      iExp: "exp",
+      iLoyalty: "loyalty",
+      iHpPoint: "hp",
+      sMpPoint: "mp",
+      sAtk: "attack",
+      sAc: "ac",
+      sHitRate: "hitRate",
+      sEvadeRate: "evadeRate",
+      sDamage: "damage",
+      sAttackDelay: "attackDelay",
+      bySpeed1: "speed1",
+      bySpeed2: "speed2",
+      sStandtime: "standtime",
+      iMagic1: "magic1",
+      iMagic2: "magic2",
+      iMagic3: "magic3",
+      sFireR: "fireR",
+      sColdR: "coldR",
+      sLightningR: "lightningR",
+      sMagicR: "magicR",
+      sDiseaseR: "diseaseR",
+      sPoisonR: "poisonR",
+      sBulk: "bulk",
+      byAttackRange: "attackRange",
+      bySearchRange: "searchRange",
+      byTracingRange: "tracingRange",
+      iMoney: "money",
+      sItem: "item",
+      byDirectAttack: "directAttack",
+      byMagicAttack: "magicAttack",
+      byMoneyType: "moneyType",
+      sSpeed: "speed"
+    },
+    db
+  });
+
   let pos = await csvReader({
     file: 'npc_monster_pos',
-    expected: 4647,
+    expected: 9392,
     transfer: {
       ZoneID: 'zone',
       NpcID: 'npc',
@@ -82,7 +136,8 @@ module.exports = async db => {
       NumNPC: 'amount',
       RegTime: 'respawnTime',
       byDirection: 'direction',
-      DotCnt: 'dot'
+      DotCnt: 'dot',
+      path: 'path'
     },
     db
   });
@@ -98,17 +153,45 @@ module.exports = async db => {
   }
 
 
+  for (let monster of monsters) {
+    if (grouped[monster.id]) {
+      monster.spawn = grouped[monster.id];
+    } else {
+      monster.spawn = [];
+    }
+  }
+
   try {
     let total = npcs.length;
     let sent = 0;
     while (npcs.length) {
       let arr = npcs.splice(0, 100);
+      for (let npc of arr) {
+        npc.isMonster = false;
+      }
       sent += arr.length;
       await Npc.insertMany(arr);
       console.log('npc patch sent %d status: %f %', sent, parseInt(sent / total * 1000) / 10);
     }
   } catch (e) {
     console.error('error ocurred on inserting npc!');
+    throw e;
+  }
+
+  try {
+    let total = monsters.length;
+    let sent = 0;
+    while (monsters.length) {
+      let arr = monsters.splice(0, 100);
+      for (let npc of arr) {
+        npc.isMonster = true;
+      }
+      sent += arr.length;
+      await Npc.insertMany(arr);
+      console.log('monster patch sent %d status: %f %', sent, parseInt(sent / total * 1000) / 10);
+    }
+  } catch (e) {
+    console.error('error ocurred on inserting monsters!');
     throw e;
   }
 
@@ -119,7 +202,41 @@ function groupBy(array) {
 
   for (let item of array) {
     let npc = item.npc;
+    let dot = +item.dot;
+    let path = item.path;
+
     delete item.npc;
+    delete item.dot;
+    delete item.path;
+
+    if (dot && path) {
+      let points = [];
+
+      for (let i = 0; i < dot; i++) {
+        let x = +path.substring(i * 8, i * 8 + 4);
+        let z = +path.substring(i * 8 + 4, i * 8 + 8);
+        if (isNaN(x) || isNaN(z)) continue;
+        points.push({ x, z })
+      }
+
+      item.points = points;
+    }
+
+    item.actType = +item.actType || 0;
+    item.amount = +item.amount || 0;
+    item.bottomZ = +item.bottomZ || 0;
+    item.leftX = +item.leftX || 0;
+    item.maxx = +item.maxx || 0;
+    item.maxz = +item.maxz || 0;
+    item.minx = +item.minx || 0;
+    item.minz = +item.minz || 0;
+    item.respawnTime = +item.respawnTime || 0;
+    item.rightX = +item.rightX || 0;
+    item.specialType = +item.specialType || 0;
+    item.topZ = +item.topZ || 0;
+    item.trap = +item.trap || 0;
+    item.zone = +item.zone || 0;
+    item.direction = +item.direction || 0;
 
     if (data[npc]) {
       data[npc].push(item)

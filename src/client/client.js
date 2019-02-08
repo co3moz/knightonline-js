@@ -122,7 +122,6 @@ module.exports = async function () {
     let pickedConfig = config.get('testClient.server');
     let picked = servers.filter(x => x.name == pickedConfig);
 
-
     console.log('connecting to game server...' + picked[0].name);
     gcon = await client({
       ip: picked[0].ip,
@@ -365,18 +364,20 @@ module.exports = async function () {
     table(userList, 'user');
 
     gcon.send([0x09, 0x00, 0x00]); // send direction as short(0)
-    gcon.send([
-      0x06,
-      ...unit.short(player.x * 10), ...unit.short(player.z * 10), ...unit.short(player.y * 10),
-      0x00, 0x00, 0x00, // speed and echo thing
-      ...unit.short(player.x * 10), ...unit.short(player.z * 10), ...unit.short(player.y * 10)
-    ]); // send movement
-
 
 
     setTimeout(function () {
-      gcon.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
+      gcon.send([
+        0x06,
+        ...unit.short(player.x * 10 - 500), ...unit.short(player.z * 10), ...unit.short(player.y * 10),
+        0x00, 0x00, 0x00, // speed and echo thing
+        ...unit.short(player.x * 10 - 500), ...unit.short(player.z * 10), ...unit.short(player.y * 10)
+      ]); // send movement
     }, 5000);
+
+    // setTimeout(function () {
+    //   gcon.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
+    // }, 5000);
 
     let d = 0;
     setInterval(function () {
@@ -562,9 +563,9 @@ module.exports = async function () {
         for (let i = 0; i < npcCount; i++) {
           npcs.push({
             id: data.short(),
-            pid: data.short(),
-            isMonster: data.byte() == 1 ? 'true' : 'false',
             sid: data.short(),
+            isMonster: data.byte() == 1 ? 'true' : 'false',
+            pid: data.short(),
             sellingGroup: data.int(),
             type: data.byte(),
             unk: data.int(),
@@ -586,12 +587,12 @@ module.exports = async function () {
 
         table(npcs, 'INCOMING_NPC_INFO');
       } else if (opcode == 0xA) { // NPC IN_OUT
-        /*let type = data.byte();
+        let type = data.byte();
         let id = data.short();
 
-        if(type == 1) {
+        if (type == 1) {
           table({
-            id,
+            npcIn: id,
             pid: data.short(),
             isMonster: data.byte() == 1 ? 'true' : 'false',
             sid: data.short(),
@@ -612,7 +613,11 @@ module.exports = async function () {
             unk3: data.short(),
             direction: data.short(),
           });
-        }*/
+        } else if (type == 2) {
+          table({
+            npcOut: id
+          });
+        }
       } else if (opcode == 0xB) { // NPC MOVE
         /*data.byte();
 

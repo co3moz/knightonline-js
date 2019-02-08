@@ -28,7 +28,8 @@ module.exports = {
   REGION_PLAYER_DETAIL: 0x16,
   ZONE_CHANGE: 0x27,
   TARGET_HP: 0x22,
-  STATE_CHANGE: 0x29
+  STATE_CHANGE: 0x29,
+  NPC_DETAILED_REQUEST: 0x1D
 };
 
 Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);

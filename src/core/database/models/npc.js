@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
   id: { type: Number, index: true },
   name: { type: String },
-  pid: { type: Number },
+  pid: { type: Number }, // pictureId
   size: { type: Number },
   weapon1: { type: Number },
   weapon2: { type: Number },
@@ -46,7 +46,9 @@ const schema = new mongoose.Schema({
   directAttack: { type: Number },
   magicAttack: { type: Number },
   speed: { type: Number },
+  moneyType: { type: Number },
 
+  isMonster: { type: Boolean },
   spawn: [{ type: mongoose.SchemaTypes.Mixed }]
 }, {
     timestamps: false

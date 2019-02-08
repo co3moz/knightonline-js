@@ -1,5 +1,5 @@
 database:
-  uri: mongodb://localhost:27017/knight-online
+  uri: mongodb://127.0.0.1:27017/knight-online
   options:
 
 redis:

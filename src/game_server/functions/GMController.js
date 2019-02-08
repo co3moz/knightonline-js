@@ -3,6 +3,7 @@ const unit = require('../../core/utils/unit');
 const region = require('../region');
 const { MESSAGE_TYPES, sendMessageToPlayer } = require('./sendChatMessage');
 const { sendWarp } = require('./sendWarp');
+const sendRegionNPCShow = require('./sendRegionNPCShow');
 const GM_COMMANDS_HEADER = exports.GM_COMMANDS_HEADER = '[GM CONTROLLER]';
 
 const sendMessageToGM = exports.sendMessageToGM = (socket, message) => {
@@ -71,36 +72,80 @@ const GM_COMMANDS = exports.GM_COMMANDS = {
     sendWarp(socket, +id);
   },
 
-  test: (args, socket) => {
-    function showImaginaryClient(id) {
-      socket.send([
-        0x07,  // USER_IN_OUT
-        1, 0, // show
-        ...unit.short(id),
-        ...require('./buildUserDetail')(socket)
-      ]);
+  npc: (args, socket) => {
+    let name = args.join(' ');
+    if (!name) {
+      return sendMessageToGM(socket, `USAGE: npc name`);
     }
 
-    function hideImaginaryClient(id) {
-      socket.send([
-        0x07,  // USER_IN_OUT
-        2, 0, // hide
-        ...unit.short(id)
-      ]);
+    const { Npc } = require('../../core/database').models;
+    let promise;
+
+    if (name.startsWith('!')) {
+      promise = Npc.findOne({
+        id: +name.substring(1)
+      })
+    } else {
+      promise = Npc.findOne({
+        name: new RegExp(name)
+      })
     }
 
-
-    for (let i = 10; i < 500; i++) {
-      showImaginaryClient(i);
-    }
-
-    setTimeout(function () {
-      for (let i = 10; i < 500; i++) {
-        hideImaginaryClient(i);
+    promise.then(npc => {
+      if (!npc) {
+        throw new Error(`Unknown npc name! "${name}"`)
       }
-    }, 10000);
 
-    sendMessageToPlayer(socket, 1, '[SERVER]', 'ok', undefined, -1);
+      sendMessageToGM(socket, `Npc found! ${npc.name} id: ${npc.id}`);
+    }).catch(e => {
+      sendMessageToGM(socket, `ERROR: ${e.message}`);
+    })
+  },
+
+  summon: (args, socket) => {
+    let name = args.join(' ');
+    if (!name) {
+      return sendMessageToGM(socket, `USAGE: summon name`);
+    }
+
+    const { Npc } = require('../../core/database').models;
+    let promise;
+
+    if (name.startsWith('!')) {
+      promise = Npc.findOne({
+        id: +name.substring(1)
+      })
+    } else {
+      promise = Npc.findOne({
+        name: new RegExp(name)
+      })
+    }
+
+    promise.then(npc => {
+      if (!npc) {
+        throw new Error(`Unknown npc name! "${name}"`)
+      }
+
+      const summon = require('../ai/summon');
+      return summon(npc, {
+        zone: socket.character.zone,
+        leftX: socket.character.x,
+        rightX: socket.character.x,
+        topZ: socket.character.z,
+        bottomZ: socket.character.z,
+        direction: socket.character.direction,
+      });
+    }).then(regionNPC => {
+      for (let userSocket of region.queryUsersByNpc(regionNPC)) {
+        sendRegionNPCShow(userSocket, regionNPC);
+      }
+
+
+      sendMessageToGM(socket, `Summoned! "${regionNPC.npc.name}" uuid:${regionNPC.uuid}`);
+    }).catch(e => {
+      sendMessageToGM(socket, `ERROR: ${e.message}`);
+    })
+
   }
 }
 

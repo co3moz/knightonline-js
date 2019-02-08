@@ -1,7 +1,7 @@
 const unit = require('../../core/utils/unit');
 const { BREAST, LEG, HEAD, GLOVE, FOOT, SHOULDER, RIGHTHAND, LEFTHAND, CWING, CHELMET, CLEFT, CRIGHT, CTOP, FAIRY } = require('../var/item_slot');
 
-module.exports = (socket) => {
+function buildUserDetail(socket) {
   const result = [];
   let uu = socket.user;
   let uc = socket.character;
@@ -52,3 +52,5 @@ module.exports = (socket) => {
 
   return result;
 }
+
+module.exports = buildUserDetail;
