@@ -79,19 +79,10 @@ const GM_COMMANDS = exports.GM_COMMANDS = {
     }
 
     const { Npc } = require('../../core/database').models;
-    let promise;
-
-    if (name.startsWith('!')) {
-      promise = Npc.findOne({
-        id: +name.substring(1)
-      })
-    } else {
-      promise = Npc.findOne({
-        name: new RegExp(name)
-      })
-    }
-
-    promise.then(npc => {
+    Npc.findOne({
+      name: new RegExp(name, 'i'),
+      isMonster: true
+    }).then(npc => {
       if (!npc) {
         throw new Error(`Unknown npc name! "${name}"`)
       }
@@ -103,27 +94,18 @@ const GM_COMMANDS = exports.GM_COMMANDS = {
   },
 
   summon: (args, socket) => {
-    let name = args.join(' ');
-    if (!name) {
-      return sendMessageToGM(socket, `USAGE: summon name`);
+    let id = args.join(' ');
+    if (!id) {
+      return sendMessageToGM(socket, `USAGE: summon id`);
     }
 
     const { Npc } = require('../../core/database').models;
-    let promise;
-
-    if (name.startsWith('!')) {
-      promise = Npc.findOne({
-        id: +name.substring(1)
-      })
-    } else {
-      promise = Npc.findOne({
-        name: new RegExp(name)
-      })
-    }
-
-    promise.then(npc => {
+    Npc.findOne({
+      id: +id,
+      isMonster: true
+    }).then(npc => {
       if (!npc) {
-        throw new Error(`Unknown npc name! "${name}"`)
+        throw new Error(`Unknown npc id! "${id}"`)
       }
 
       const summon = require('../ai/summon');
@@ -145,7 +127,49 @@ const GM_COMMANDS = exports.GM_COMMANDS = {
     }).catch(e => {
       sendMessageToGM(socket, `ERROR: ${e.message}`);
     })
+  },
 
+  effect: (args, socket) => {
+    socket.send([
+      0x6c, ...unit.short(socket.session), ...unit.int(106800)
+    ])
+  },
+
+  saitama: (args, socket) => {
+    if (socket.variables.saitama) {
+      socket.variables.saitama = false;
+      sendMessageToPlayer(socket, 1, '[SERVER]', 'Saitama mod disabled', undefined, -1);
+    } else {
+      socket.variables.saitama = true;
+      sendMessageToPlayer(socket, 1, '[SERVER]', 'Saitama mod activated', undefined, -1);
+    }
+  },
+
+  hp_set: (args, socket) => {
+    let hp = +args[0];
+
+    if (isNaN(hp) || !hp) {
+      return sendMessageToGM(socket, `USAGE: hp_set hp`);
+    }
+
+    if (socket.target) {
+      let npcRegion = require('../region').npcs[socket.target];
+
+      if (npcRegion) {
+        npcRegion.npc.hp = +args[0];
+        require('./sendTargetHP')(socket, 0, 0);
+      }
+    }
+  },
+
+  test: (args, socket) => {
+    sendMessageToPlayer(socket, 1, 'TEST', 'sent', undefined, -1)
+    socket.send([
+      0x23, // ITEM_DROP
+      ...unit.short(socket.target),
+      1, 0, 0, 0, // bundle id
+      2 //unkwn
+    ]);
   }
 }
 

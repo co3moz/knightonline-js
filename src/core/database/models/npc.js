@@ -42,14 +42,14 @@ const schema = new mongoose.Schema({
   searchRange: { type: Number },
   tracingRange: { type: Number },
   money: { type: Number },
-  item: { type: Number },
   directAttack: { type: Number },
   magicAttack: { type: Number },
   speed: { type: Number },
   moneyType: { type: Number },
 
   isMonster: { type: Boolean },
-  spawn: [{ type: mongoose.SchemaTypes.Mixed }]
+  spawn: [{ type: mongoose.SchemaTypes.Mixed }],
+  drops: [{ item: mongoose.SchemaTypes.Mixed, rate: Number }]
 }, {
     timestamps: false
   });

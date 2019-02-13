@@ -200,6 +200,12 @@ module.exports = function (onchange, onexit) {
       }
     },
 
+    regionSendByNpc(npc, packet) {
+      for (let s of this.queryUsersByNpc(npc)) {
+        s.send(packet);
+      }
+    },
+
     zoneSend(socket, packet) {
       for (let s of this.query(socket, { zone: true })) {
         s.send(packet);

@@ -29,7 +29,10 @@ module.exports = {
   ZONE_CHANGE: 0x27,
   TARGET_HP: 0x22,
   STATE_CHANGE: 0x29,
-  NPC_DETAILED_REQUEST: 0x1D
+  NPC_DETAILED_REQUEST: 0x1D,
+  ATTACK: 0x08,
+  DROP_OPEN: 0x24,
+  DROP_TAKE: 0x26
 };
 
 Object.keys(module.exports).forEach(x => module.exports[module.exports[x]] = x);

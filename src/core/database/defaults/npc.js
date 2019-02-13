@@ -142,22 +142,54 @@ module.exports = async db => {
     db
   });
 
-  let grouped = groupBy(pos);
+  let drops = await csvReader({
+    file: 'monster_drop',
+    expected: 1000,
+    transfer: {
+      sIndex: 'id',
+      iItem01: 'item1',
+      sPersent01: 'percent1',
+      iItem02: 'item2',
+      sPersent02: 'percent2',
+      iItem03: 'item3',
+      sPersent03: 'percent3',
+      iItem04: 'item4',
+      sPersent04: 'percent4',
+      iItem05: 'item5',
+      sPersent05: 'percent5',
+    },
+    db
+  });
+
+  let dropsGrouped = groupDrop(drops);
+  let positionGrouped = groupPosition(pos);
 
   for (let npc of npcs) {
-    if (grouped[npc.id]) {
-      npc.spawn = grouped[npc.id];
+    if (positionGrouped[npc.id]) {
+      npc.spawn = positionGrouped[npc.id];
     } else {
       npc.spawn = [];
+    }
+
+    if (dropsGrouped[npc.item]) {
+      npc.drops = dropsGrouped[npc.item];
+    } else {
+      npc.drops = [];
     }
   }
 
 
   for (let monster of monsters) {
-    if (grouped[monster.id]) {
-      monster.spawn = grouped[monster.id];
+    if (positionGrouped[monster.id]) {
+      monster.spawn = positionGrouped[monster.id];
     } else {
       monster.spawn = [];
+    }
+
+    if (dropsGrouped[monster.item]) {
+      monster.drops = dropsGrouped[monster.item];
+    } else {
+      monster.drops = [];
     }
   }
 
@@ -197,7 +229,7 @@ module.exports = async db => {
 
 }
 
-function groupBy(array) {
+function groupPosition(array) {
   let data = {};
 
   for (let item of array) {
@@ -243,6 +275,26 @@ function groupBy(array) {
     } else {
       data[npc] = [item];
     }
+  }
+
+  return data;
+}
+
+
+function groupDrop(array) {
+  let data = {};
+
+  for (let item of array) {
+    let id = item.id;
+
+    let drops = data[id];
+    if (!drops) drops = data[id] = [];
+
+    if (item.item1 && item.percent1) drops.push({ item: +item.item1, rate: (+item.percent1) / 10000 });
+    if (item.item2 && item.percent2) drops.push({ item: +item.item2, rate: (+item.percent2) / 10000 });
+    if (item.item3 && item.percent3) drops.push({ item: +item.item3, rate: (+item.percent3) / 10000 });
+    if (item.item4 && item.percent4) drops.push({ item: +item.item4, rate: (+item.percent4) / 10000 });
+    if (item.item5 && item.percent5) drops.push({ item: +item.item5, rate: (+item.percent5) / 10000 });
   }
 
   return data;

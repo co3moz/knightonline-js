@@ -4,7 +4,7 @@ module.exports = {
   LEFTEAR: 2, // 2: sağ küpe
   NECK: 3, // 3: kolye
   BREAST: 4, // 4: göğüslük
-  SHOULDER: 5, // 5: omuzluk
+  SHOULDER: 5, // 5: omuzluk  
   RIGHTHAND: 6, // 6: sol el
   WAIST: 7, // 7: kemer
   LEFTHAND: 8, // 8: sağ kol

@@ -23,6 +23,4 @@ module.exports = async function ({ body, socket, opcode }) {
 
 
   sendTargetHP(socket, echo, 0);
-
-
 }

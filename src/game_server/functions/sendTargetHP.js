@@ -22,10 +22,10 @@ module.exports = (socket, echo, damage) => {
       socket.targetType = 'notarget';
     }
   } else if (socket.targetType == 'npc') {
-    let targetNPC = region.npcs[socket.target];
+    let regionNPC = region.npcs[socket.target];
 
-    if (targetNPC) {
-      let npc = targetNPC.npc;
+    if (regionNPC) {
+      let npc = regionNPC.npc;
 
       socket.send([
         0x22, // TARGET_HP

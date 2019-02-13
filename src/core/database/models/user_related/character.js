@@ -40,6 +40,12 @@ const schema = new mongoose.Schema({
   direction: { type: Number, default: 0 },
 
   skills: { type: Buffer },
+  skillPointCat1: { type: Number, default: 0 },
+  skillPointCat2: { type: Number, default: 0 },
+  skillPointCat3: { type: Number, default: 0 },
+  skillPointMaster: { type: Number, default: 0 },
+  skillPointFree: { type: Number, default: 0 },
+
   items: [{
     id: { type: Number },
     durability: { type: Number },
