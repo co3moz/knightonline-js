@@ -1,3 +1,4 @@
+const shared = require('../shared');
 const coefficientTable = require('../var/coefficient');
 const { LEFTHAND, RIGHTHAND, ItemSlotHelmet, ItemSlotPauldron, ItemSlotPads, ItemSlotGloves, ItemSlotBoots } = require('../var/item_slot');
 const { ZONE_SNOW_BATTLE, ZONE_CHAOS_DUNGEON } = require('../var/zone_codes');
@@ -161,7 +162,7 @@ exports.calculateStatBonus = socket => {
     if (!item || !item.detail) continue;
 
     if (i == 47 || i == 48) { // magic bags
-      v.maxWeightBonus += item.detail.duration;
+      v.maxWeightBonus += item.detail.durability;
     } else {
       v.itemWeight += (item.detail.weight || 0) * (item.amount || 0);
     }
@@ -247,7 +248,7 @@ exports.calculateStatBonus = socket => {
     }
 
     if (item.detail.kind == 255) { // ITEM_KIND_COSPRE
-      exports.setItemApply(socket.shared.setItems[item.id], v);
+      exports.setItemApply(shared.setItems[item.id], v);
     }
 
     if (item.detail.race < 100) {
@@ -278,7 +279,7 @@ exports.calculateStatBonus = socket => {
   }
 
   for (let item in setItems) {
-    exports.setItemApply(socket.shared.setItems[setItems[item]], v);
+    exports.setItemApply(shared.setItems[setItems[item]], v);
   }
 
   let addArmourAc = v.addArmourAc || 0;

@@ -13,18 +13,17 @@ module.exports = async function () {
 
   let setItems = await loadSetItems(db); // find all
 
-  let shared = {};
-  let userMap = shared.userMap = {};
-  let characterMap = shared.characterMap = {};
+  let shared = require('./shared');
   let region = require('./region');
+  let userMap = shared.userMap;
+  let characterMap = shared.characterMap;
   shared.setItems = setItems;
-  shared.region = region;
   region.setOnChange(require('./functions/onRegionUpdate'));
   region.setOnExit(require('./functions/onUserExit'));
 
   await AI(db, region);
 
-  await server({
+  let serverInstances = await server({
     ip: config.get('gameServer.ip'),
     ports: config.get('gameServer.ports'),
     debug: true,
@@ -41,7 +40,7 @@ module.exports = async function () {
       }
 
       if (socket.character) {
-        shared.region.exit(socket);
+        region.exit(socket);
         if (characterMap[socket.character.name]) {
           delete characterMap[socket.character.name];
         }
@@ -51,8 +50,10 @@ module.exports = async function () {
     onData: async ({ socket, opcode, length, body }) => {
       require.cache[require.resolve('./utils/op_codes')] = undefined;
       let opCodes = require('./utils/op_codes');
-      if (!opCodes[opcode]) return socket.debug('unknown opcode! 0x' + (opcode ? opcode.toString(16).padStart(2, '0') : '00'));
 
+      if (!opCodes[opcode]) {
+        return console.log('[SERVER] Unknown opcode received! (0x' + (opcode ? opcode.toString(16).padStart(2, '0') : '00') + ') | ' + body.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+      }
 
       // if (!socket.cryption || !socket.cryption.enabled) {
       //   // dont allow uncrypted messages 
@@ -64,14 +65,18 @@ module.exports = async function () {
       require.cache[require.resolve('./ops/' + opCodes[opcode])] = undefined;
       await require('./ops/' + opCodes[opcode])({ socket, body, length, opcode, db });
     }
-  }, shared);
+  });
+
+  
 }
 
 async function loadSetItems(db) {
-  return (await db.models.SetItem.find({}).exec()).reduce((obj, x) => {
-    obj[x.id] = x.toJSON();
-    delete obj[x.id].id;
-    delete obj[x.id]._id;
-    return obj;
-  }, {})
+  let obj = {};
+  let setItems = await db.models.SetItem.find({}).select(['-id', '-_id']).exec();
+
+  for (let setItem of setItems) {
+    obj[setItem.id] = setItem.toJSON();
+  }
+
+  return obj;
 }

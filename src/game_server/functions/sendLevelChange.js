@@ -1,8 +1,8 @@
 const config = require('config');
-const unit = require('../../core/utils/unit');
-const region = require('../region');
-const { calculateUserAbilities } = require('../utils/ability');
 const levelUp = config.get('gameServer.levelUp');
+const unit = require('../../core/utils/unit');
+const sendAbility = require('./sendAbility');
+const region = require('../region');
 
 module.exports = (socket, newLevel) => {
   if (newLevel < 1 || newLevel > 83) return;
@@ -34,7 +34,7 @@ module.exports = (socket, newLevel) => {
 
   c.level = newLevel;
 
-  calculateUserAbilities(socket);
+  sendAbility(socket);
   
   let v = socket.variables;
   

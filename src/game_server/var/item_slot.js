@@ -47,5 +47,9 @@ module.exports = {
   ItemSlotCosprePauldron: 105,
   ItemSlotCospreHelmet: 107,
   ItemSlotCospreWings: 110,
-  ItemSlotCospreFairy: 111
+  ItemSlotCospreFairy: 111,
+
+
+  INVENTORY_START: 14,
+  INVENTORY_END: 14 + 28
 }

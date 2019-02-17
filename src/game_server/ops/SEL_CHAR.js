@@ -1,6 +1,7 @@
 const unit = require('../../core/utils/unit');
 const unique = require('../../core/utils/unique');
-const ability = require('../utils/ability');
+
+const sendAbility = require('../functions/sendAbility');
 
 module.exports = async function ({ socket, opcode, body, db }) {
   let session = body.string();
@@ -104,7 +105,7 @@ module.exports = async function ({ socket, opcode, body, db }) {
 
 
   socket.variables = {};
-  await ability.calculateUserAbilities(socket);
+  sendAbility(socket);
   await character.save();
 
 

@@ -24,6 +24,9 @@ loginServer:
     dir: /
   otp: 'knightonline'
   maxOTPTry: 5
+  versions:
+    - version: 2228
+      fileName: none
 
 gameServer:
   ip: 0.0.0.0

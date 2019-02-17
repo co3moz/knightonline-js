@@ -14,7 +14,7 @@ module.exports = async function ({ body, socket, opcode }) {
     ...unit.int(dropIndex), 1
   ];
 
-  sendMessageToPlayer(socket, 1, '[DROPS]', `total: ${drop.items.map(x=> x.item + '(' + x.amount + ')').join(' ')}`, undefined, -1);
+  sendMessageToPlayer(socket, 1, '[DROPS]', `total: ${drop.items.map(x=> x ? (x.item + '(' + x.amount + ')') : 'empty').join(' ')}`, undefined, -1);
 
   for (let i = 0; i < 6; i++) {
     let item = drop.items[i];

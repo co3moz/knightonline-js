@@ -1,12 +1,11 @@
 {
   "name": "ko-js",
   "version": "1.0.0",
+  "private": false,
   "description": "",
-  "main": "src/index.js",
+  "main": "src/login_server.ts",
   "scripts": {
     "lint": "eslint src/**",
-    "login_server": "node src/login_server",
-    "game_server": "node src/game_server",
     "smd_test": "mocha test/smd.test.js",
     "test": "mocha test/**/*.test.js",
     "start": "node src"
@@ -24,14 +23,22 @@
     "js-yaml": "^3.11.0",
     "long": "^4.0.0",
     "lzfjs": "^1.0.1",
-    "mongoose": "^5.1.1",
+    "mongoose": "^5.4.13",
     "natives": "^1.1.6",
     "redis": "^2.8.0",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.3.3",
     "unzip": "^0.1.11"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-plugin-node": "^6.0.1",
+    "@types/bluebird": "^3.5.25",
+    "@types/config": "0.0.34",
+    "@types/glob": "^7.1.1",
+    "@types/long": "^4.0.0",
+    "@types/mongodb": "^3.1.19",
+    "@types/mongoose": "^5.3.17",
+    "@types/node": "^11.9.4",
+    "@types/redis": "^2.8.10",
     "mocha": "^5.2.0"
   },
   "engines": {

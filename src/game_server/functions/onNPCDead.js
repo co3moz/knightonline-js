@@ -4,6 +4,7 @@ const sendExperienceChange = require('./sendExperienceChange');
 const { sendMessageToPlayer } = require('./sendChatMessage');
 const itemDropGroups = require('../var/item_drop_groups');
 const { wrapDrop } = require('./dropHandler');
+const { Item } = require('../../core/database').models;
 
 const ARROW_MIN = 391010000;
 const ARROW_MAX = 392010000;
@@ -47,7 +48,7 @@ module.exports = (npc) => {
       if (money > 0) {
         dropped.push({
           item: 900000000,
-          amount: money | 0
+          amount: Math.min(32000, money | 0) // amount is short, so we limit the max output
         });
       }
     }
@@ -89,12 +90,37 @@ module.exports = (npc) => {
 
     if (dropped.length) {
       sendMessageToPlayer(greatestSession, 1, 'DROP', 'should be visible', undefined, -1);
-      greatestSession.send([
-        0x23, // ITEM_DROP
-        ...unit.short(npc.uuid),
-        ...unit.int(wrapDrop(greatestSession.session, dropped)), // bundle id
-        2
-      ]);
+
+      let itemIds = dropped.map(x => x.item).filter(x => x != 900000000);
+
+
+      if (itemIds.length > 0) {
+        Item.find({
+          id: {
+            $in: itemIds
+          }
+        }).then(items => {
+          let wrap = wrapDrop(greatestSession.session, dropped, items, npc.npc.name);
+          
+          greatestSession.send([
+            0x23, // ITEM_DROP
+            ...unit.short(npc.uuid),
+            ...unit.int(wrap), // bundle id
+            2
+          ]);
+        }).catch(x => {
+
+        });
+      } else {
+        greatestSession.send([
+          0x23, // ITEM_DROP
+          ...unit.short(npc.uuid),
+          ...unit.int(wrapDrop(greatestSession.session, dropped)), // bundle id
+          2
+        ]);
+      }
+
+
     }
   }
 }
