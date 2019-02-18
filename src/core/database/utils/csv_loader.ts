@@ -1,10 +1,10 @@
 import { Model } from 'mongoose';
-import csv from 'csv-streamify'
-import unzip from 'unzip'
-import fs from 'fs'
-import path from 'path'
+import * as csv from 'csv-streamify'
+import * as unzip from 'unzip'
+import * as fs from 'fs'
+import * as path from 'path'
 
-export default async function CSVLoader(file: string, transfer: object, expected: number, model: Model<any>): Promise<boolean> {
+export async function CSVLoader(file: string, transfer: object, expected: number, model: Model<any>): Promise<boolean> {
   if (await model.findOne({}).exec()) {
     return false;
   }

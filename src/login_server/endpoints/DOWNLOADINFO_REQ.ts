@@ -5,7 +5,7 @@ import { ILoginEndpoint } from '../endpoint';
 
 let versions: any[] = config.get('loginServer.versions');
 
-export default <ILoginEndpoint>async function (socket: ILoginSocket, body: Queue, opcode: number) {
+export const DOWNLOADINFO_REQ: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
   let downloadSet = [];
   let clientVersion = body.short();
 

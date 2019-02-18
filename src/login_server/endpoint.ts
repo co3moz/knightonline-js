@@ -1,5 +1,6 @@
 import { Queue } from "../core/utils/unit";
 import { ILoginSocket } from "./login_socket";
+import * as Endpoints from './endpoints'
 
 export enum LoginEndpointCodes {
   VERSION_REQ = 0x01,
@@ -12,20 +13,10 @@ export enum LoginEndpointCodes {
   UNK_REQ = 0xFD
 }
 
-
-
-export async function LoginEndpointResolver(name: string): Promise<ILoginEndpoint> {
-  let cache = endpointCache[name];
-  if (cache) return cache;
-  return endpointCache[name] = <ILoginEndpoint>await import('./endpoints/' + name);
+export function LoginEndpoint(name: string): ILoginEndpoint {
+  return Endpoints[name];
 }
-
-const endpointCache: LoginEndpointDirectory = {};
 
 export interface ILoginEndpoint {
   (socket: ILoginSocket, body: Queue, opcode: number): Promise<void>
-}
-
-interface LoginEndpointDirectory {
-  [endpoint: string]: ILoginEndpoint
 }

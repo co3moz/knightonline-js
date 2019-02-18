@@ -1,4 +1,4 @@
-export default function UniqueQueue(width: number, min = 0) {
+export function UniqueQueue(width: number, min = 0) {
   let data: number[] = Array(width);
   let i = width;
 

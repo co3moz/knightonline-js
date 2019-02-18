@@ -1,7 +1,7 @@
 import * as glob from 'glob'
 import * as path from 'path'
 
-export default function DefaultChecker() {
+export function DefaultChecker() {
   return new Promise((resolve, reject) => {
     glob(path.resolve(__dirname, '../defaults/**/*.ts'), async (err, files) => {
       if (err) {

@@ -1,9 +1,10 @@
 import * as config from 'config'
-import Database from '../core/database'
-import RedisConnect from '../core/redis/connect'
-import { ServerFactory, ISocket } from '../core/server';
+import { Database } from '../core/database'
+import { RedisConnect } from '../core/redis/connect'
+import { KOServerFactory } from '../core/server';
 import { Queue } from '../core/utils/unit';
-import { LoginEndpointCodes, LoginEndpointResolver } from './endpoint';
+import { LoginEndpointCodes, LoginEndpoint } from './endpoint';
+import { ILoginSocket } from './login_socket';
 
 export default async function LoginServer() {
   console.log('login server is going to start...');
@@ -15,17 +16,18 @@ export default async function LoginServer() {
 
   console.log('looks like latest server version is ' + serverVersion);
 
-  return await ServerFactory({
+  return await KOServerFactory({
     ip: config.get('loginServer.ip'),
     ports: config.get('loginServer.ports'),
     timeout: 5000,
 
-    onData: async (socket: ISocket, data: Buffer) => {
+    onData: async (socket: ILoginSocket, data: Buffer) => {
       let body = Queue.from(data);
       let opcode = body.byte();
       if (!LoginEndpointCodes[opcode]) return;
 
-      let endpoint = await LoginEndpointResolver(LoginEndpointCodes[opcode])
+      let endpoint = LoginEndpoint(LoginEndpointCodes[opcode]);
+      if (!endpoint) return;
 
       await endpoint(socket, body, opcode)
     }

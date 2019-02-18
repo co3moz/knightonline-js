@@ -1,10 +1,10 @@
-import csv from 'csv-streamify'
-import unzip from 'unzip'
-import fs from 'fs'
-import path from 'path'
+import * as csv from 'csv-streamify'
+import * as unzip from 'unzip'
+import * as fs from 'fs'
+import * as path from 'path'
 
 
-export default async function CSVReader(file: string, transfer: object, expected: number): Promise<any[]> {
+export async function CSVReader(file: string, transfer: object, expected: number): Promise<any[]> {
   let dataPath = path.resolve(__dirname, '../../../../data/');
   let zipPath = path.resolve(dataPath, file + '.zip');
   let csvPath = path.resolve(dataPath, file + '.csv');

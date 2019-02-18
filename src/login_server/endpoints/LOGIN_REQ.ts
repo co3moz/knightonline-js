@@ -4,7 +4,7 @@ import { ILoginEndpoint } from '../endpoint';
 import { Account, IAccount } from '../../core/database/models';
 import { GenerateOTP } from '../../core/utils/otp';
 
-export default <ILoginEndpoint>async function (socket: ILoginSocket, body: Queue, opcode: number) {
+export const LOGIN_REQ: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
   let accountName = body.string();
   let password = body.string();
   body.skip(1);

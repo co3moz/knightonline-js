@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import * as crypto from 'crypto'
 import * as config from 'config'
 
 export function GenerateOTP(secret: string): string {

@@ -1,6 +1,6 @@
 import { Setting } from '../models';
 
-export default async function SettingDefaults() {
+export async function SettingDefaults() {
   let defaultSettings = {
     'test': ['bool', true, 'DELETED']
   };

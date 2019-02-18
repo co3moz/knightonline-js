@@ -1,7 +1,7 @@
 import * as config from 'config'
 import * as mongoose from 'mongoose'
 
-export default function ConnectToDatabase(): Promise<mongoose.Connection> {
+export function ConnectToDatabase(): Promise<mongoose.Connection> {
   (<any>mongoose).Promise = global.Promise;
 
   console.log('database connection...');

@@ -8,11 +8,10 @@
       "type": "node",
       "request": "launch",
       "name": "Run",
-      "program": "${workspaceFolder}\\src\\index.js",
-      "outFiles": [
-        "${workspaceFolder}/**/*.js",
-        "${workspaceFolder}/**/*.ts"
-      ]
+      "args": ["${workspaceFolder}\\src\\app.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "protocol": "inspector",
+      "sourceMaps": true
     }
   ]
 }

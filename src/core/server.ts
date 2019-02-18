@@ -1,12 +1,12 @@
 import * as net from 'net';
-import { Queue, int, short, readShort } from './utils/unit';
+import { int, short, readShort } from './utils/unit';
 import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise';
-import uniqueQueue from './utils/unique_queue';
-import lzfjs from 'lzfjs';
+import { UniqueQueue } from './utils/unique_queue';
+import * as lzfjs from 'lzfjs';
 import * as crc32 from 'crc-32';
-import Crypt from './utils/crypt';
+import { Crypt } from './utils/crypt';
 
-export async function ServerFactory(params: IServerConfiguration): Promise<net.Server[]> {
+export async function KOServerFactory(params: IServerConfiguration): Promise<net.Server[]> {
   let { ip, ports } = params;
 
   if (!params.ipPool) {
@@ -34,7 +34,7 @@ export async function ServerFactory(params: IServerConfiguration): Promise<net.S
 
 function serverHandler(params: IServerConfiguration) {
   let { timeout, onConnect, onData, onError, onDisconnect, ipPool } = params;
-  let idPool = uniqueQueue(3000);
+  let idPool = UniqueQueue(3000);
 
   return (socket: ISocket) => {
     var session = socket.session = idPool.reserve();
@@ -75,7 +75,7 @@ function serverHandler(params: IServerConfiguration) {
       socket.write(Buffer.from([0xAA, 0x55, ...short(response.length), ...response, 0x55, 0xAA]));
     }
 
-    socket.terminate = message => {
+    socket.terminate = () => {
       socket.end();
 
       return socket.terminatePromise = CreateDeferredPromise();

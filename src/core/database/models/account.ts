@@ -1,4 +1,4 @@
-import hash from '../../utils/password_hash';
+import { PasswordHash } from '../../utils/password_hash';
 import { Schema, model, Document } from 'mongoose';
 
 export interface IAccount extends Document {
@@ -45,7 +45,7 @@ AccountSchema.pre('save', function (next) {
   let user = <IAccount>this;
 
   if (user.isModified('password')) {
-    user.password = hash(user.password);
+    user.password = PasswordHash(user.password);
   }
 
   next();

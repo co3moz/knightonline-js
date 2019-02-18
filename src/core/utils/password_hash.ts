@@ -26,7 +26,7 @@ const alphabetArray = [
   0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a
 ];
 
-export default function PasswordHash(password: string, encoding = 'utf8'): string {
+export function PasswordHash(password: string, encoding = 'utf8'): string {
   var buf = Array.from(Buffer.from(password, encoding));
   while (buf.length % 4 != 0) buf.push(0);
 

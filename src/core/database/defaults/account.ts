@@ -1,6 +1,6 @@
 import { Account} from '../models';
 
-export default async function AccountDefaults() {
+export async function AccountDefaults() {
   let testUsers = [{
     account: 'test',
     password: '1'

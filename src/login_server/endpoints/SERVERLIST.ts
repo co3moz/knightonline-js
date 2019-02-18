@@ -1,10 +1,10 @@
 import { Queue, string, short } from '../../core/utils/unit';
 import { ILoginSocket } from '../login_socket';
 import { Server } from '../../core/database/models';
-import RedisCaching from '../../core/redis/cache';
+import { RedisCaching} from '../../core/redis/cache';
 import { ILoginEndpoint } from '../endpoint'
 
-export default <ILoginEndpoint>async function (socket: ILoginSocket, body: Queue, opcode: number) {
+export const SERVERLIST: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
   let echo = body.short();
 
   let servers = await RedisCaching('servers', ServersCache);
@@ -17,21 +17,21 @@ export default <ILoginEndpoint>async function (socket: ILoginSocket, body: Queue
 }
 
 async function ServersCache() {
-    let servers = await Server.find().exec();
+  let servers = await Server.find().exec();
 
-    return [servers.length].concat(...servers.map(server => [
-      ...string(server.ip),
-      ...string(server.lanip),
-      ...string(server.name),
-      ...short(server.onlineCount),
-      ...short(1 /** server id */),
-      ...short(1 /** group id */),
-      ...short(server.userPremiumLimit),
-      ...short(server.userFreeLimit),
-      0,
-      ...string(server.karusKing),
-      ...string(server.karusNotice),
-      ...string(server.elmoradKing),
-      ...string(server.elmoradNotice)
-    ]));
+  return [servers.length].concat(...servers.map(server => [
+    ...string(server.ip),
+    ...string(server.lanip),
+    ...string(server.name),
+    ...short(server.onlineCount),
+    ...short(1 /** server id */),
+    ...short(1 /** group id */),
+    ...short(server.userPremiumLimit),
+    ...short(server.userFreeLimit),
+    0,
+    ...string(server.karusKing),
+    ...string(server.karusNotice),
+    ...string(server.elmoradKing),
+    ...string(server.elmoradNotice)
+  ]));
 }

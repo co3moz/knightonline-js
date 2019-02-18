@@ -1,11 +1,11 @@
-import CSVLoader from '../utils/csv_loader';
+import { CSVLoader } from '../utils/csv_loader';
 import { SetItem } from '../models';
 
-export default async function SetItemDefaults() {
+export async function SetItemDefaults() {
   await CSVLoader('set_items', SetItemTransferObjects, 1066, SetItem);
 }
 
-const SetItemTransferObjects =  {
+const SetItemTransferObjects = {
   "SetIndex": "id",
   "SetName": "name",
   "ACBonus": "acBonus",

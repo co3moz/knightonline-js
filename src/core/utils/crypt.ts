@@ -1,6 +1,6 @@
 const privateKey = [0x66, 0x89, 0x12, 0x20, 0x01, 0x50, 0x07, 0x12];
 
-export default class Crypt {
+export class Crypt {
   public pubKey: number[];
 
   private constructor(private enable: boolean = true) {

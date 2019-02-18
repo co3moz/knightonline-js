@@ -1,7 +1,7 @@
-import CSVLoader from '../utils/csv_loader';
+import { CSVLoader} from '../utils/csv_loader';
 import { Item } from '../models';
 
-export default async function ItemDefaults() {
+export async function ItemDefaults() {
   await CSVLoader('items', ItemTransferObject, 477645, Item);
 }
 

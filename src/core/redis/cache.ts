@@ -1,6 +1,6 @@
 import redis from './index'
 
-export default async function RedisCaching(name: string, action: () => Promise<any>, cacheTime: number = 60) {
+export async function RedisCaching(name: string, action: () => Promise<any>, cacheTime: number = 60) {
   let data = await redis.getAsync('cache-' + name);
 
   if (data) {

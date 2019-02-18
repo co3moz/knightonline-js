@@ -1,13 +1,13 @@
 import * as config from 'config'
 import * as mongoose from 'mongoose'
-import { ClientFactory, IClientSocket } from '../core/client'
+import { KOClientFactory, IClientSocket } from '../core/client'
 import { short, string, byte_string } from '../core/utils/unit'
-import PasswordHash from '../core/utils/password_hash'
+import {PasswordHash} from '../core/utils/password_hash'
 import OPCodes from '../game_server/utils/op_codes'
 import { AuthenticationCode } from '../login_server/endpoints/LOGIN_REQ'
-import Database from '../core/database'
+import { Database} from '../core/database'
 
-export default async function Client() {
+export async function TestClient() {
   let loginConnection: IClientSocket;
   let gameConnection: IClientSocket;
   let dbConnection: mongoose.Connection;
@@ -34,7 +34,7 @@ export default async function Client() {
 
 
     console.log('connecting to login server...');
-    loginConnection = await ClientFactory({
+    loginConnection = await KOClientFactory({
       ip: config.get('testClient.ip'),
       port: (<number>config.get('testClient.port')) + (Math.random() * 9 >>> 0),
       debug,
@@ -122,7 +122,7 @@ export default async function Client() {
     let picked = servers.filter(x => x.name == pickedConfig);
 
     console.log('connecting to game server...' + picked[0].name);
-    gameConnection = await ClientFactory({
+    gameConnection = await KOClientFactory({
       ip: picked[0].ip,
       port: 15001,
       debug,

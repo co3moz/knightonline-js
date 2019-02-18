@@ -1,6 +1,6 @@
 import { Server } from '../models';
 
-export default async function ServerDefaults() {
+export async function ServerDefaults() {
   let testServer = {
     ip: '127.0.0.1',
     lanip: '127.0.0.1',

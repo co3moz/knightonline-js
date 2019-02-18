@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": false,
   "description": "",
-  "main": "src/login_server.ts",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint src/**",
     "smd_test": "mocha test/smd.test.js",

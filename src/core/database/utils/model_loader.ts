@@ -1,7 +1,7 @@
 import * as glob from 'glob'
 import * as path from 'path'
 
-export default function ModelLoader() {
+export function ModelLoader() {
   return new Promise((resolve, reject) => {
     glob(path.resolve(__dirname, '../models/**/*.ts'), async (err, files) => {
       if (err) {

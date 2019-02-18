@@ -1,10 +1,10 @@
-import net from 'net'
-import lzfjs from 'lzfjs'
-import crc32 from 'crc-32'
+import * as net from 'net'
+import * as lzfjs from 'lzfjs'
+import * as crc32 from 'crc-32'
 import { Queue, short, readShort } from './utils/unit'
 import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise'
 
-export function ClientFactory(params: IClientConfiguration): Promise<IClientSocket> {
+export function KOClientFactory(params: IClientConfiguration): Promise<IClientSocket> {
   let { ip, port, debug, onConnect, name } = params;
 
   var debugFn;
