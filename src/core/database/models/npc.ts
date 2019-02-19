@@ -17,6 +17,7 @@ export interface ISpawn {
   zone: number
   direction: number
 
+  spawnedBy: string
   points?: { x: number, z: number }[]
 }
 

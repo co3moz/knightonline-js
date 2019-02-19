@@ -13,13 +13,7 @@ module.exports = async function () {
 
   let setItems = await loadSetItems(db); // find all
 
-  let shared = require('./shared');
-  let region = require('./region');
-  let userMap = shared.userMap;
-  let characterMap = shared.characterMap;
-  shared.setItems = setItems;
-  region.setOnChange(require('./functions/onRegionUpdate'));
-  region.setOnExit(require('./functions/onUserExit'));
+
 
   await AI(db, region);
 

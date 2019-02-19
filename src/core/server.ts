@@ -36,7 +36,7 @@ function serverHandler(params: IServerConfiguration) {
   let { timeout, onConnect, onData, onError, onDisconnect, ipPool } = params;
   let idPool = UniqueQueue(3000);
 
-  return (socket: ISocket) => {
+  return (socket: IKOSocket) => {
     var session = socket.session = idPool.reserve();
 
     if (!session) {
@@ -159,7 +159,7 @@ const doesProtocolFooterValid = (data, length) => {
   return data[4 + length] != 0x55 || data[5 + length] != 0xAA
 }
 
-export interface ISocket extends net.Socket {
+export interface IKOSocket extends net.Socket {
   session: number
   connectedAt: number
   send: (packet: Array<number>) => void
@@ -173,8 +173,8 @@ export interface IServerConfiguration {
   ports: number[]
   timeout?: number
   ipPool?: object
-  onConnect?: (socket: ISocket) => void
-  onData?: (socket: ISocket, data: Buffer) => Promise<void>
-  onError?: (socket: ISocket, error: Error) => void
-  onDisconnect?: (socket: ISocket) => Promise<void>
+  onConnect?: (socket: IKOSocket) => void
+  onData?: (socket: IKOSocket, data: Buffer) => Promise<void>
+  onError?: (socket: IKOSocket, error: Error) => void
+  onDisconnect?: (socket: IKOSocket) => Promise<void>
 }

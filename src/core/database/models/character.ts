@@ -14,7 +14,7 @@ export interface ICharacter extends Document {
   name: string
   race: number
   klass: number
-  strKlass: string
+  strKlass: "unknown" | "warrior" | "rogue" | "mage" | "priest" | "kurian"
   hair: number
   rank: number
   title: number

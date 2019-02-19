@@ -1,6 +1,6 @@
 import * as config from 'config'
 import * as mongoose from 'mongoose'
-import { KOClientFactory, IClientSocket } from '../core/client'
+import { KOClientFactory, IKOClientSocket } from '../core/client'
 import { short, string, byte_string } from '../core/utils/unit'
 import {PasswordHash} from '../core/utils/password_hash'
 import OPCodes from '../game_server/utils/op_codes'
@@ -8,8 +8,8 @@ import { AuthenticationCode } from '../login_server/endpoints/LOGIN_REQ'
 import { Database} from '../core/database'
 
 export async function TestClient() {
-  let loginConnection: IClientSocket;
-  let gameConnection: IClientSocket;
+  let loginConnection: IKOClientSocket;
+  let gameConnection: IKOClientSocket;
   let dbConnection: mongoose.Connection;
   let data: any;
   let debug = false;
@@ -835,7 +835,7 @@ function simplifyKlass(klass) {
   } else if (klass >= 200 && klass < 300) {
     klass -= 200;
   } else {
-    return '(unknown class)';
+    return 'unknown';
   }
 
   if (klass == 1 || klass == 5 || klass == 6) {
@@ -847,7 +847,7 @@ function simplifyKlass(klass) {
   }
 
   if (klass == 3 || klass == 9 || klass == 10) {
-    return 'magician';
+    return 'mage';
   }
 
   if (klass == 4 || klass == 11 || klass == 12) {
@@ -858,7 +858,7 @@ function simplifyKlass(klass) {
     return 'kurian';
   }
 
-  return '(unknown class)';
+  return 'unknown';
 }
 
 const table = function (data: any[] | object, name?: string) {

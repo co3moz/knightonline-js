@@ -4,7 +4,7 @@ import * as crc32 from 'crc-32'
 import { Queue, short, readShort } from './utils/unit'
 import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise'
 
-export function KOClientFactory(params: IClientConfiguration): Promise<IClientSocket> {
+export function KOClientFactory(params: IClientConfiguration): Promise<IKOClientSocket> {
   let { ip, port, debug, onConnect, name } = params;
 
   var debugFn;
@@ -16,7 +16,7 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IClientSo
   }
 
   return new Promise(async (resolve, reject) => {
-    const client = <IClientSocket>new net.Socket();
+    const client = <IKOClientSocket>new net.Socket();
     client.debug = debugFn;
     client.connected = false;
 
@@ -194,7 +194,7 @@ function doesProtocolFooterValid(data, length) {
   return data[4 + length] != 0x55 || data[5 + length] != 0xAA
 }
 
-export interface IClientSocket extends net.Socket {
+export interface IKOClientSocket extends net.Socket {
   connected: boolean
   waitNextData: (opcode?: number, subopcode?: number) => IWaitingTaskPromise
   debug: ((...args: any[]) => void)
@@ -208,7 +208,7 @@ export interface IClientConfiguration {
   ip: string
   port: number
   debug?: boolean | ((...args: any[]) => void)
-  onConnect?: (socket: IClientSocket) => void
+  onConnect?: (socket: IKOClientSocket) => void
   name: string
 }
 

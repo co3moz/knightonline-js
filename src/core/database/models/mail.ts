@@ -13,6 +13,10 @@ export interface IMail extends Document {
   serial: string
   money: number
   deleted: boolean
+  status: number
+
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const MailSchema = new Schema({
@@ -27,6 +31,7 @@ export const MailSchema = new Schema({
   durability: { type: Number },
   serial: { type: String },
   money: { type: Number },
+  status: { type: Number },
   deleted: { type: Boolean }
 }, { timestamps: true });
 
