@@ -5,7 +5,7 @@ export interface ICharacterItem {
   durability: number
   amount: number
   serial: string
-  expire: number
+  expire?: number
   flag: number
   detail: any
 }

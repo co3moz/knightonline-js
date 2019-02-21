@@ -104,7 +104,8 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
 
 
   socket.variables = <IVariables>{};
-  socket.visiblePlayers = <IVisiblePlayers>{};
+  socket.visiblePlayers = {};
+  socket.visibleNPCs = {};
 
   SendAbility(socket);
   await character.save();

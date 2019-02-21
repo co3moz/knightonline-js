@@ -1,5 +1,7 @@
 import { IGameSocket } from "./game_socket";
 import { INPCInstance } from "./ai_system/declare";
+import { OnUserExit } from "./events/onUserExit";
+import { OnRegionUpdate } from "./events/onRegionUpdate";
 
 export const RRegionMap: IRegionDictionary = {};
 export const RUserMap: IUserDictionary = {};
@@ -7,9 +9,6 @@ export const RZoneMap: IZoneDictionary = {};
 export const RSessionMap: ISessionDictionary = {};
 export const RNPCRegionMap: INPCRegionDictionary = {};
 export const RNPCMap: INPCDictionary = {};
-
-let onChange = null;
-let onExit = null;
 
 export function GetRegionName(socket: IGameSocket) {
   let c = socket.character;
@@ -46,11 +45,11 @@ export function RegionUpdate(socket: IGameSocket, disableEvent = false): boolean
 
   RRegionMap[s].push(socket);
   RZoneMap[c.zone].push(socket);
-  RUserMap[c.name] = <IRegionUser> { s, zone: c.zone, x, z, socket };
+  RUserMap[c.name] = <IRegionUser>{ s, zone: c.zone, x, z, socket };
   RSessionMap[socket.session] = socket;
 
-  if (!disableEvent && onChange) {
-    onChange(this, socket, s);
+  if (!disableEvent) {
+    OnRegionUpdate(socket);
   }
   return true;
 }
@@ -117,10 +116,7 @@ export function RegionRemoveNPC(npc) {
 }
 
 export function RegionExit(socket) {
-  if (onExit) {
-    onExit(this, socket);
-  }
-
+  OnUserExit(socket);
   RegionRemove(socket);
 }
 
@@ -219,14 +215,6 @@ export function AllSend(socket: IGameSocket, packet: number[]): void {
   }
 }
 
-export function UpdateOnChange(callback) {
-  onChange = callback;
-}
-
-export function UpdateOnExit(callback) {
-  onExit = callback;
-}
-
 export interface IRegionCharacter {
 
 }
@@ -287,7 +275,7 @@ export interface IRegionNPC {
   z: number
 
   /** NPC instance */
-  npc
+  npc: INPCInstance
 }
 
 interface IQueryOptions {

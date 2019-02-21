@@ -1,19 +1,19 @@
 import { Schema, SchemaTypes, model, Document } from 'mongoose';
 
 export interface ISpawn {
-  actType: number
-  amount: number
+  actType?: number
+  amount?: number
   bottomZ: number
   leftX: number
-  maxx: number
-  maxz: number
-  minx: number
-  minz: number
-  respawnTime: number
+  maxx?: number
+  maxz?: number
+  minx?: number
+  minz?: number
+  respawnTime?: number
   rightX: number
-  specialType: number
+  specialType?: number
   topZ: number
-  trap: number
+  trap?: number
   zone: number
   direction: number
 

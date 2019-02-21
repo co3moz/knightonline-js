@@ -4,7 +4,7 @@ import { NPCUUID } from "./uuid";
 import { RegionUpdateNPC } from "../region";
 
 
-export async function SummonNPC(npc: INpc, spawn: ISpawn) {
+export function SummonNPC(npc: INpc, spawn: ISpawn) {
   if (!npc) return;
   if (!spawn) return;
 

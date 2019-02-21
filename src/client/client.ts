@@ -3,9 +3,9 @@ import * as mongoose from 'mongoose'
 import { KOClientFactory, IKOClientSocket } from '../core/client'
 import { short, string, byte_string } from '../core/utils/unit'
 import {PasswordHash} from '../core/utils/password_hash'
-import OPCodes from '../game_server/utils/op_codes'
 import { AuthenticationCode } from '../login_server/endpoints/LOGIN_REQ'
 import { Database} from '../core/database'
+import { GameEndpointCodes } from '../game_server/endpoint';
 
 export async function TestClient() {
   let loginConnection: IKOClientSocket;
@@ -417,7 +417,7 @@ export async function TestClient() {
             userInRegion: 'end'
           });
         }
-      } else if (opcode == OPCodes.CHAT) { // chat
+      } else if (opcode == GameEndpointCodes.CHAT) { // chat
         let message = {
           op: 'chat',
           type: data.byte(),
@@ -429,7 +429,7 @@ export async function TestClient() {
         table(message);
 
         if (message.type == 2) { // private message
-          let op35 = await gameConnection.sendAndWait([OPCodes.CHAT_TARGET, 0x01, ...string(message.name)], 0x35, 0x01);
+          let op35 = await gameConnection.sendAndWait([GameEndpointCodes.CHAT_TARGET, 0x01, ...string(message.name)], 0x35, 0x01);
           let canI = op35.short();
           if (canI == 0) {
             console.log('Cannot echo chat, because user is not seem online');
@@ -438,7 +438,7 @@ export async function TestClient() {
             console.log('Cannot echo chat, because user blocked private messages');
             console.break();
           } else {
-            gameConnection.send([OPCodes.CHAT, message.type, ...string(message.message, 'ascii')])
+            gameConnection.send([GameEndpointCodes.CHAT, message.type, ...string(message.message, 'ascii')])
             console.log('Echo sent to ' + message.name);
             console.break();
           }

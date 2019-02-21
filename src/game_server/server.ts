@@ -15,10 +15,7 @@ export default async function GameServer() {
   await RedisConnect();
 
   await LoadSetItems(); // load set items to memory
-  
-  // region.setOnChange(require('./functions/onRegionUpdate'));
-  // region.setOnExit(require('./functions/onUserExit'));
-  
+
   await AISystemStart();
 
   return await KOServerFactory({
@@ -30,9 +27,9 @@ export default async function GameServer() {
     },
 
     onDisconnect: async (socket: IGameSocket) => {
-      if (socket.account) {
-        if (UserMap[socket.account.account]) {
-          delete UserMap[socket.account.account];
+      if (socket.user) {
+        if (UserMap[socket.user.account]) {
+          delete UserMap[socket.user.account];
         }
       }
 
@@ -47,12 +44,14 @@ export default async function GameServer() {
     onData: async (socket: IGameSocket, data: Buffer) => {
       let body = Queue.from(data);
       let opcode = body.byte();
-      if (!GameEndpointCodes[opcode]) return;
+      if (!GameEndpointCodes[opcode]) {
+        return console.log('[SERVER] Unknown opcode received! (0x' + (opcode ? opcode.toString(16).padStart(2, '0') : '00') + ') | ' + body.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+      }
 
       let endpoint = GameEndpoint(GameEndpointCodes[opcode]);
       if (!endpoint) return;
 
-      // await endpoint(socket, body, opcode)
+      await endpoint(socket, body, opcode)
     }
   });
 }

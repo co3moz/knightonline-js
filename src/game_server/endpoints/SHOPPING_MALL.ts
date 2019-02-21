@@ -57,7 +57,7 @@ export const SHOPPING_MALL: IGameEndpoint = async function (socket: IGameSocket,
       opcode,
       subOpcode,
       letterOperation,
-      await Mail.count({
+      await Mail.countDocuments({
         character: socket.character.name,
         deleted: false
       }).exec() & 0xFF

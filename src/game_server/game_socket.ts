@@ -10,6 +10,9 @@ export interface IGameSocket extends IKOSocket {
 
   visiblePlayers: IVisiblePlayers
   visibleNPCs: IVisibleNPCs
+
+  target: number // player's target
+  targetType: 'user' | 'npc' | 'notarget'
 }
 
 export interface IVisiblePlayers {
@@ -76,4 +79,6 @@ export interface IVariables {
   inParty: boolean
 
   saitama: boolean // gm feature to hit 30k always
+  lastHome: number // lastHomeTimestamp
+  chatTo: string // private message target user name
 }

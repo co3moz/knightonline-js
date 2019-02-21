@@ -13,4 +13,12 @@ export interface INPCInstance {
   mp: number
   maxHp: number
   maxMp: number
+
+  damagedBy?: INPCDamageDirectory
+  status?: 'alive' | 'dead'
+}
+
+export type Damage = number;
+export interface INPCDamageDirectory {
+  [session: number]: Damage
 }

@@ -1,6 +1,8 @@
 import { Queue } from '../../core/utils/unit';
 import { IGameEndpoint } from '../endpoint';
 import { IGameSocket } from '../game_socket';
+import { SendRegionUserInMultiple } from '../functions/sendRegionInOut';
+import { SendBlinkStart } from '../functions/sendBlink';
 
 export const ZONE_CHANGE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
   let subOpcode = body.byte();
@@ -10,8 +12,8 @@ export const ZONE_CHANGE: IGameEndpoint = async function (socket: IGameSocket, b
       opcode, ZoneChangeEnum.LOADED
     ]);
   } else if (subOpcode == ZoneChangeEnum.LOADED) {
-    sendRegionPlayers(socket, true);
-    sendBlinkStart(socket);
+    SendRegionUserInMultiple(socket, true);
+    SendBlinkStart(socket);
   }
 }
 

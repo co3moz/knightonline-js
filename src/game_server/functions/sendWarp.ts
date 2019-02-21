@@ -5,7 +5,7 @@ import { short } from "../../core/utils/unit";
 import { RegionUpdate } from "../region";
 import { SendRegionUserOutForMe } from "./sendRegionInOut";
 
-export function SetWarp(socket: IGameSocket, zone: ZoneCode): boolean {
+export function SendWarp(socket: IGameSocket, zone: ZoneCode): boolean {
   let pos = FindStartPositionOfZoneForUser(socket, zone);
 
   if (!pos) {
