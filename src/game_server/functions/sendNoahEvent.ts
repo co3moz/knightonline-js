@@ -1,8 +1,9 @@
-const region = require('../region');
-const unit = require('../../core/utils/unit');
-const sendNoahChange = require('./sendNoahChange');
+import { IGameSocket } from "../game_socket";
+import { RegionSend } from "../region";
+import { short } from "../../core/utils/unit";
+import { SendNoahChange } from "./sendNoahChange";
 
-module.exports = (socket, noah) => {
+export function SendNoahEvent(socket: IGameSocket, noah: number) {
   if (noah <= 0) return false; // this is event, not the punishment
 
   let chance = Math.random();
@@ -16,14 +17,14 @@ module.exports = (socket, noah) => {
   else if (chance > 0.02) multiplier = 500;
   else multiplier = 1000;
 
-  region.regionSend(socket, [
+  RegionSend(socket, [
     0x4A, // GOLD_CHANGE
     5, // Event
-    ...unit.short(740), 0, 0, 0, 0, 0, 0, ...unit.short(multiplier), ...unit.short(socket.session)
+    ...short(740), 0, 0, 0, 0, 0, 0, ...short(multiplier), ...short(socket.session)
   ]);
 
 
-  sendNoahChange(socket, multiplier * noah);
+  SendNoahChange(socket, multiplier * noah);
 
   return true;
 }

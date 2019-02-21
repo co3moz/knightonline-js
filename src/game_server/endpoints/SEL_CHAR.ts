@@ -1,5 +1,5 @@
 import { IGameEndpoint } from "../endpoint";
-import { IGameSocket, IVariables } from "../game_socket";
+import { IGameSocket, IVariables, IVisiblePlayers } from "../game_socket";
 import { Queue, short } from "../../core/utils/unit";
 import { Character, Warehouse } from "../../core/database/models";
 import { CharacterMap } from "../shared";
@@ -104,6 +104,8 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
 
 
   socket.variables = <IVariables>{};
+  socket.visiblePlayers = <IVisiblePlayers>{};
+
   SendAbility(socket);
   await character.save();
 

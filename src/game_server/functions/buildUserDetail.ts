@@ -4,8 +4,8 @@ import { ItemSlot } from "../var/item_slot";
 
 const UserDetailSlots = [ItemSlot.BREAST, ItemSlot.LEG, ItemSlot.HEAD, ItemSlot.GLOVE, ItemSlot.FOOT, ItemSlot.SHOULDER, ItemSlot.RIGHTHAND, ItemSlot.LEFTHAND, ItemSlot.CWING, ItemSlot.CHELMET, ItemSlot.CLEFT, ItemSlot.CRIGHT, ItemSlot.CTOP, ItemSlot.FAIRY, ItemSlot.FAIRY];
 
-export function BuildUserDetail(socket: IGameSocket) {
-  const result = [];
+export function BuildUserDetail(socket: IGameSocket): number[] {
+  const result: number[] = [];
   let uu = socket.user;
   let uc = socket.character;
   let uv = socket.variables;

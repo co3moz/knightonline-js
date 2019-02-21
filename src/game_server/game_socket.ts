@@ -7,9 +7,22 @@ export interface IGameSocket extends IKOSocket {
   variables: IVariables
   warehouse: IWarehouse
   ingame: boolean
+
+  visiblePlayers: IVisiblePlayers
+  visibleNPCs: IVisibleNPCs
+}
+
+export interface IVisiblePlayers {
+  [session: number]: boolean
+}
+
+export interface IVisibleNPCs {
+  [uuid: number]: boolean
 }
 
 export interface IVariables {
+  expiryBlink: NodeJS.Timeout // setTimeout id
+
   acAmount: number
   totalHit: number
   statBonus: number[]
@@ -61,4 +74,6 @@ export interface IVariables {
   hptype: number
   abnormalType: number
   inParty: boolean
+
+  saitama: boolean // gm feature to hit 30k always
 }

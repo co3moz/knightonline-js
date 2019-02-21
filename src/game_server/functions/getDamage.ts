@@ -1,7 +1,9 @@
-function getDamageNPC(socket, npc, skill, preview) {
+import { IGameSocket } from "../game_socket";
+import { INPCInstance } from "../ai_system/declare";
+
+export function GetDamageNPC(socket: IGameSocket, npc: INPCInstance, skill?, preview?) {
   if (!npc || npc.hp == 0) return -1;
   let model = npc.npc;
-
 
   let ac = model.ac || 0;
   let v = socket.variables;
@@ -14,7 +16,7 @@ function getDamageNPC(socket, npc, skill, preview) {
   if (skill) {
     // TODO: do here
   } else {
-    if (getHitRate(v.totalHitRate / (model.evadeRate || 1)) == 'fail') {
+    if (GetHitRate(v.totalHitRate / (model.evadeRate || 1)) == 'fail') {
       return 0; // lol unlucky shit
     }
 
@@ -27,7 +29,7 @@ function getDamageNPC(socket, npc, skill, preview) {
   }
 }
 
-function getHitRate(rate) {
+export function GetHitRate(rate: number) {
   let rand = Math.random();
 
   if (rate >= 5) {
@@ -70,6 +72,3 @@ function getHitRate(rate) {
 
   return 'fail';
 }
-
-exports.getDamageNPC = getDamageNPC;
-exports.getHitRate = getHitRate;

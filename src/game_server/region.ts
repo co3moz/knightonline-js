@@ -1,12 +1,12 @@
 import { IGameSocket } from "./game_socket";
 import { INPCInstance } from "./ai_system/declare";
 
-export const regions: IRegionDictionary = {};
-export const users: IUserDictionary = {};
-export const zones: IZoneDictionary = {};
-export const sessions: ISessionDictionary = {};
-export const npcRegions: INPCRegionDictionary = {};
-export const npcs: INPCDictionary = {};
+export const RRegionMap: IRegionDictionary = {};
+export const RUserMap: IUserDictionary = {};
+export const RZoneMap: IZoneDictionary = {};
+export const RSessionMap: ISessionDictionary = {};
+export const RNPCRegionMap: INPCRegionDictionary = {};
+export const RNPCMap: INPCDictionary = {};
 
 let onChange = null;
 let onExit = null;
@@ -15,7 +15,7 @@ export function GetRegionName(socket: IGameSocket) {
   let c = socket.character;
   if (!c) return '';
 
-  let q = users[c.name];
+  let q = RUserMap[c.name];
   if (q) {
     return q.s;
   }
@@ -30,24 +30,24 @@ export function RegionUpdate(socket: IGameSocket, disableEvent = false): boolean
   let z = c.z / 35 >> 0;
   let s = `${c.zone}x${x}z${z}`;
 
-  if (users[c.name]) {
-    if (users[c.name].s == s) return false;
+  if (RUserMap[c.name]) {
+    if (RUserMap[c.name].s == s) return false;
 
     RegionRemove(socket);
   }
 
-  if (!regions[s]) {
-    regions[s] = [];
+  if (!RRegionMap[s]) {
+    RRegionMap[s] = [];
   }
 
-  if (!zones[c.zone]) {
-    zones[c.zone] = [];
+  if (!RZoneMap[c.zone]) {
+    RZoneMap[c.zone] = [];
   }
 
-  regions[s].push(socket);
-  zones[c.zone].push(socket);
-  users[c.name] = { s, zone: c.zone, x, z, socket };
-  sessions[socket.session] = socket;
+  RRegionMap[s].push(socket);
+  RZoneMap[c.zone].push(socket);
+  RUserMap[c.name] = <IRegionUser> { s, zone: c.zone, x, z, socket };
+  RSessionMap[socket.session] = socket;
 
   if (!disableEvent && onChange) {
     onChange(this, socket, s);
@@ -61,57 +61,57 @@ export function RegionUpdateNPC(npc: INPCInstance) {
   let z = npc.z / 35 >> 0;
   let s = `${npc.zone}x${x}z${z}`;
 
-  if (npcs[npc.uuid]) {
-    if (npcs[npc.uuid].s == s) return false; // no need to update
+  if (RNPCMap[npc.uuid]) {
+    if (RNPCMap[npc.uuid].s == s) return false; // no need to update
 
     RegionRemoveNPC(npc);
   }
 
-  if (!npcRegions[s]) {
-    npcRegions[s] = [];
+  if (!RNPCRegionMap[s]) {
+    RNPCRegionMap[s] = [];
   }
 
-  npcRegions[s].push(npc);
-  npcs[npc.uuid] = <IRegionNPC>{ s, zone: npc.zone, x, z, npc };
+  RNPCRegionMap[s].push(npc);
+  RNPCMap[npc.uuid] = <IRegionNPC>{ s, zone: npc.zone, x, z, npc };
   return true;
 }
 
 export function RegionRemove(socket: IGameSocket) {
-  delete sessions[socket.session];
+  delete RSessionMap[socket.session];
   let c = socket.character;
   if (!c) return;
 
-  let us = users[c.name];
+  let us = RUserMap[c.name];
 
   if (us) {
-    delete users[c.name];
+    delete RUserMap[c.name];
 
-    let userRegion = regions[us.s];
+    let userRegion = RRegionMap[us.s];
     let userRegionIndex = userRegion.findIndex(x => x == socket);
     userRegion.splice(userRegionIndex, 1);
 
     if (userRegion.length == 0) {
-      delete regions[us.s];
+      delete RRegionMap[us.s];
     }
 
-    let userZone = zones[us.zone];
+    let userZone = RZoneMap[us.zone];
     let userZoneIndex = userZone.findIndex(x => x == socket);
     userZone.splice(userZoneIndex, 1);
   }
 }
 
 export function RegionRemoveNPC(npc) {
-  let n = npcs[npc.uuid];
+  let n = RNPCMap[npc.uuid];
 
   if (n) {
-    delete npcs[npc.uuid];
+    delete RNPCMap[npc.uuid];
 
-    let region = npcRegions[n.s];
+    let region = RNPCRegionMap[n.s];
     let index = region.findIndex(x => x == npc);
     region.splice(index, 1);
 
     if (region.length == 0) {
-      delete npcRegions[n.s];
+      delete RNPCRegionMap[n.s];
     }
   }
 }
@@ -126,18 +126,18 @@ export function RegionExit(socket) {
 
 export function* RegionQuery(socket, opts?: IQueryOptions) {
   let c = socket.character;
-  let s = users[c.name];
+  let s = RUserMap[c.name];
   if (!s) return;
 
   if (opts && opts.all) { // query users without caring location?
-    for (let key in users) {
-      yield users[key].socket;
+    for (let key in RUserMap) {
+      yield RUserMap[key].socket;
     }
     return;
   }
 
   if (opts && opts.zone) { // query users by zone only?
-    yield* zones[s.zone];
+    yield* RZoneMap[s.zone];
     return;
   }
 
@@ -150,8 +150,8 @@ export function* RegionQuery(socket, opts?: IQueryOptions) {
   for (let x = -d; x <= d; x++) {
     for (let y = -d; y <= d; y++) {
       let s = `${fix}${cx + x}z${cz + y}`;
-      if (regions[s]) {
-        yield* regions[s];
+      if (RRegionMap[s]) {
+        yield* RRegionMap[s];
       }
     }
   }
@@ -159,7 +159,7 @@ export function* RegionQuery(socket, opts?: IQueryOptions) {
 
 export function* RegionQueryNPC(socket, d = 1) {
   let c = socket.character;
-  let s = users[c.name];
+  let s = RUserMap[c.name];
   if (!s) return;
 
   let fix = `${s.zone}x`
@@ -170,8 +170,8 @@ export function* RegionQueryNPC(socket, d = 1) {
   for (let x = -d; x <= d; x++) {
     for (let y = -d; y <= d; y++) {
       let s = `${fix}${cx + x}z${cz + y}`;
-      if (npcRegions[s]) {
-        yield* npcRegions[s];
+      if (RNPCRegionMap[s]) {
+        yield* RNPCRegionMap[s];
       }
     }
   }
@@ -188,32 +188,32 @@ export function* RegionQueryUsersByNpc(regionNPC) {
   for (let x = -d; x <= d; x++) {
     for (let y = -d; y <= d; y++) {
       let s = `${fix}${cx + x}z${cz + y}`;
-      if (regions[s]) {
-        yield* regions[s];
+      if (RRegionMap[s]) {
+        yield* RRegionMap[s];
       }
     }
   }
 }
 
-export function RegionSend(socket, packet) {
+export function RegionSend(socket: IGameSocket, packet: number[]): void {
   for (let s of RegionQuery(socket)) {
     s.send(packet);
   }
 }
 
-export function RegionSendByNpc(npc, packet) {
+export function RegionSendByNpc(npc: INPCInstance, packet: number[]): void {
   for (let s of RegionQueryUsersByNpc(npc)) {
     s.send(packet);
   }
 }
 
-export function ZoneSend(socket, packet) {
+export function ZoneSend(socket: IGameSocket, packet: number[]): void {
   for (let s of RegionQuery(socket, { zone: true })) {
     s.send(packet);
   }
 }
 
-export function AllSend(socket, packet) {
+export function AllSend(socket: IGameSocket, packet: number[]): void {
   for (let s of RegionQuery(socket, { all: true })) {
     s.send(packet);
   }

@@ -1,10 +1,10 @@
-const config = require('config');
-const levelUp = config.get('gameServer.levelUp');
-const unit = require('../../core/utils/unit');
-const sendAbility = require('./sendAbility');
-const region = require('../region');
+import { IGameSocket } from "../game_socket";
+import { SendAbility } from "./sendAbility";
+import { RegionSend } from "../region";
+import { short, long, int } from "../../core/utils/unit";
+import { GetLevelUp } from "./getLevelUp";
 
-module.exports = (socket, newLevel) => {
+export function SendLevelChange(socket: IGameSocket, newLevel: number) {
   if (newLevel < 1 || newLevel > 83) return;
 
   let c = socket.character;
@@ -34,22 +34,22 @@ module.exports = (socket, newLevel) => {
 
   c.level = newLevel;
 
-  sendAbility(socket);
-  
+  SendAbility(socket, false);
+
   let v = socket.variables;
-  
+
   c.hp = v.maxHp; // level up so give hp
   c.mp = v.maxMp; // level up so give mp
 
-  region.regionSend(socket, [
+  RegionSend(socket, [
     0x1B, // Level change
-    ...unit.short(socket.session),
+    ...short(socket.session),
     newLevel,
-    ...unit.short(c.statRemaining),
+    ...short(c.statRemaining),
     c.skillPointFree,
-    ...unit.long(levelUp[newLevel]), ...unit.long(c.exp),
-    ...unit.short(v.maxHp || 0), ...unit.short(c.hp),
-    ...unit.short(v.maxMp || 0), ...unit.short(c.mp),
-    ...unit.int(v.maxWeight), ...unit.int(v.itemWeight),
+    ...long(GetLevelUp(newLevel)), ...long(c.exp),
+    ...short(v.maxHp || 0), ...short(c.hp),
+    ...short(v.maxMp || 0), ...short(c.mp),
+    ...int(v.maxWeight), ...int(v.itemWeight),
   ])
 }

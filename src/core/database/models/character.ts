@@ -10,6 +10,11 @@ export interface ICharacterItem {
   detail: any
 }
 
+export interface IQuestItem {
+  id: number
+  state: number
+}
+
 export interface ICharacter extends Document {
   name: string
   race: number
@@ -57,6 +62,7 @@ export interface ICharacter extends Document {
   skillPointFree: number
 
   items: ICharacterItem[]
+  quests: IQuestItem[]
   friends: string[]
   skillBar: number[]
 }
