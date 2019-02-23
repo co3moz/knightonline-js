@@ -25,7 +25,7 @@ export const SHOPPING_MALL: IGameEndpoint = async function (socket: IGameSocket,
     // TODO: check this later
     // idea is check for items in database then send inventory data
 
-    let data = [];
+    let data: number[] = [];
     let items = socket.character.items;
     for (var i = INVENTORY_START; i < INVENTORY_END; i++) {
       let item = items[i];

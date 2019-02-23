@@ -6,6 +6,7 @@ import { ItemDropGroups } from "../var/item_drop_groups";
 import { SendMessageToPlayer } from "../functions/sendChatMessage";
 import { Item } from "../../core/database/models";
 import { CreateDrop } from "../drop";
+import { IGameSocket } from "../game_socket";
 
 const ARROW_MIN = 391010000;
 const ARROW_MAX = 392010000;
@@ -22,14 +23,14 @@ export function OnNPCDead(npc: INPCInstance) {
 
   let exp = npc.npc.exp;
   let hp = npc.npc.hp;
-  let greatestDamage = null;
-  let greatestSession = null;
+  let greatestDamage: number = 0;
+  let greatestSession: IGameSocket = null;
   for (let session in npc.damagedBy) {
     let userSocket = RSessionMap[session];
 
     if (userSocket) { // still online
       let damage = npc.damagedBy[session];
-      if (greatestDamage == null || greatestDamage < damage) {
+      if (greatestDamage < damage) {
         greatestDamage = damage;
         greatestSession = userSocket;
       }

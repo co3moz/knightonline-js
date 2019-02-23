@@ -4,7 +4,7 @@ import { RegionSend } from "../region";
 
 export function SendMessageToPlayer(socket: IGameSocket, type: ChatMessageType, sender: string, message: string, nation?: number, session?: number) {
   if (!nation) nation = socket.user.nation;
-  if (!session) nation = socket.session;
+  if (!session) session = socket.session;
 
   socket.send([
     0x10, type, nation,

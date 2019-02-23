@@ -7,14 +7,14 @@ import { LoginEndpointCodes, LoginEndpoint } from './endpoint';
 import { ILoginSocket } from './login_socket';
 
 export default async function LoginServer() {
-  console.log('login server is going to start...');
+  console.log('[SERVER] Login server is going to start...');
   await Database();
   await RedisConnect();
 
   let versions: any[] = config.get('loginServer.versions');
   let { version: serverVersion } = versions[versions.length - 1];
 
-  console.log('looks like latest server version is ' + serverVersion);
+  console.log('[SERVER] Looks like latest server version is ' + serverVersion);
 
   return await KOServerFactory({
     ip: config.get('loginServer.ip'),

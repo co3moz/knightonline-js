@@ -38,6 +38,7 @@ export function SendWarp(socket: IGameSocket, zone: ZoneCode): boolean {
   RegionUpdate(socket, true);
 
   SendRegionUserOutForMe(socket);
+  return true;
 }
 
 export function FindStartPositionOfZoneForUser(socket: IGameSocket, zone: ZoneCode) {

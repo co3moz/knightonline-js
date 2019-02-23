@@ -92,6 +92,7 @@ export const LOGIN_REQ: ILoginEndpoint = async function (socket: ILoginSocket, b
   }
 }
 
+
 function generateSession(): string {
   return Array(3).fill(0).map(generateRandomHexString).join('');
 }

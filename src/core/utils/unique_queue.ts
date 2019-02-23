@@ -1,4 +1,4 @@
-export function UniqueQueue(width: number, min = 0) {
+export function UniqueQueue(width: number, min = 0): IUniqueQueue {
   let data: number[] = Array(width);
   let i = width;
 
@@ -8,4 +8,9 @@ export function UniqueQueue(width: number, min = 0) {
     free: (i: number) => data.push(i),
     reserve: () => data.pop()
   }
+}
+
+export interface IUniqueQueue {
+  free: (i: number) => void
+  reserve: () => number
 }

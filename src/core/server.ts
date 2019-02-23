@@ -1,22 +1,64 @@
 import * as net from 'net';
 import { int, short, readShort } from './utils/unit';
 import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise';
-import { UniqueQueue } from './utils/unique_queue';
+import { UniqueQueue, IUniqueQueue } from './utils/unique_queue';
 import * as lzfjs from 'lzfjs';
 import * as crc32 from 'crc-32';
 import { Crypt } from './utils/crypt';
 
-export async function KOServerFactory(params: IServerConfiguration): Promise<net.Server[]> {
+export async function KOServerFactory(params: IServerConfiguration): Promise<IKOServer[]> {
   let { ip, ports } = params;
 
   if (!params.ipPool) {
     params.ipPool = {};
   }
 
+  if (!params.idPool) {
+    params.idPool = UniqueQueue(3000);
+  }
+
+  if (!params.connections) {
+    params.connections = {};
+  }
+
   let servers = await Promise.all(ports.map(port => new Promise(resolve => {
-    var server = net.createServer(serverHandler(params));
+    var server = <IKOServer>net.createServer(serverHandler(params));
 
     server.maxConnections = 10000;
+
+    let stopping = false;
+    server.stop = () => {
+      if (stopping) return;
+      stopping = true;
+      params.stopping = true;
+
+      let promise = <any> Promise.all([
+        new Promise(resolve => server.close(resolve)),
+        (async () => {
+          if (params.onStop) {
+            await params.onStop(server);
+          }
+
+          for (let socket of server.querySocketList()) {
+            await socket.terminate(); // make sure client disconnect
+          }
+
+          console.log('[SERVER] Server stopped! (' + ip + ':' + port + ')');
+        })()
+      ]);
+
+      return promise;
+    }
+
+    server.querySocketList = () => {
+      let sockets = [];
+      let c = params.connections;
+      for (let session in c) {
+        sockets.push(c[session]);
+      }
+
+      return sockets;
+    }
 
     server.listen(port, ip, function () {
       resolve(server);
@@ -24,25 +66,26 @@ export async function KOServerFactory(params: IServerConfiguration): Promise<net
   })));
 
   if (ports.length == 1) {
-    console.log('server started at ' + ip + ':' + ports[0] + '!');
+    console.log('[SERVER] Server started! (' + ip + ':' + ports[0] + ')');
   } else {
-    console.log('servers started at ' + ip + ':' + ports[0] + '-' + ports[ports.length - 1] + '!');
+    console.log('[SERVER] Servers started! (' + ip + ':' + ports[0] + '-' + ports[ports.length - 1] + ')');
   }
 
-  return <net.Server[]>servers;
+  return <IKOServer[]>servers;
 }
 
 function serverHandler(params: IServerConfiguration) {
-  let { timeout, onConnect, onData, onError, onDisconnect, ipPool } = params;
-  let idPool = UniqueQueue(3000);
+  let { timeout, onConnect, onData, onError, onDisconnect, ipPool, idPool, connections } = params;
 
   return (socket: IKOSocket) => {
-    var session = socket.session = idPool.reserve();
+    let session = socket.session = idPool.reserve();
 
     if (!session) {
       socket.end(); // no new connections!
       return;
     }
+
+    socket.setNoDelay(true);
 
     if (ipPool[socket.remoteAddress]) {
       if (ipPool[socket.remoteAddress] > 5) {
@@ -54,6 +97,8 @@ function serverHandler(params: IServerConfiguration) {
     } else {
       ipPool[socket.remoteAddress] = 1;
     }
+
+    connections[session] = socket;
 
     socket.connectedAt = Date.now();
     socket.setTimeout(timeout);
@@ -75,7 +120,10 @@ function serverHandler(params: IServerConfiguration) {
       socket.write(Buffer.from([0xAA, 0x55, ...short(response.length), ...response, 0x55, 0xAA]));
     }
 
-    socket.terminate = () => {
+    socket.terminate = (message) => {
+      if (message) {
+        console.log('[SOCKET] Terminated because of "' + message + '" session: ' + session);
+      }
       socket.end();
 
       return socket.terminatePromise = CreateDeferredPromise();
@@ -90,6 +138,8 @@ function serverHandler(params: IServerConfiguration) {
     if (onData) {
       let queue = [];
       socket.on('data', async data => {
+        if (params.stopping) return; // stop new requests
+
         let deferredPromise = CreateDeferredPromise();
         queue.push(deferredPromise);
 
@@ -102,12 +152,14 @@ function serverHandler(params: IServerConfiguration) {
           return socket.terminate('too much request');
         }
 
+        if (params.stopping) return; // stop queue requests
+
         try {
           let maxLoop = 10;
           while (data.length > 0 && maxLoop-- > 0) { // multiple data
             if (doesProtocolHeaderValid(data)) return socket.terminate('invalid protocol begin')
             const length = readShort(data, 2);
-            if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end');
+            if (doesProtocolFooterValid(data, length)) return socket.terminate('invalid protocol end'); // client always sends small packets. it will never be splitted packets
 
             let onlyBody = data.slice(4, 4 + length);
 
@@ -129,6 +181,7 @@ function serverHandler(params: IServerConfiguration) {
     }
 
     socket.on('close', async () => {
+      delete connections[session];
       if (onDisconnect) await onDisconnect(socket);
 
       if (socket.terminatePromise) {
@@ -159,11 +212,13 @@ const doesProtocolFooterValid = (data, length) => {
   return data[4 + length] != 0x55 || data[5 + length] != 0xAA
 }
 
+
+
 export interface IKOSocket extends net.Socket {
   session: number
   connectedAt: number
-  send: (packet: Array<number>) => void
-  terminate: (message: string) => IDeferredPromise
+  send: (packet: number[]) => void
+  terminate: (message?: string) => IDeferredPromise
   terminatePromise: IDeferredPromise
   cryption?: Crypt
 }
@@ -173,8 +228,18 @@ export interface IServerConfiguration {
   ports: number[]
   timeout?: number
   ipPool?: object
+  idPool?: IUniqueQueue
+  connections?: object // {session: socket} holder
+  stopping?: boolean // if stopping, ignore all packages..
   onConnect?: (socket: IKOSocket) => void
   onData?: (socket: IKOSocket, data: Buffer) => Promise<void>
   onError?: (socket: IKOSocket, error: Error) => void
   onDisconnect?: (socket: IKOSocket) => Promise<void>
+  onStop?: (server: IKOServer) => Promise<void>
+}
+
+
+export interface IKOServer extends net.Server {
+  stop: () => Promise<void>
+  querySocketList: () => IKOSocket[]
 }

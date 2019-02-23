@@ -1,16 +1,17 @@
 import * as config from 'config'
 import { Database } from '../core/database'
 import { RedisConnect } from '../core/redis/connect'
-import { KOServerFactory } from '../core/server';
+import { KOServerFactory, IKOServer } from '../core/server';
 import { Queue } from '../core/utils/unit';
 import { GameEndpointCodes, GameEndpoint } from './endpoint';
 import { IGameSocket } from './game_socket';
 import { UserMap, CharacterMap, LoadSetItems } from './shared';
-import { RegionExit } from './region';
+import { RegionRemove } from './region';
 import { AISystemStart } from './ai_system/start';
+import { OnUserExit } from './events/onUserExit';
 
 export default async function GameServer() {
-  console.log('game server is going to start...');
+  console.log('[SERVER] Game server is going to start...');
   await Database();
   await RedisConnect();
 
@@ -27,6 +28,9 @@ export default async function GameServer() {
     },
 
     onDisconnect: async (socket: IGameSocket) => {
+      await OnUserExit(socket);
+      RegionRemove(socket);
+
       if (socket.user) {
         if (UserMap[socket.user.account]) {
           delete UserMap[socket.user.account];
@@ -34,7 +38,6 @@ export default async function GameServer() {
       }
 
       if (socket.character) {
-        RegionExit(socket);
         if (CharacterMap[socket.character.name]) {
           delete CharacterMap[socket.character.name];
         }

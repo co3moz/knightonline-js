@@ -57,12 +57,14 @@ export function SendRegionUserIn(socket: IGameSocket, whichSessionIn: number, in
       }
     }
 
-    socket.send([
-      0x07,  // USER_IN_OUT
-      inCase, 0, // show
-      ...short(whichSessionIn),
-      ...cached
-    ]);
+    if (cached) {
+      socket.send([
+        0x07,  // USER_IN_OUT
+        inCase, 0, // show
+        ...short(whichSessionIn),
+        ...cached
+      ]);
+    }
   }
 
   if (!onlyOneWay) {

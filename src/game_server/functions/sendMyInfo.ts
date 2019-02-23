@@ -10,7 +10,7 @@ export function SendMyInfo(socket: IGameSocket) {
 
   let nation = u.nation;
 
-  let items = [];
+  let items: number[] = [];
 
   for (let i = 0; i < 75; i++) {
     let item = c.items[i];

@@ -24,7 +24,7 @@ export async function AISystemStart() {
 
     for (let spawn of npc.spawn) {
       if (spawn.zone == 21) { // rn do only moradon
-        let amount = spawn.amount;
+        let amount = spawn.amount || 1;
 
         for (let i = 0; i < amount; i++) {
           npcCount++;

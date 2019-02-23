@@ -53,10 +53,10 @@ export async function NpcDefaults() {
       }
       sent += arr.length;
       await Npc.insertMany(arr);
-      console.log('npc patch sent %d status: %f %', sent, (sent / total * 1000 | 0) / 10);
+      console.log('[CSV] NPC patch sent %d status: %f %', sent, (sent / total * 1000 | 0) / 10);
     }
   } catch (e) {
-    console.error('error ocurred on inserting npc!');
+    console.error('[CSV] Error ocurred on inserting npc!');
     throw e;
   }
 
@@ -70,10 +70,10 @@ export async function NpcDefaults() {
       }
       sent += arr.length;
       await Npc.insertMany(arr);
-      console.log('monster patch sent %d status: %f %', sent, (sent / total * 1000 | 0) / 10);
+      console.log('[CSV] Monster patch sent %d status: %f %', sent, (sent / total * 1000 | 0) / 10);
     }
   } catch (e) {
-    console.error('error ocurred on inserting monsters!');
+    console.error('[CSV] Error ocurred on inserting monsters!');
     throw e;
   }
 

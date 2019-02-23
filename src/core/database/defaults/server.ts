@@ -23,5 +23,5 @@ export async function ServerDefaults() {
 
   await server.save();
 
-  console.log('A test server has been defined!')
+  console.log('[DB] A test server has been defined!')
 }

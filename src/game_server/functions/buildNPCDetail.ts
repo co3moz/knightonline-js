@@ -7,7 +7,7 @@ export function BuildNPCDetail(npc: INPCInstance) {
   // }
 
   let model = npc.npc;
-  const result = [];
+  const result: number[] = [];
 
   result.push(...short(model.id));
   result.push(model.isMonster ? 1 : 2);

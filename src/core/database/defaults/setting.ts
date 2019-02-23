@@ -19,12 +19,12 @@ export async function SettingDefaults() {
 
       await setting.save();
 
-      console.log('A setting has been defined! | (%s) %s =', value[0], key, value[1])
+      console.log('[DB] A setting has been defined! | (%s) %s =', value[0], key, value[1])
     } else {
       if (value[2] == 'DELETED' && data) {
         await data.remove();
 
-        console.log('A setting has been removed! | (%s) %s = NULL', value[0], key)
+        console.log('[DB] A setting has been removed! | (%s) %s = NULL', value[0], key)
       }
     }
   }

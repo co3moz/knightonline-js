@@ -5,9 +5,6 @@ import { RegionUpdateNPC } from "../region";
 
 
 export function SummonNPC(npc: INpc, spawn: ISpawn) {
-  if (!npc) return;
-  if (!spawn) return;
-
   let npcObj: INPCInstance = {
     npc,
     spawn,

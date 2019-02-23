@@ -5,10 +5,10 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint src/**",
+    "build": "tsc",
+    "start": "tsc && node build/app",
     "smd_test": "mocha test/smd.test.js",
-    "test": "mocha test/**/*.test.js",
-    "start": "node src"
+    "test": "mocha test/**/*.test.js"
   },
   "keywords": [],
   "author": "",

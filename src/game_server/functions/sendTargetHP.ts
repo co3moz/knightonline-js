@@ -19,7 +19,7 @@ export function SendTargetHP(socket: IGameSocket, echo: number, damage: number):
         ...short(damage || 0)
       ]);
     } else {
-      socket.target = null;
+      socket.target = 0;
       socket.targetType = 'notarget';
     }
   } else if (socket.targetType == 'npc') {
@@ -37,7 +37,7 @@ export function SendTargetHP(socket: IGameSocket, echo: number, damage: number):
         ...short(damage || 0)
       ]);
     } else {
-      socket.target = null;
+      socket.target = 0;
       socket.targetType = 'notarget';
     }
   }

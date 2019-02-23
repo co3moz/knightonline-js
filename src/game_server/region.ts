@@ -76,10 +76,10 @@ export function RegionUpdateNPC(npc: INPCInstance) {
 }
 
 export function RegionRemove(socket: IGameSocket) {
-  delete RSessionMap[socket.session];
   let c = socket.character;
   if (!c) return;
-
+  delete RSessionMap[socket.session];
+  
   let us = RUserMap[c.name];
 
   if (us) {
@@ -113,11 +113,6 @@ export function RegionRemoveNPC(npc) {
       delete RNPCRegionMap[n.s];
     }
   }
-}
-
-export function RegionExit(socket) {
-  OnUserExit(socket);
-  RegionRemove(socket);
 }
 
 export function* RegionQuery(socket, opts?: IQueryOptions) {

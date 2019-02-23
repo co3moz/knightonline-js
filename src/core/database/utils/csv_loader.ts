@@ -19,7 +19,7 @@ export async function CSVLoader(file: string, transfer: object, expected: number
     fs.createReadStream(zipPath).pipe(extract);
 
     extract.on('close', () => {
-      console.log(file + '.zip unzipped');
+      console.log('[CSV] ' + file + '.zip unzipped');
 
       let arr = [];
       const parser = csv({ columns: true, newline: '\r\n', })
@@ -41,16 +41,16 @@ export async function CSVLoader(file: string, transfer: object, expected: number
           parser.pause();
           await model.insertMany(arr);
           total += arr.length;
-          console.log(file + ' patch sent %d status: %f %', total, (total / expected * 1000 | 0) / 10);
+          console.log('[CSV] ' + file + ' patch sent %d status: %f %', total, (total / expected * 1000 | 0) / 10);
           arr = [];
           parser.resume();
           await delay(500);
         }
 
-        console.log(file + '.csv completed');
+        console.log('[CSV] ' + file + '.csv completed');
 
         fs.unlink(csvPath, function () {
-          console.log(file + '.csv removed');
+          console.log('[CSV] ' + file + '.csv removed');
 
           resolve(true);
         });

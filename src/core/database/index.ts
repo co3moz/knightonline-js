@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose'
 
-import { ConnectToDatabase} from './utils/connect'
+import { ConnectToDatabase } from './utils/connect'
 import { SettingDefaults, ServerDefaults, SetItemDefaults, ItemDefaults, NpcDefaults, AccountDefaults } from './defaults';
 
 let connection: mongoose.Connection = null;
@@ -20,4 +20,8 @@ export async function Database(): Promise<mongoose.Connection> {
   await AccountDefaults();
 
   return connection;
+}
+
+export function DisconnectFromDatabase(): Promise<void> {
+  return mongoose.disconnect();
 }
