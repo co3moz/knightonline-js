@@ -1,8 +1,7 @@
-const fse = require('fs-extra');
-const path = require('path');
+import * as fse from 'fs-extra'
+import * as path from 'path'
 
-// for testing use this ->   await require('./core/utils/smd_reader')('elmo2004')
-module.exports = async function (file, onlySmall) { // TODO: finish this
+export async function SMDReader(file: string)  { // no need for smd reading
   let fd = await fse.open(path.resolve(__dirname, '../../../data/' + file + '.smd'), "r");
   let mapSize = await int(fd);
   let mapUnitDistance = await float(fd);

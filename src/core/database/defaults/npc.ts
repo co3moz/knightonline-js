@@ -1,4 +1,4 @@
-import { CSVReader} from '../utils/csv_reader';
+import { CSVReader } from '../utils/csv_reader';
 import { Npc, IDrop } from '../models';
 
 export async function NpcDefaults() {
@@ -92,7 +92,7 @@ function groupPosition(array) {
     delete item.path;
 
     if (dot && path) {
-      let points = [];
+      let points: IDirectionPoint[] = [];
 
       for (let i = 0; i < dot; i++) {
         let x = +path.substring(i * 8, i * 8 + 4);
@@ -132,6 +132,11 @@ function groupPosition(array) {
 
 interface IDropsGroupedByIds {
   [dropId: number]: IDrop[]
+}
+
+interface IDirectionPoint {
+  x: number,
+  z: number
 }
 
 interface IRawDrops {

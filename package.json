@@ -26,22 +26,19 @@
     "mongoose": "^5.4.13",
     "natives": "^1.1.6",
     "redis": "^2.8.0",
-    "ts-node": "^8.0.2",
     "typescript": "^3.3.3",
-    "unzip": "^0.1.11"
-  },
-  "devDependencies": {
+    "unzip": "^0.1.11",
     "@types/bluebird": "^3.5.25",
     "@types/config": "0.0.34",
     "@types/glob": "^7.1.1",
     "@types/long": "^4.0.0",
     "@types/mongodb": "^3.1.19",
     "@types/mongoose": "^5.3.17",
-    "@types/node": "^11.9.4",
+    "@types/node": "^11.9.5",
     "@types/redis": "^2.8.10",
     "mocha": "^5.2.0"
   },
   "engines": {
-    "node": ">=8.9.4"
+    "node": ">= 10"
   }
 }

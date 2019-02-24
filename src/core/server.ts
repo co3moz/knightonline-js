@@ -32,7 +32,7 @@ export async function KOServerFactory(params: IServerConfiguration): Promise<IKO
       stopping = true;
       params.stopping = true;
 
-      let promise = <any> Promise.all([
+      let promise = <any>Promise.all([
         new Promise(resolve => server.close(resolve)),
         (async () => {
           if (params.onStop) {
@@ -136,7 +136,7 @@ function serverHandler(params: IServerConfiguration) {
     if (onConnect) onConnect(socket);
 
     if (onData) {
-      let queue = [];
+      let queue: IDeferredPromise[] = [];
       socket.on('data', async data => {
         if (params.stopping) return; // stop new requests
 
@@ -226,7 +226,7 @@ export interface IKOSocket extends net.Socket {
 export interface IServerConfiguration {
   ip: string
   ports: number[]
-  timeout?: number
+  timeout: number
   ipPool?: object
   idPool?: IUniqueQueue
   connections?: object // {session: socket} holder

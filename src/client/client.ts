@@ -2,15 +2,15 @@ import * as config from 'config'
 import * as mongoose from 'mongoose'
 import { KOClientFactory, IKOClientSocket } from '../core/client'
 import { short, string, byte_string } from '../core/utils/unit'
-import {PasswordHash} from '../core/utils/password_hash'
+import { PasswordHash } from '../core/utils/password_hash'
 import { AuthenticationCode } from '../login_server/endpoints/LOGIN_REQ'
-import { Database} from '../core/database'
+import { Database } from '../core/database'
 import { GameEndpointCodes } from '../game_server/endpoint';
 
 export async function TestClient() {
-  let loginConnection: IKOClientSocket;
-  let gameConnection: IKOClientSocket;
-  let dbConnection: mongoose.Connection;
+  let loginConnection: IKOClientSocket | null;
+  let gameConnection: IKOClientSocket | null;
+  let dbConnection: mongoose.Connection | null;
   let data: any;
   let debug = false;
   let loadItems = false;
@@ -55,7 +55,7 @@ export async function TestClient() {
     let ftpAddress = data.string();
     let ftpRoot = data.string();
     let totalFiles = data.short();
-    let files = [];
+    let files: string[] = [];
     for (var i = 0; i < totalFiles; i++) {
       files.push(data.string());
     }
@@ -93,7 +93,7 @@ export async function TestClient() {
     data.skip(2); // dummy 1, 0 
 
     let serverCount = data.byte();
-    let servers = [];
+    let servers: any[] = [];
 
     for (i = 0; i < serverCount; i++) {
       servers.push({
@@ -160,7 +160,7 @@ export async function TestClient() {
     data.skip(2);
 
     let selectedChar;
-    let characters = [];
+    let characters: any[] = [];
 
     for (let i = 0; i < 4; i++) {
       let name = data.string();
@@ -208,7 +208,7 @@ export async function TestClient() {
     data = await gameConnection.waitNextData(0x0E);
 
     let player: Dictionary<any> = {}
-    let items = [];
+    let items: any[] = [];
 
     player.socketId = data.short();
     player.name = data.byte_string();
@@ -309,7 +309,7 @@ export async function TestClient() {
     data = await gameConnection.sendAndWait([0x3C, 0x41], 0x3C, 0x41); // knights top 10 request
     data.skip(2); // short 0
 
-    let knights = [[], []];
+    let knights: any[] = [[], []];
     for (let m = 0; m < 2; m++) {
       for (let i = 0; i < 5; i++) {
         knights[m].push({
@@ -343,7 +343,7 @@ export async function TestClient() {
 
     data.skip(1); // 0 
 
-    let userList = [];
+    let userList: any[] = [];
     let userCount = data.short();
     for (let i = 0; i < userCount; i++) {
       userList.push({

@@ -4,7 +4,6 @@
     "alwaysStrict": true,
     "removeComments": true,
     "sourceMap": true,
-    "strictNullChecks": false,
     "module": "commonjs",
     "target": "es2017",
     "lib": [
