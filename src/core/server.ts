@@ -1,7 +1,7 @@
 import * as net from 'net';
 import { int, short, readShort } from './utils/unit';
 import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise';
-import { UniqueQueue, IUniqueQueue } from './utils/unique_queue';
+import { UniqueQueue } from './utils/unique_queue';
 import * as lzfjs from 'lzfjs';
 import * as crc32 from 'crc-32';
 import { Crypt } from './utils/crypt';
@@ -14,7 +14,7 @@ export async function KOServerFactory(params: IServerConfiguration): Promise<IKO
   }
 
   if (!params.idPool) {
-    params.idPool = UniqueQueue(3000);
+    params.idPool = UniqueQueue.from(3000);
   }
 
   if (!params.connections) {
@@ -228,7 +228,7 @@ export interface IServerConfiguration {
   ports: number[]
   timeout: number
   ipPool?: object
-  idPool?: IUniqueQueue
+  idPool?: UniqueQueue
   connections?: object // {session: socket} holder
   stopping?: boolean // if stopping, ignore all packages..
   onConnect?: (socket: IKOSocket) => void
