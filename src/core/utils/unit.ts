@@ -19,15 +19,15 @@ export function readUInt(data: number[], i: number): number {
   return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >>> 0;
 }
 
-export function short(i: number): number[] {
+export function short(i: number): [number, number] {
   return [(i >>> 0) & 0xFF, (i >>> 8) & 0xFF];
 }
 
-export function int(i: number): number[] {
+export function int(i: number): [number, number, number, number] {
   return [(i >>> 0) & 0xFF, (i >>> 8) & 0xFF, (i >>> 16) & 0xFF, (i >>> 24) & 0xFF];
 }
 
-export function long(i: number): number[] {
+export function long(i: number): [number, number, number, number, number, number, number, number] {
   if (i > Number.MAX_SAFE_INTEGER) return [255, 255, 255, 255, 255, 255, 31, 0];
   let l = i % 0x100000000 | 0;
   let h = i / 0x100000000 | 0;
@@ -58,7 +58,7 @@ export function stringFromArray(i) {
   return [...short(i.length), ...i];
 }
 
-export function string(str: string, encoding: 'utf8' | 'ascii' = 'utf8') {
+export function string(str: string, encoding: 'utf8' | 'ascii' = 'utf8'): number[] {
   let array = Array.from(Buffer.from(str, encoding));
 
   if (array.length > 65536) {
@@ -93,7 +93,7 @@ export class Queue {
   }
 
   public static from(buffer: Buffer) {
-    return new this(Array.from(buffer));
+    return new Queue(Array.from(buffer));
   }
 
   byte(): number {

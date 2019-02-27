@@ -2,7 +2,6 @@ import { IGameEndpoint } from "../endpoint";
 import { IGameSocket } from "../game_socket";
 import { Queue, int, short } from "../../core/utils/unit";
 import { GetDrop } from "../drop";
-import { SendMessageToPlayer } from "../functions/sendChatMessage";
 
 export const DROP_OPEN: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
   let dropIndex = body.int();
@@ -17,8 +16,6 @@ export const DROP_OPEN: IGameEndpoint = async function (socket: IGameSocket, bod
     opcode,
     ...int(dropIndex), 1
   ];
-
-  SendMessageToPlayer(socket, 1, '[DROPS]', `total: ${drop.dropped.map(x => x ? (x.item + '(' + x.amount + ')') : 'empty').join(' ')}`, undefined, -1);
 
   for (let i = 0; i < 6; i++) {
     let item = drop.dropped[i];

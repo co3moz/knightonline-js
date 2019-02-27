@@ -1,9 +1,8 @@
 import { INPCInstance } from "../ai_system/declare";
-import { RegionRemoveNPC, RegionSendByNpc, RSessionMap, RegionQueryUsersByNpc } from "../region";
+import { RegionRemoveNPC, RSessionMap, RegionQueryUsersByNpc } from "../region";
 import { short, int } from "../../core/utils/unit";
 import { SendExperienceChange } from "../functions/sendExperienceChange";
 import { ItemDropGroups } from "../var/item_drop_groups";
-import { SendMessageToPlayer } from "../functions/sendChatMessage";
 import { Item } from "../../core/database/models";
 import { CreateDrop } from "../drop";
 import { IGameSocket } from "../game_socket";
@@ -109,8 +108,6 @@ export function OnNPCDead(npc: INPCInstance) {
     }
 
     if (dropped.length) {
-      SendMessageToPlayer(greatestSession, 1, 'DROP', 'should be visible', undefined, -1);
-
       let itemIds = dropped.map(x => x.item).filter(x => x != 900000000);
 
 
@@ -128,7 +125,7 @@ export function OnNPCDead(npc: INPCInstance) {
             ...int(wrap), // bundle id
             2
           ]);
-        }).catch(x => {
+        }).catch(() => {
 
         });
       } else {

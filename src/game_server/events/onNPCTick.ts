@@ -3,17 +3,14 @@ import { NPCMap } from "../ai_system/uuid";
 import { RegionUpdateNPC, RegionQueryUsersByNpc, RegionSendByNpc } from "../region";
 import { SendRegionNpcIn } from "../functions/sendRegionInOut";
 import { short } from "../../core/utils/unit";
+import { WaitNextTick } from "../../core/utils/general";
 
-let npcTick = false;
-export async function OnNPCTick() {
-  if (npcTick) return;
-  npcTick = true;
-  
+export async function OnNPCTick() {  
   let now = Date.now();
   let ioSafe = 0;
 
   for (let uuid in NPCMap) {
-    if (++ioSafe > 100) {
+    if (++ioSafe > 50) {
       ioSafe = 0;
       await WaitNextTick();
     }
@@ -91,8 +88,6 @@ export async function OnNPCTick() {
       instance.wait = 0;
     }
   }
-
-  npcTick = false;
 }
 
 
@@ -125,8 +120,4 @@ function NpcMove(instance: INPCInstance) {
 
 function random(min, max) {
   return Math.random() * (max - min) + min;
-}
-
-function WaitNextTick(): Promise<void> {
-  return new Promise(resolve => setImmediate(resolve))
 }

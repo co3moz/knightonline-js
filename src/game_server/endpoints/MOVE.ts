@@ -45,10 +45,4 @@ export const MOVE: IGameEndpoint = async function (socket: IGameSocket, body: Qu
     ...short(newZ),
     ...short(newY)
   ]);
-
-
-
-  let text = (realX + ' ' + realZ + ' ' + realY + ' | W ' + rwillX + ' ' + rwillZ + ' ' + rwillY + ' | ' + speed);
-  console.log('MOVE REAL ' + text);
-  SendMessageToPlayer(socket, 7, 'MOVE', text);
 }
