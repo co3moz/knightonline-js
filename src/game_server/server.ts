@@ -28,7 +28,13 @@ export default async function GameServer() {
     },
 
     onDisconnect: async (socket: IGameSocket) => {
-      await OnUserExit(socket);
+      try {
+        await OnUserExit(socket);
+      } catch (e) {
+        console.error('[ERROR] Saving failed for user! ' + socket.session);
+        console.error(e);
+      }
+      
       RegionRemove(socket);
 
       if (socket.user) {

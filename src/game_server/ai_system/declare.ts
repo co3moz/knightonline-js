@@ -6,8 +6,10 @@ export interface INPCInstance {
 
   uuid: number
   zone: number
-  x: number
-  z: number
+  x: number // current x
+  z: number // current z
+  tx: number // target x
+  tz: number // target z
   direction: number
   hp: number
   mp: number
@@ -15,7 +17,13 @@ export interface INPCInstance {
   maxMp: number
 
   damagedBy?: INPCDamageDirectory
-  status?: 'alive' | 'dead'
+  status: 'init' | 'standing' | 'moving' | 'attacking' | 'tracing' | 'fighting' | 'back' | 'dead'
+  timestamp: number
+  wait: number
+  initialized: boolean
+  agressive: boolean
+
+  cache: number[]
 }
 
 export type Damage = number;

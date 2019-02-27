@@ -1,5 +1,5 @@
 import { Npc } from "../../core/database/models";
-import { NPCUUID } from "./uuid";
+import { NPCUUID, NPCMap } from "./uuid";
 import { RegionUpdateNPC } from "../region";
 import { INPCInstance } from "./declare";
 
@@ -16,6 +16,7 @@ export async function AISystemStart() {
   let monsterCount = 0;
   let skipped = 0;
 
+  let now = Date.now();
   for (let npc of rawNpcs) {
     if (!npc.spawn.length) {
       skipped++;
@@ -30,23 +31,17 @@ export async function AISystemStart() {
           npcCount++;
           if (npc.isMonster) monsterCount++;
 
-          let npcObj: INPCInstance = {
+          let npcObj: INPCInstance = <any>{
             npc,
             spawn,
 
             uuid: NPCUUID.reserve(),
-            zone: spawn.zone,
-            x: random(spawn.leftX, spawn.rightX),
-            z: random(spawn.topZ, spawn.bottomZ),
-            direction: spawn.direction,
-            hp: npc.hp,
-            mp: npc.mp,
-            maxHp: npc.hp,
-            maxMp: npc.mp
+            status: 'init',
+            timestamp: now,
+            wait: 0
           };
 
-
-          RegionUpdateNPC(npcObj);
+          NPCMap[npcObj.uuid] = npcObj;
         }
       } else {
         let amount = spawn.amount || 1;
@@ -59,9 +54,4 @@ export async function AISystemStart() {
   }
 
   console.log("[NPC] total: %d, mobs: %d, skipped: %d", npcCount, monsterCount, skipped);
-}
-
-
-function random(min, max) {
-  return Math.random() * (max - min) + min;
 }

@@ -8,9 +8,18 @@
       "type": "node",
       "request": "launch",
       "name": "Run",
-      "args": ["${workspaceFolder}\\src\\app.ts"],
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "args": [
+        "${workspaceFolder}\\src\\app.ts"
+      ],
+      "runtimeArgs": [
+        "--nolazy",
+        "-r",
+        "ts-node/register"
+      ],
       "protocol": "inspector",
+      "env": {
+        "TS_NODE_TRANSPILE_ONLY": "true"
+      },
       "sourceMaps": true
     }
   ]

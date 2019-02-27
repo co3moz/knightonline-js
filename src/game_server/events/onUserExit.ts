@@ -27,9 +27,9 @@ export function OnUserExit(socket: IGameSocket, serverClose?: boolean) {
 
   let actions: Promise<any>[] = [];
 
-  if (socket.user) actions.push(socket.user.save({ validateBeforeSave: false, }));
-  if (socket.character) actions.push(socket.character.save({ validateBeforeSave: false }));
-  if (socket.warehouse) actions.push(socket.warehouse.save({ validateBeforeSave: false }));
+  if (socket.user) actions.push(socket.user.save());
+  if (socket.character) actions.push(socket.character.save());
+  if (socket.warehouse) actions.push(socket.warehouse.save());
 
   return Promise.all(actions);
 }

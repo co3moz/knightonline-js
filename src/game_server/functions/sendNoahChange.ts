@@ -15,11 +15,17 @@ export function SendNoahChange(socket: IGameSocket, noah: number, shouldISendPac
   if (shouldISendPacket) {
     socket.send([
       0x4A, // GOLD_CHANGE
-      noah < 0 ? 2 : 1, // 1: GOLD GAIN, 2: GOLD LOSS, 5: GOLD EVENT
+      noah < 0 ? GoldGainType.Loss : GoldGainType.Gain,
       ...int(Math.abs(noah)),
       ...int(c.money)
     ]);
   }
 
   return true;
+}
+
+export enum GoldGainType {
+  Gain = 1,
+  Loss = 2,
+  Event = 5
 }

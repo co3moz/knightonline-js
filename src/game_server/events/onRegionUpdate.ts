@@ -1,14 +1,14 @@
 import { IGameSocket } from "../game_socket";
 import { SendRegionUserOut, SendRegionNpcOut, SendRegionUserIn, SendRegionNpcIn, RegionInCase } from "../functions/sendRegionInOut";
 import { BuildUserDetail } from "../functions/buildUserDetail";
-import { RSessionMap, RegionQuery, RegionQueryNPC, RNPCMap } from "../region";
+import { RSessionMap, RegionQuery, RegionQueryNPC, RNPCMap, IRegionNPC } from "../region";
 
 export function OnRegionUpdate(socket: IGameSocket) {
   if (!socket.ingame) return;
   let oldSessions: number[] = <any>Object.keys(socket.visiblePlayers);
   let oldNPCSessions: number[] = <any>Object.keys(socket.visiblePlayers);
-  let newSessions = [];
-  let newNPCSessions = [];
+  let newSessions: number[] = [];
+  let newNPCSessions: number[] = [];
 
   for (let userSocket of RegionQuery(socket)) {
     newSessions.push(userSocket.session);
@@ -48,7 +48,7 @@ export function OnRegionUpdate(socket: IGameSocket) {
 
   for (let newNPCSession of newNPCSessions) {
     if (!oldNPCSessions.find(x => x == newNPCSession)) {
-      let npc = RNPCMap[newNPCSession];
+      let npc: IRegionNPC = RNPCMap[newNPCSession];
 
       if (npc) {
         SendRegionNpcIn(socket, npc.npc);

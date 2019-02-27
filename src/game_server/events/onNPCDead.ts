@@ -1,5 +1,5 @@
 import { INPCInstance } from "../ai_system/declare";
-import { RegionRemoveNPC, RegionSendByNpc, RSessionMap } from "../region";
+import { RegionRemoveNPC, RegionSendByNpc, RSessionMap, RegionQueryUsersByNpc } from "../region";
 import { short, int } from "../../core/utils/unit";
 import { SendExperienceChange } from "../functions/sendExperienceChange";
 import { ItemDropGroups } from "../var/item_drop_groups";
@@ -7,6 +7,7 @@ import { SendMessageToPlayer } from "../functions/sendChatMessage";
 import { Item } from "../../core/database/models";
 import { CreateDrop } from "../drop";
 import { IGameSocket } from "../game_socket";
+import { NPCMap, NPCUUID } from "../ai_system/uuid";
 
 const ARROW_MIN = 391010000;
 const ARROW_MAX = 392010000;
@@ -15,11 +16,28 @@ export function OnNPCDead(npc: INPCInstance) {
   if (npc.status == 'dead') return;
 
   npc.status = 'dead';
+
   RegionRemoveNPC(npc);
-  RegionSendByNpc(npc, [
+
+  const npcDeadPacket = [
     0x11, // dead
     ...short(npc.uuid)
-  ]);
+  ];
+
+  for (let s of RegionQueryUsersByNpc(npc)) {
+    delete s.visibleNPCs[npc.uuid];
+    s.send(npcDeadPacket);
+  }
+
+  if (npc.spawn.respawnTime) {
+    npc.wait = npc.spawn.respawnTime * 1000;
+  } else {
+    delete NPCMap[npc.uuid];
+
+    setTimeout(function () {
+      NPCUUID.free(npc.uuid);
+    }, 2000);
+  }
 
   let exp = npc.npc.exp;
   let hp = npc.npc.hp;

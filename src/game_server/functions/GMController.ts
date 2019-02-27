@@ -110,22 +110,16 @@ export const GM_COMMANDS = {
         throw new Error(`Unknown npc id! "${id}"`)
       }
 
-      return SummonNPC(npc, {
+      let instance =  SummonNPC(npc, {
         zone: socket.character.zone,
         leftX: socket.character.x,
         rightX: socket.character.x,
         topZ: socket.character.z,
         bottomZ: socket.character.z,
-        direction: socket.character.direction,
-        spawnedBy: 'gm'
+        direction: socket.character.direction
       });
-    }).then(npcInstance => {
-      for (let userSocket of RegionQueryUsersByNpc(npcInstance)) {
-        SendRegionNpcIn(userSocket, npcInstance);
-      }
 
-
-      SendUsageMessageForGM(socket, `Summoned! "${npcInstance.npc.name}" uuid:${npcInstance.uuid}`);
+      SendUsageMessageForGM(socket, `Summoned! "${npc.name}" uuid:${instance.uuid}`);
     }).catch(e => {
       SendUsageMessageForGM(socket, `ERROR: ${e.message}`);
     })

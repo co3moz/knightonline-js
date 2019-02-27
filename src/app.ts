@@ -11,7 +11,7 @@ async function main() {
   servers.push(...await LoginServer());
   servers.push(...await GameServer());
 
-  const tick = setInterval(OnServerTick, 100);
+  const tick = setInterval(OnServerTick, 250);
 
   process.on('SIGINT', CloseSignal.bind(null, 'SIGINT', servers, tick));
   process.on('SIGTERM', CloseSignal.bind(null, 'SIGTERM', servers, tick));

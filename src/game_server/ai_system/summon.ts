@@ -1,30 +1,21 @@
 import { INpc, ISpawn } from "../../core/database/models";
 import { INPCInstance } from "./declare";
-import { NPCUUID } from "./uuid";
+import { NPCUUID, NPCMap } from "./uuid";
 import { RegionUpdateNPC } from "../region";
 
 
 export function SummonNPC(npc: INpc, spawn: ISpawn) {
-  let npcObj: INPCInstance = {
+  let npcObj: INPCInstance = <any>{
     npc,
     spawn,
 
+    status: 'init',
     uuid: NPCUUID.reserve(),
-    zone: spawn.zone,
-    x: random(spawn.leftX, spawn.rightX),
-    z: random(spawn.topZ, spawn.bottomZ),
-    direction: spawn.direction,
-    hp: npc.hp,
-    mp: npc.mp,
-    maxHp: npc.hp,
-    maxMp: npc.mp,
+    timestamp: Date.now(),
+    wait: 0
   };
 
-  RegionUpdateNPC(npcObj);
+  NPCMap[npcObj.uuid] = npcObj;
 
   return npcObj;
-}
-
-function random(min, max) {
-  return Math.random() * (max - min) + min;
 }
