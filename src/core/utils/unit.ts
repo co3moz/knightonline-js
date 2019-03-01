@@ -12,11 +12,11 @@ export function readShort(data: number[] | Buffer, i: number): number {
 }
 
 export function readInt(data: number[] | Buffer, i: number): number {
-  return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >> 0;
+  return ((data[i] | 0) + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >> 0;
 }
 
 export function readUInt(data: number[] | Buffer, i: number): number {
-  return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >>> 0;
+  return ((data[i] | 0)  + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >>> 0;
 }
 
 export function short(i: number): [number, number] {
@@ -87,8 +87,8 @@ export function configString(name) {
 }
 
 export class Queue {
-  private _: Buffer;
-  private o: number;
+  private _: Buffer; // buffer
+  private o: number; // offset
   private constructor(buf: Buffer) {
     this._ = buf;
     this.o = 0;
