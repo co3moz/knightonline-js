@@ -123,7 +123,7 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
           let len = body.int();
           let realLen = body.int();
           let crc = body.int();
-          let compressedData = body.skip(len);
+          let compressedData = body.sub(len);
           let uncompressedData = lzfjs.decompress(new Uint8Array(compressedData));
           let crcUncompressedData = crc32.buf(uncompressedData, ~-1);
           // if (crcUncompressedData != crc || uncompressedData.length != realLen || compressedData.length != len) {

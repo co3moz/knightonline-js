@@ -78,6 +78,9 @@ export interface IVariables {
   abnormalType: number
   inParty: boolean
 
+  isHelmetHiding: number
+  isCospreHiding: number
+
   saitama: boolean // gm feature to hit 30k always
   lastHome: number // lastHomeTimestamp
   chatTo: string // private message target user name

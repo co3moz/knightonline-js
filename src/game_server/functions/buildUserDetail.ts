@@ -30,8 +30,8 @@ export function BuildUserDetail(socket: IGameSocket): number[] {
   result.push(0); // party leader?
   result.push(0); // invisibility state
   result.push(0); // teamcolor
-  result.push(0); // helmet hiding
-  result.push(0); // cospre hiding
+  result.push(uv.isHelmetHiding || 0); // helmet hiding
+  result.push(uv.isCospreHiding || 0); // cospre hiding
   result.push(...short(uc.direction));
   result.push(0); // chicken?
   result.push(uc.rank);

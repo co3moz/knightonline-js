@@ -10,7 +10,7 @@ const internalCommunicationSecret = <string>config.get('gameServer.internalCommu
 // TODO: DESTROY THIS FILE, IMPLEMENT BETTER WAY like IPC or redis subscription
 
 export const _INTERNAL_QUERY: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
-  let hash = body.skip(20);
+  let hash = body.sub(20);
 
   if (hash.length != 20) {
     socket.terminate('internal_query_access!!!! invalid hash length');

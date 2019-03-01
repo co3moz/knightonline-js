@@ -11,11 +11,11 @@ export function readShort(data: number[] | Buffer, i: number): number {
   return x;
 }
 
-export function readInt(data: number[], i: number): number {
+export function readInt(data: number[] | Buffer, i: number): number {
   return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >> 0;
 }
 
-export function readUInt(data: number[], i: number): number {
+export function readUInt(data: number[] | Buffer, i: number): number {
   return (data[i] + (data[i + 1] << 8) + (data[i + 2] << 16) + (data[i + 3] << 24 >>> 0)) >>> 0;
 }
 
@@ -38,7 +38,7 @@ export function long(i: number): [number, number, number, number, number, number
 }
 
 
-export function readStringArray(data: number[], i: number, len: number): string[] {
+export function readStringArray(data: number[] | Buffer, i: number, len: number): string[] {
   let str = [];
 
   for (; ; i++) {
@@ -87,63 +87,71 @@ export function configString(name) {
 }
 
 export class Queue {
-  private _: number[];
-  private constructor(array: number[]) {
-    this._ = array;
+  private _: Buffer;
+  private o: number;
+  private constructor(buf: Buffer) {
+    this._ = buf;
+    this.o = 0;
   }
 
   public static from(buffer: Buffer) {
-    return new Queue(Array.from(buffer));
+    return new Queue(buffer);
   }
 
   byte(): number {
-    return this._.shift() | 0;
+    return this._[this.o++] | 0;
   }
 
   short(): number {
-    let data = readShort(this._, 0);
-    this._.splice(0, 2);
+    let data = readShort(this._, this.o);
+    this.o += 2;
     return data;
   }
 
   int(): number {
-    let data = readInt(this._, 0);
-    this._.splice(0, 4);
+    let data = readInt(this._, this.o);
+    this.o += 4;
     return data;
   }
 
   uint(): number {
-    let data = readUInt(this._, 0);
-    this._.splice(0, 4);
+    let data = readUInt(this._, this.o);
+    this.o += 4;
     return data;
   }
 
-  skip(length: number): number[] {
-    return this._.splice(0, length);
+  skip(length: number): void {
+    this.o += length;
+  }
+
+  sub(length: number): Buffer {
+    this.o += length;
+
+    return this._.slice(this.o - length, this.o);
   }
 
   string() {
     let len = this.short();
-    let data = readStringArray(this._, 0, len);
+    let data = readStringArray(this._, this.o, len);
 
-    this._.splice(0, data.length);
+    this.o += data.length;
     return data.join('');
   }
 
 
   byte_string() {
     let len = this.byte();
-    let data = readStringArray(this._, 0, len);
+    let data = readStringArray(this._, this.o, len);
 
-    this._.splice(0, data.length);
+    this.o += data.length;
     return data.join('');
   }
 
   long() {
-    return (<any>longLib.fromBytesLE(this.skip(8))).toNumber();
+    return (<any>longLib.fromBytesLE(<any>this.sub(8))).toNumber();
   }
 
-  array() {
-    return this._;
+  array(): number[] {
+    return Array.from(this._.slice(this.o));
   }
 }

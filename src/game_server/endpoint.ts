@@ -34,7 +34,11 @@ export enum GameEndpointCodes {
   NPC_DETAILED_REQUEST = 0x1D,
   ATTACK = 0x08,
   DROP_OPEN = 0x24,
-  DROP_TAKE = 0x26
+  DROP_TAKE = 0x26,
+  HELMET_STATUS_CHANGE = 0x87,
+  GENIE = 0x97,
+  ITEM_REMOVE = 0x3F,
+  ITEM_MOVE = 0x1F
 }
 
 export function GameEndpoint(name: string): IGameEndpoint {

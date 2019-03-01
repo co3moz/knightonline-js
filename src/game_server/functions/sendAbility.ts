@@ -4,6 +4,9 @@ import { Coefficient } from "../var/coefficient";
 import { ISetItem } from "../../core/database/models";
 import { SetItems } from "../shared";
 import { ItemSlot } from "../var/item_slot";
+import { GameEndpointCodes } from "../endpoint";
+import { short } from "../../core/utils/unit";
+import { SendItemMove } from "./sendItemMove";
 
 const ZONE_SNOW_BATTLE = ZoneCode.ZONE_SNOW_BATTLE;
 const ZONE_CHAOS_DUNGEON = ZoneCode.ZONE_CHAOS_DUNGEON;
@@ -19,7 +22,7 @@ export function SendAbility(socket: IGameSocket, sendChanges = false) {
   CalculateUserAbilities(socket);
 
   if (sendChanges) {
-    // TODO: do something here..
+    SendItemMove(socket, 2);
   }
 }
 
@@ -63,9 +66,9 @@ export function CalculateUserAbilities(socket: IGameSocket) {
         case 11: hitCoefficient = coefficient.staff; break;
       }
       if (rightHandItem.durability == 0) {
-        itemDamage += (rightHandItem.detail.itemDamage + v.addWeaponDamage) / 2
+        itemDamage += (rightHandItem.detail.damage + v.addWeaponDamage) / 2
       } else {
-        itemDamage += rightHandItem.detail.itemDamage + v.addWeaponDamage
+        itemDamage += rightHandItem.detail.damage + v.addWeaponDamage
       }
     }
 
@@ -77,16 +80,16 @@ export function CalculateUserAbilities(socket: IGameSocket) {
           v.haveBow = true;
 
           if (leftHandItem.durability == 0) {
-            itemDamage += (leftHandItem.detail.itemDamage + v.addWeaponDamage) / 2
+            itemDamage += (leftHandItem.detail.damage + v.addWeaponDamage) / 2
           } else {
-            itemDamage += leftHandItem.detail.itemDamage + v.addWeaponDamage
+            itemDamage += leftHandItem.detail.damage + v.addWeaponDamage
           }
           break;
         default:
           if (leftHandItem.durability == 0) {
-            itemDamage += (leftHandItem.detail.itemDamage + v.addWeaponDamage) / 4
+            itemDamage += (leftHandItem.detail.damage + v.addWeaponDamage) / 4
           } else {
-            itemDamage += leftHandItem.detail.itemDamage + v.addWeaponDamage / 2
+            itemDamage += leftHandItem.detail.damage + v.addWeaponDamage / 2
           }
           break;
       }

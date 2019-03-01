@@ -1,4 +1,13 @@
 import { Schema, SchemaTypes, model, Document } from 'mongoose';
+import { IItem } from './item';
+
+export interface ICharacterRemovedItem {
+  id: number
+  durability: number
+  amount: number
+  serial: string
+  removedAt: Date
+}
 
 export interface ICharacterItem {
   id: number
@@ -7,7 +16,7 @@ export interface ICharacterItem {
   serial: string
   expire?: number
   flag: number
-  detail: any
+  detail: IItem
 }
 
 export interface IQuestItem {
@@ -62,9 +71,11 @@ export interface ICharacter extends Document {
   skillPointFree: number
 
   items: ICharacterItem[]
+  removedItems: ICharacterRemovedItem[]
   quests: IQuestItem[]
   friends: string[]
   skillBar: number[]
+  genieSettings: Buffer
 }
 
 export const CharacterSchema = new Schema({
@@ -122,6 +133,13 @@ export const CharacterSchema = new Schema({
     flag: { type: Number },
     detail: SchemaTypes.Mixed
   }],
+  removedItems: [{
+    id: { type: Number },
+    durability: { type: Number },
+    amount: { type: Number },
+    serial: { type: String },
+    removedAt: { type: Date }
+  }],
   quests: [{
     id: { type: Number },
     state: { type: Number }
@@ -133,7 +151,8 @@ export const CharacterSchema = new Schema({
   }],
 
   friends: [String],
-  skillBar: [Number]
+  skillBar: [Number],
+  genieSettings: Buffer
 }, { timestamps: true });
 
 export const Character = model<ICharacter>('Character', CharacterSchema, 'characters');

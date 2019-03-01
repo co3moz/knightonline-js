@@ -57,7 +57,7 @@ export interface IItem extends Document {
   maxmpB: number
   fireR: number
   coldR: number
-  lighingR: number
+  lightningR: number
   magicR: number
   poisonR: number
   curseR: number

@@ -17,10 +17,10 @@
         "ts-node/register"
       ],
       "protocol": "inspector",
+      "sourceMaps": true,
       "env": {
         "TS_NODE_TRANSPILE_ONLY": "true"
       },
-      "sourceMaps": true
     }
   ]
 }

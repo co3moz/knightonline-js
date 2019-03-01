@@ -58,7 +58,9 @@ export default async function GameServer() {
       }
 
       let endpoint = GameEndpoint(GameEndpointCodes[opcode]);
-      if (!endpoint) return;
+      if (!endpoint) {
+        return console.log('[SERVER] Missing endpoint definition on endpoints/index.ts file')
+      }
 
       await endpoint(socket, body, opcode)
     }
