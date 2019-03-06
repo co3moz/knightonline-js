@@ -39,8 +39,6 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
       if (!item) throw 1;
       if (item.id != itemID) throw 1;
 
-      if (!IsValidPosForItem(socket, item, dst)) throw 1;
-
       let targetSpot = c.items[dst + 14];
 
       c.items[pos + 14] = targetSpot;
@@ -236,20 +234,20 @@ function IsValidPosForItem(socket: IGameSocket, item: ICharacterItem, slot: numb
       oneHandedItem = true;
       break;
     case 3: // only right hand
-      let leftHand = socket.character.items[8];
-      if (slot != 6 || leftHand) {
-        let rightHand = socket.character.items[6];
-        socket.character.items[8] = rightHand;
-        socket.character.items[6] = leftHand;
-      }
+      // let leftHand = socket.character.items[8];
+      // if (slot != 6 || leftHand) {
+      //   let rightHand = socket.character.items[6];
+      //   socket.character.items[8] = rightHand;
+      //   socket.character.items[6] = leftHand;
+      // }
       break;
     case 4: // only left hand
-      let rightHand = socket.character.items[6];
-      if (slot != 8 || rightHand) {
-        let leftHand = socket.character.items[8];
-        socket.character.items[8] = rightHand;
-        socket.character.items[6] = leftHand;
-      }
+      // let rightHand = socket.character.items[6];
+      // if (slot != 8 || rightHand) {
+      //   let leftHand = socket.character.items[8];
+      //   socket.character.items[8] = rightHand;
+      //   socket.character.items[6] = leftHand;
+      // }
       break;
     case 5:
       if (slot != 4) return false;

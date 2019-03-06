@@ -50,7 +50,7 @@ export function CalculateUserAbilities(socket: IGameSocket) {
     let rightHandItem = c.items[RIGHTHAND];
     let leftHandItem = c.items[LEFTHAND];
 
-    if (rightHandItem && rightHandItem.detail) {
+    if (rightHandItem) {
       switch (rightHandItem.detail.kind / 10 | 0) {
         case 1: hitCoefficient = coefficient.shortSword; break;
         case 2: hitCoefficient = coefficient.sword; break;
@@ -66,30 +66,30 @@ export function CalculateUserAbilities(socket: IGameSocket) {
         case 11: hitCoefficient = coefficient.staff; break;
       }
       if (rightHandItem.durability == 0) {
-        itemDamage += (rightHandItem.detail.damage + v.addWeaponDamage) / 2
+        itemDamage += ((rightHandItem.detail.damage | 0) + v.addWeaponDamage) / 2
       } else {
-        itemDamage += rightHandItem.detail.damage + v.addWeaponDamage
+        itemDamage += (rightHandItem.detail.damage | 0) + v.addWeaponDamage
       }
     }
 
-    if (leftHandItem && leftHandItem.detail) {
-      switch (rightHandItem.detail.kind / 10 | 0) {
+    if (leftHandItem) {
+      switch (leftHandItem.detail.kind / 10 | 0) {
 
         case 10:
           hitCoefficient = coefficient.bow;
           v.haveBow = true;
 
           if (leftHandItem.durability == 0) {
-            itemDamage += (leftHandItem.detail.damage + v.addWeaponDamage) / 2
+            itemDamage += ((leftHandItem.detail.damage | 0) + v.addWeaponDamage) / 2
           } else {
-            itemDamage += leftHandItem.detail.damage + v.addWeaponDamage
+            itemDamage += (leftHandItem.detail.damage | 0) + v.addWeaponDamage
           }
           break;
         default:
           if (leftHandItem.durability == 0) {
-            itemDamage += (leftHandItem.detail.damage + v.addWeaponDamage) / 4
+            itemDamage += ((leftHandItem.detail.damage | 0) + v.addWeaponDamage) / 4
           } else {
-            itemDamage += leftHandItem.detail.damage + v.addWeaponDamage / 2
+            itemDamage += (leftHandItem.detail.damage | 0) + v.addWeaponDamage / 2
           }
           break;
       }
