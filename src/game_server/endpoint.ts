@@ -38,7 +38,9 @@ export enum GameEndpointCodes {
   HELMET_STATUS_CHANGE = 0x87,
   GENIE = 0x97,
   ITEM_REMOVE = 0x3F,
-  ITEM_MOVE = 0x1F
+  ITEM_MOVE = 0x1F,
+  POINT_CHANGE = 0x28,
+  NPC_EVENT = 0x20
 }
 
 export function GameEndpoint(name: string): IGameEndpoint {

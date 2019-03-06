@@ -122,7 +122,7 @@ function serverHandler(params: IServerConfiguration) {
 
     socket.terminate = (message) => {
       if (message) {
-        console.log('[SOCKET] Terminated because of "' + message + '" session: ' + session);
+        console.log('[SOCKET] Terminated because of "' + message + '" session: ' + session+ ' from: ' + socket.remoteAddress);
       }
       socket.end();
 
@@ -172,8 +172,8 @@ function serverHandler(params: IServerConfiguration) {
             // socket.debug('It took ' + (Date.now() - time) + 'ms to handle 0x' + (opcode ? (opcode < 16 ? "0" : "") + opcode.toString(16) : 'null'));
           }
         } catch (e) {
+          console.error('[SERVER] onData has some error that did not catched before!');
           console.error(e.stack);
-          console.error('onData has some error that did not catched before!');
         }
 
         queue.shift().resolve();

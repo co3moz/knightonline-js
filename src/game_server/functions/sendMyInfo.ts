@@ -89,7 +89,7 @@ export function SendMyInfo(socket: IGameSocket) {
     0, 0, 0, 0, 0, 0, 0, 0, // unknown
     0, 0, // cover title
     0, 0, // skill title
-    1, 0, 0, 0, // return symbol //FIX: LATER
+    0, 0, 0, 0, // return symbol // TODO: LATER
     0, 0
   ]);
 }

@@ -353,7 +353,7 @@ export function UpdateMaxHp(socket: IGameSocket, flag: number) {
   if (!coefficient) return;
 
   let maxHpAmount = v.maxHpAmount || 0;
-  let totalStr = (c.statStr + v.statBonus[0] + v.statBuffBonus[0]);
+  let totalHpStat = (c.statHp + v.statBonus[1] + v.statBuffBonus[1]);
 
   if (c.zone == ZONE_SNOW_BATTLE && flag == 0)
     if (c.fame == 100 || c.rank == 1) // COMMANDER or KING
@@ -363,8 +363,8 @@ export function UpdateMaxHp(socket: IGameSocket, flag: number) {
   else if (c.zone == ZONE_CHAOS_DUNGEON && flag == 0)
     v.maxHp = 10000 / 10;
   else {
-    v.maxHp = (((coefficient.hp * c.level * c.level * totalStr)
-      + 0.1 * (c.level * totalStr) + (totalStr / 5)) + maxHpAmount + v.itemMaxHp + 20) | 0;
+    v.maxHp = (((coefficient.hp * c.level * c.level * totalHpStat)
+      + 0.1 * (c.level * totalHpStat) + (totalHpStat / 5)) + maxHpAmount + v.itemMaxHp + 20) | 0;
 
     if (v.maxHp > 14000) v.maxHp = 14000;
 

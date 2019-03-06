@@ -34,7 +34,7 @@ export default async function GameServer() {
         console.error('[ERROR] Saving failed for user! ' + socket.session);
         console.error(e);
       }
-      
+
       RegionRemove(socket);
 
       if (socket.user) {
@@ -53,13 +53,14 @@ export default async function GameServer() {
     onData: async (socket: IGameSocket, data: Buffer) => {
       let body = Queue.from(data);
       let opcode = body.byte();
-      if (!GameEndpointCodes[opcode]) {
+      let endpointCode = GameEndpointCodes[opcode];
+      if (!endpointCode) {
         return console.log('[SERVER] Unknown opcode received! (0x' + (opcode ? opcode.toString(16).padStart(2, '0') : '00') + ') | ' + body.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
       }
 
-      let endpoint = GameEndpoint(GameEndpointCodes[opcode]);
+      let endpoint = GameEndpoint(endpointCode);
       if (!endpoint) {
-        return console.log('[SERVER] Missing endpoint definition on endpoints/index.ts file')
+        return console.log('[SERVER] Missing endpoint definition on endpoints/index.ts file! name: ' + endpointCode)
       }
 
       await endpoint(socket, body, opcode)

@@ -6,7 +6,7 @@ import { RSessionMap, RegionQuery, RegionQueryNPC, RNPCMap, IRegionNPC } from ".
 export function OnRegionUpdate(socket: IGameSocket) {
   if (!socket.ingame) return;
   let oldSessions: number[] = <any>Object.keys(socket.visiblePlayers);
-  let oldNPCSessions: number[] = <any>Object.keys(socket.visiblePlayers);
+  let oldNPCSessions: number[] = <any>Object.keys(socket.visibleNPCs);
   let newSessions: number[] = [];
   let newNPCSessions: number[] = [];
 

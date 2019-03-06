@@ -99,15 +99,19 @@ export function SendRegionUserInMultiple(socket: IGameSocket, warp?: boolean) {
   socket.send([0x15, 2]);
 
 
-  result = [0x1C, 0, 0];
-  let npcSessions = [];
+  result = [0x1D, 0, 0];
+  let visibleNPCs = socket.visibleNPCs = {};
+  let total = 0;
+  
   for (let npc of RegionQueryNPC(socket)) {
-    npcSessions.push(npc.uuid);
+    visibleNPCs[npc.uuid] = true;
+    total++;
     result.push(...short(npc.uuid));
+    result.push(...BuildNPCDetail(npc));
   }
 
-  result[1] = npcSessions.length & 0xFF;
-  result[2] = npcSessions.length >>> 8;
+  result[1] = total & 0xFF;
+  result[2] = total >>> 8;
 
   socket.send(result);
 }

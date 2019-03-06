@@ -12,12 +12,19 @@ export function SendWarp(socket: IGameSocket, zone: ZoneCode): boolean {
     return false;
   }
 
+
+  socket.character.x = pos.x;
+  socket.character.z = pos.z;
+  socket.character.y = 0;
+
   if (socket.character.zone == zone) {
     socket.send([
       0x1E, // WARP
       ...short(pos.x * 10),
       ...short(pos.z * 10)
     ]);
+
+    RegionUpdate(socket);
   } else {
     socket.send([
       0x27, // ZONE_CHANGE
@@ -29,15 +36,12 @@ export function SendWarp(socket: IGameSocket, zone: ZoneCode): boolean {
     ]);
 
     socket.character.zone = zone;
+
+    RegionUpdate(socket, true);
+
+    SendRegionUserOutForMe(socket);
   }
 
-  socket.character.x = pos.x;
-  socket.character.z = pos.z;
-  socket.character.y = 0;
-
-  RegionUpdate(socket, true);
-
-  SendRegionUserOutForMe(socket);
   return true;
 }
 
