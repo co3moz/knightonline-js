@@ -8,6 +8,7 @@ import { FindSlotForItem } from "../functions/findSlotForItem";
 import { ItemSlot } from "../var/item_slot";
 import { SendWeightChange } from "../functions/sendWeightChange";
 import { AllSend } from "../region";
+import { GenerateItem } from "../functions/generateItem";
 
 export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
   let dropIndex = body.int();
@@ -52,7 +53,7 @@ export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, bod
       if (itemDetailIndex == -1) throw 1; // has to be
       let itemDetail = drop.specs[itemDetailIndex];
 
-      let newTotalWeight = itemWeight + (itemDetail.weight || 0) * dropItem.amount;
+      let newTotalWeight = itemWeight + (itemDetail.weight | 0) * dropItem.amount;
       if (newTotalWeight > maxWeight) {
         return socket.send([
           opcode,
@@ -66,14 +67,7 @@ export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, bod
       if (c.items[slot]) {
         c.items[slot].amount = Math.min(9999, c.items[slot].amount + dropItem.amount);
       } else {
-        c.items[slot] = {
-          id: itemDetail.id,
-          durability: itemDetail.durability,
-          amount: dropItem.amount || 1,
-          serial: GenerateItemSerial(),
-          flag: 0,
-          detail: itemDetail
-        }
+        c.items[slot] = GenerateItem(itemDetail, dropItem.amount);
       }
 
       let outputItem = c.items[slot];
@@ -114,8 +108,4 @@ export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, bod
       0 // Loot Error
     ]);
   }
-}
-
-export function GenerateItemSerial() {
-  return Date.now().toString(16) + (Math.random() * 0xFFFFFF | 0).toString(16).padStart(6, '0')
 }

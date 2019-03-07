@@ -2,12 +2,15 @@ import { CSVLoader} from '../utils/csv_loader';
 import { Item } from '../models';
 
 export async function ItemDefaults() {
-  await CSVLoader('items', ItemTransferObject, 477645, Item);
+  await CSVLoader('items', ItemTransferObject, 443267, Item);
 }
 
 const ItemTransferObject = {
   'Num': 'id',
   'strName': 'name',
+  "Extension": "extension",
+  "isUnique": "isUnique",
+  "IconID": "iconID",
   'Kind': 'kind',
   'Slot': 'slot',
   'Race': 'race',
@@ -21,7 +24,6 @@ const ItemTransferObject = {
   "SellPrice": "sellPrice",
   "Ac": "defenceAbility",
   "Countable": "countable",
-  "isUnique": "isUnique",
   "Effect1": "effect1",
   "Effect2": "effect2",
   "ReqLevel": "reqLevel",
@@ -38,12 +40,12 @@ const ItemTransferObject = {
   "Hitrate": "hitRate",
   "Evasionrate": "evaRate",
   "DaggerAc": "daggerDefenceAbility",
+  "JamadarAC": "jamadarDefenceAbility",
   "SwordAc": "swordDefenceAbility",
   "MaceAc": "maceDefenceAbility",
   "AxeAc": "axeDefenceAbility",
   "SpearAc": "spearDefenceAbility",
   "BowAc": "bowDefenceAbility",
-  "JamadarAC": "jamadarDefenceAbility",
   "FireDamage": "fireDamage",
   "IceDamage": "iceDamage",
   "LightningDamage": "lightningDamage",
@@ -68,8 +70,6 @@ const ItemTransferObject = {
   "CurseR": "curseR",
   "ItemClass": "itemClass",
   "ItemExt": "itemExt",
-  "IconID": "iconID",
-  "Extension": "extension",
   "UpgradeNotice": "upgradeNotice",
   "NPbuyPrice": "npBuyPrice",
   "Bound": "bound"

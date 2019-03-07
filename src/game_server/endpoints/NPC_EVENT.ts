@@ -1,4 +1,4 @@
-import { Queue, short } from '../../core/utils/unit';
+import { Queue, short, int } from '../../core/utils/unit';
 import { IGameEndpoint } from '../endpoint';
 import { IGameSocket } from '../game_socket';
 import { INPCInstance, NPCType } from '../ai_system/declare';
@@ -19,7 +19,7 @@ export const NPC_EVENT: IGameEndpoint = async function (socket: IGameSocket, bod
     case NPCType.NPC_TINKER:
       socket.send([
         NPCType.NPC_MERCHANT ? 0x25 : 0x3A,
-        npc.npc.sellingGroup | 0
+        ...int(npc.npc.sellingGroup | 0)
       ]);
       break;
     case NPCType.NPC_MARK:
