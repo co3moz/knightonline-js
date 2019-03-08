@@ -3,7 +3,7 @@ import { RegionRemoveNPC, RSessionMap, RegionQueryUsersByNpc } from "../region";
 import { short, int } from "../../core/utils/unit";
 import { SendExperienceChange } from "../functions/sendExperienceChange";
 import { ItemDropGroups } from "../var/item_drop_groups";
-import { Item } from "../../core/database/models";
+import { Item, PrepareItems } from "../../core/database/models";
 import { CreateDrop } from "../drop";
 import { IGameSocket } from "../game_socket";
 import { NPCMap, NPCUUID } from "../ai_system/uuid";
@@ -15,6 +15,8 @@ export function OnNPCDead(npc: INPCInstance) {
   if (npc.status == 'dead') return;
 
   npc.status = 'dead';
+
+  console.log('[NPC] NPC died (%d)', npc.uuid);
 
   RegionRemoveNPC(npc);
 
@@ -112,12 +114,8 @@ export function OnNPCDead(npc: INPCInstance) {
 
 
       if (itemIds.length > 0) {
-        Item.find({
-          id: {
-            $in: itemIds
-          }
-        }).then(items => {
-          let wrap = CreateDrop([greatestSession.session], dropped, items);
+        PrepareItems(itemIds).then(() => {
+          let wrap = CreateDrop([greatestSession.session], dropped);
 
           greatestSession.send([
             0x23, // ITEM_DROP

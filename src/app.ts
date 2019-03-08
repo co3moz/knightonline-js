@@ -3,6 +3,7 @@ import GameServer from "./game_server/server";
 import { OnServerTick } from "./game_server/events/onServerTick";
 import { IKOServer } from "./core/server";
 import { Database, DisconnectFromDatabase } from "./core/database";
+import { GarbageCollect } from "./core/utils/general";
 
 async function main() {
   console.log('[MAIN] Servers are queued');
@@ -12,6 +13,8 @@ async function main() {
   servers.push(...await GameServer());
 
   const tick = setInterval(OnServerTick, 250);
+
+  GarbageCollect();
 
   process.on('SIGINT', CloseSignal.bind(null, 'SIGINT', servers, tick));
   process.on('SIGTERM', CloseSignal.bind(null, 'SIGTERM', servers, tick));

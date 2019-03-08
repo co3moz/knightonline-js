@@ -14,7 +14,8 @@
       "runtimeArgs": [
         "--nolazy",
         "-r",
-        "ts-node/register"
+        "ts-node/register",
+        "--expose-gc"
       ],
       "protocol": "inspector",
       "sourceMaps": true,

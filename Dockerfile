@@ -5,4 +5,4 @@ RUN npm install --production
 COPY . .
 RUN npm run build
 EXPOSE 15100-15109 15001
-CMD [ "node", "build/app" ]
+CMD [ "node", "--expose-gc" , "build/app"]

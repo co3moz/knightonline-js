@@ -9,6 +9,7 @@ import { ItemSlot } from "../var/item_slot";
 import { SendWeightChange } from "../functions/sendWeightChange";
 import { AllSend } from "../region";
 import { GenerateItem } from "../functions/generateItem";
+import { GetItemDetail } from "../../core/database/models";
 
 export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
   let dropIndex = body.int();
@@ -48,10 +49,7 @@ export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, bod
       let { maxWeight, itemWeight } = v;
 
       // this part of code has to be sync, we load items when npc dies. calculation all of this can work flawless 
-      if (!drop.specs) throw 1; // has to be
-      let itemDetailIndex = drop.specs.findIndex(x => x.id == dropItem.item);
-      if (itemDetailIndex == -1) throw 1; // has to be
-      let itemDetail = drop.specs[itemDetailIndex];
+      let itemDetail = GetItemDetail(dropItem.item);
 
       let newTotalWeight = itemWeight + (itemDetail.weight | 0) * dropItem.amount;
       if (newTotalWeight > maxWeight) {
@@ -71,9 +69,6 @@ export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, bod
       }
 
       let outputItem = c.items[slot];
-      if (drop.dropped.findIndex(x => x && x.item == item) == -1) {
-        drop.specs.splice(itemDetailIndex, 1); // remove item from specs, no need to store anymore
-      }
 
       socket.send([
         opcode, 1, // success

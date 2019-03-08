@@ -142,3 +142,31 @@ export const ItemSchema = new Schema({
 
 
 export const Item = model<IItem>('Item', ItemSchema, 'items');
+
+const _cache: IItemCache = {};
+
+/**
+ * Loads Items to cache. You may call this function before user log in, or items drop
+ * @param items 
+ */
+export async function PrepareItems(items: number[]): Promise<void> {
+  let filtered = items.filter(x => !_cache[x]);
+
+  if (!filtered.length) return;
+
+  let loadedItems = await Item.find({
+    id: { $in: filtered }
+  }).lean().select(['-_id', '-iconID', '-__v', '-name']).exec();
+
+  for (let item of loadedItems) {
+    _cache[item.id] = item;
+  }
+}
+
+export function GetItemDetail(itemID: number) {
+  return _cache[itemID];
+}
+
+export interface IItemCache {
+  [itemID: number]: IItem
+}

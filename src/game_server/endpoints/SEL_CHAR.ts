@@ -1,7 +1,7 @@
 import { IGameEndpoint } from "../endpoint";
 import { IGameSocket, IVariables, IVisiblePlayers } from "../game_socket";
 import { Queue, short } from "../../core/utils/unit";
-import { Character, Warehouse } from "../../core/database/models";
+import { Character, Warehouse, Item, PrepareItems } from "../../core/database/models";
 import { CharacterMap } from "../shared";
 import { SendAbility } from "../functions/sendAbility";
 
@@ -83,21 +83,16 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
    }*/
 
   // load item details
-  // FIXME: Probably no need this.
-  // for (let item of character.items) {
-  //   if (!item) continue;
+  let items = character.items;
+  let itemIds: number[] = [];
 
-  //   if (!item.detail) {
-  //     let detail = await Item.findOne({ id: item.id }).exec();
+  for (let i = 0; i < items.length; i++) {
+    let item = items[i];
+    if (!item) continue;
+    itemIds.push(item.id);
+  }
 
-  //     item.detail = detail;
-  //     character.markModified('items');
-  //   }
-
-  //   if (!item.serial) {
-  //     item.serial = unique();
-  //   }
-  // }
+  await PrepareItems(itemIds);
 
   /* TODO: RENTAL*/
   // TODO: clan stuff
@@ -108,8 +103,8 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
   socket.visibleNPCs = {};
 
   SendAbility(socket);
-  await character.save();
 
+  console.log('[GAME] Character connected (%s) from %s', character.name, socket.remoteAddress);
 
   socket.send([
     opcode,

@@ -3,7 +3,7 @@ import { IGameEndpoint } from '../endpoint';
 import { IGameSocket } from '../game_socket';
 import { INPCInstance, NPCType } from '../ai_system/declare';
 import { NPCMap } from '../ai_system/uuid';
-import { Item, IItem } from '../../core/database/models';
+import { Item, IItem, GetItemDetail, PrepareItems } from '../../core/database/models';
 import { isUserDead } from '../functions/isDead';
 import { GenerateItem } from '../functions/generateItem';
 import { SendAbility } from '../functions/sendAbility';
@@ -58,7 +58,7 @@ export const ITEM_TRADE: IGameEndpoint = async function (socket: IGameSocket, bo
     // control time
     if (type == TradeType.Buy) {
       for (let item of itemPocket) {
-        let detail = item.detail;
+        let detail = GetItemDetail(item.id);
         if (!detail) throw 0;
         if (detail.race == 20) throw 0;
 
@@ -70,7 +70,7 @@ export const ITEM_TRADE: IGameEndpoint = async function (socket: IGameSocket, bo
 
         if (slot) { // inventory slot controls
           if (slot.id != item.id) throw 2;
-          if (!slot.detail.countable) throw 2;
+          if (!GetItemDetail(slot.id).countable) throw 2;
           if (slot.amount + item.count > 9999) throw 4;
         }
         totalPrice += (detail.buyPrice | 0) * item.count;
@@ -83,7 +83,7 @@ export const ITEM_TRADE: IGameEndpoint = async function (socket: IGameSocket, bo
 
         let slot = c.items[14 + item.pos];
         if (!slot) throw 2;
-        let detail = slot.detail;
+        let detail = GetItemDetail(slot.id);
 
         if (!detail) throw 0;
         if (detail.race == 20) throw 0;
@@ -112,7 +112,7 @@ export const ITEM_TRADE: IGameEndpoint = async function (socket: IGameSocket, bo
           if (slot) {
             slot.amount += item.count
           } else {
-            c.items[14 + item.pos] = GenerateItem(item.detail, item.count);
+            c.items[14 + item.pos] = GenerateItem(GetItemDetail(item.id), item.count);
           }
         }
 
@@ -167,20 +167,11 @@ export enum TradeType {
 }
 
 async function LoadItemPocketDetail(itemPocket: IItemPocket[]): Promise<void> {
-  let items = await Item.find({
-    id: {
-      $in: itemPocket.map(x => x.id)
-    }
-  }).exec();
-
-  for (let item of itemPocket) {
-    item.detail = items.find(i => i.id == item.id);
-  }
+  await PrepareItems(itemPocket.map(x => x.id));
 }
 
 interface IItemPocket {
   id: number // itemId
   pos: number
   count: number
-  detail?: IItem
 }

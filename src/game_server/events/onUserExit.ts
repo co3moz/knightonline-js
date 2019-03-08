@@ -2,21 +2,19 @@ import { IGameSocket } from "../game_socket";
 import { RSessionMap } from "../region";
 import { SendRegionUserOut } from "../functions/sendRegionInOut";
 
-export function OnUserExit(socket: IGameSocket, serverClose?: boolean) {
-  if (!serverClose) {
-    let leaveSocket = socket.session;
-    let visiblePlayers = socket.visiblePlayers;
+export function OnUserExit(socket: IGameSocket) {
+  let leaveSocket = socket.session;
+  let visiblePlayers = socket.visiblePlayers;
 
-    if (visiblePlayers) {
-      for (let session in visiblePlayers) {
-        let userSocket = RSessionMap[session];
+  if (visiblePlayers) {
+    for (let session in visiblePlayers) {
+      let userSocket = RSessionMap[session];
 
-        if (userSocket) {
-          SendRegionUserOut(userSocket, leaveSocket, true);
-        }
-
-        delete visiblePlayers[session];
+      if (userSocket) {
+        SendRegionUserOut(userSocket, leaveSocket, true);
       }
+
+      delete visiblePlayers[session];
     }
   }
 

@@ -10,7 +10,7 @@ export async function AISystemStart() {
   loaded = true;
 
   console.log("[NPC] loading..");
-  let rawNpcs = await Npc.find({}).exec();
+  let rawNpcs = await Npc.find({}).lean().select(['-_id']).exec();
 
   let npcCount = 0;
   let monsterCount = 0;

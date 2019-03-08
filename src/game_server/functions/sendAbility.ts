@@ -1,7 +1,7 @@
 import { IGameSocket, IVariables } from "../game_socket";
 import { ZoneCode } from '../var/zone_codes'
 import { Coefficient } from "../var/coefficient";
-import { ISetItem } from "../../core/database/models";
+import { ISetItem, GetItemDetail } from "../../core/database/models";
 import { SetItems } from "../shared";
 import { ItemSlot } from "../var/item_slot";
 import { GameEndpointCodes } from "../endpoint";
@@ -51,7 +51,8 @@ export function CalculateUserAbilities(socket: IGameSocket) {
     let leftHandItem = c.items[LEFTHAND];
 
     if (rightHandItem) {
-      switch (rightHandItem.detail.kind / 10 | 0) {
+      let rightHandItemDetail = GetItemDetail(rightHandItem.id);
+      switch (rightHandItemDetail.kind / 10 | 0) {
         case 1: hitCoefficient = coefficient.shortSword; break;
         case 2: hitCoefficient = coefficient.sword; break;
         case 3: hitCoefficient = coefficient.axe; break;
@@ -66,30 +67,31 @@ export function CalculateUserAbilities(socket: IGameSocket) {
         case 11: hitCoefficient = coefficient.staff; break;
       }
       if (rightHandItem.durability == 0) {
-        itemDamage += ((rightHandItem.detail.damage | 0) + v.addWeaponDamage) / 2
+        itemDamage += ((rightHandItemDetail.damage | 0) + v.addWeaponDamage) / 2
       } else {
-        itemDamage += (rightHandItem.detail.damage | 0) + v.addWeaponDamage
+        itemDamage += (rightHandItemDetail.damage | 0) + v.addWeaponDamage
       }
     }
 
     if (leftHandItem) {
-      switch (leftHandItem.detail.kind / 10 | 0) {
+      let leftHandItemDetail = GetItemDetail(leftHandItem.id);
+      switch (leftHandItemDetail.kind / 10 | 0) {
 
         case 10:
           hitCoefficient = coefficient.bow;
           v.haveBow = true;
 
           if (leftHandItem.durability == 0) {
-            itemDamage += ((leftHandItem.detail.damage | 0) + v.addWeaponDamage) / 2
+            itemDamage += ((leftHandItemDetail.damage | 0) + v.addWeaponDamage) / 2
           } else {
-            itemDamage += (leftHandItem.detail.damage | 0) + v.addWeaponDamage
+            itemDamage += (leftHandItemDetail.damage | 0) + v.addWeaponDamage
           }
           break;
         default:
           if (leftHandItem.durability == 0) {
-            itemDamage += ((leftHandItem.detail.damage | 0) + v.addWeaponDamage) / 4
+            itemDamage += ((leftHandItemDetail.damage | 0) + v.addWeaponDamage) / 4
           } else {
-            itemDamage += (leftHandItem.detail.damage | 0) + v.addWeaponDamage / 2
+            itemDamage += (leftHandItemDetail.damage | 0) + v.addWeaponDamage / 2
           }
           break;
       }
@@ -176,121 +178,123 @@ export function CalculateStatBonus(socket: IGameSocket) {
 
   for (let i = 0; i < 75; i++) {
     let item = c.items[i];
-    if (!item || !item.detail) continue;
+    if (!item) continue;
+    let itemDetail = GetItemDetail(item.id);
+    if (!itemDetail) continue;
 
     if (i == 47 || i == 48) { // magic bags
-      v.maxWeightBonus += item.detail.durability;
+      v.maxWeightBonus += itemDetail.durability;
     } else {
-      v.itemWeight += (item.detail.weight || 0) * (item.amount || 0);
+      v.itemWeight += (itemDetail.weight || 0) * (item.amount || 0);
     }
 
 
     if ((i >= 14 && i < 42)
-      || (v.weaponsDisabled && (i == LEFTHAND || i == RIGHTHAND) && !(item.detail.kind / 10 >>> 0 == 6))
+      || (v.weaponsDisabled && (i == LEFTHAND || i == RIGHTHAND) && !(itemDetail.kind / 10 >>> 0 == 6))
       || (i >= 49)
     ) continue;
 
-    let itemAc = item.detail.defenceAbility || 0;
+    let itemAc = itemDetail.defenceAbility || 0;
 
     if (item.durability == 0) {
       itemAc = itemAc / 10 >>> 0;
     }
 
-    v.itemMaxHp += item.detail.maxhpB || 0;
-    v.itemMaxMp += item.detail.maxmpB || 0;
+    v.itemMaxHp += itemDetail.maxhpB || 0;
+    v.itemMaxMp += itemDetail.maxmpB || 0;
 
     v.itemAc += itemAc;
 
-    v.statBonus[0] += item.detail.strB || 0;
-    v.statBonus[1] += item.detail.hpB || 0;
-    v.statBonus[2] += item.detail.dexB || 0;
-    v.statBonus[3] += item.detail.intB || 0;
-    v.statBonus[4] += item.detail.mpB || 0;
+    v.statBonus[0] += itemDetail.strB || 0;
+    v.statBonus[1] += itemDetail.hpB || 0;
+    v.statBonus[2] += itemDetail.dexB || 0;
+    v.statBonus[3] += itemDetail.intB || 0;
+    v.statBonus[4] += itemDetail.mpB || 0;
 
-    v.itemHitRate += item.detail.hitRate || 0;
-    v.itemEvasionRate += item.detail.evaRate || 0;
+    v.itemHitRate += itemDetail.hitRate || 0;
+    v.itemEvasionRate += itemDetail.evaRate || 0;
 
-    v.fireR += item.detail.fireR || 0;
-    v.coldR += item.detail.coldR || 0;
-    v.lightningR += item.detail.lightningR || 0;
-    v.magicR += item.detail.magicR || 0;
-    v.poisonR += item.detail.poisonR || 0;
-    v.curseR += item.detail.curseR || 0;
+    v.fireR += itemDetail.fireR || 0;
+    v.coldR += itemDetail.coldR || 0;
+    v.lightningR += itemDetail.lightningR || 0;
+    v.magicR += itemDetail.magicR || 0;
+    v.poisonR += itemDetail.poisonR || 0;
+    v.curseR += itemDetail.curseR || 0;
 
-    v.daggerR += item.detail.daggerDefenceAbility || 0;
-    v.swordR += item.detail.swordDefenceAbility || 0;
-    v.axeR += item.detail.axeDefenceAbility || 0;
-    v.maceR += item.detail.maceDefenceAbility || 0;
-    v.spearR += item.detail.spearDefenceAbility || 0;
-    v.bowR += item.detail.bowDefenceAbility || 0;
+    v.daggerR += itemDetail.daggerDefenceAbility || 0;
+    v.swordR += itemDetail.swordDefenceAbility || 0;
+    v.axeR += itemDetail.axeDefenceAbility || 0;
+    v.maceR += itemDetail.maceDefenceAbility || 0;
+    v.spearR += itemDetail.spearDefenceAbility || 0;
+    v.bowR += itemDetail.bowDefenceAbility || 0;
 
-    if (item.detail.fireDamage) {
+    if (itemDetail.fireDamage) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][0] = +item.detail.fireDamage;
+      v.equipedItemBonus[i][0] = +itemDetail.fireDamage;
     }
 
-    if (item.detail.iceDamage) {
+    if (itemDetail.iceDamage) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][1] = +item.detail.iceDamage;
+      v.equipedItemBonus[i][1] = +itemDetail.iceDamage;
     }
 
-    if (item.detail.lightningDamage) {
+    if (itemDetail.lightningDamage) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][2] = +item.detail.lightningDamage;
+      v.equipedItemBonus[i][2] = +itemDetail.lightningDamage;
     }
 
-    if (item.detail.poisonDamage) {
+    if (itemDetail.poisonDamage) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][3] = +item.detail.poisonDamage;
+      v.equipedItemBonus[i][3] = +itemDetail.poisonDamage;
     }
 
-    if (item.detail.hpDrain) {
+    if (itemDetail.hpDrain) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][4] = +item.detail.hpDrain;
+      v.equipedItemBonus[i][4] = +itemDetail.hpDrain;
     }
 
-    if (item.detail.mpDamage) {
+    if (itemDetail.mpDamage) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][5] = +item.detail.mpDamage;
+      v.equipedItemBonus[i][5] = +itemDetail.mpDamage;
     }
 
-    if (item.detail.mpDrain) {
+    if (itemDetail.mpDrain) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][6] = +item.detail.mpDrain;
+      v.equipedItemBonus[i][6] = +itemDetail.mpDrain;
     }
 
-    if (item.detail.mirrorDamage) {
+    if (itemDetail.mirrorDamage) {
       if (!v.equipedItemBonus[i]) v.equipedItemBonus[i] = {};
-      v.equipedItemBonus[i][7] = +item.detail.mirrorDamage;
+      v.equipedItemBonus[i][7] = +itemDetail.mirrorDamage;
     }
 
-    if (item.detail.kind == 255) { // ITEM_KIND_COSPRE
+    if (itemDetail.kind == 255) { // ITEM_KIND_COSPRE
       SetItemApply(SetItems[item.id], v);
     }
 
-    if (item.detail.race < 100) {
+    if (itemDetail.race < 100) {
       continue;
     }
 
-    if (!setItems[item.detail.race]) {
-      setItems[item.detail.race] = item.detail.race * 10000;
+    if (!setItems[itemDetail.race]) {
+      setItems[itemDetail.race] = itemDetail.race * 10000;
     }
 
-    switch (item.detail.slot) {
+    switch (itemDetail.slot) {
       case ItemSlotHelmet:
-        setItems[item.detail.race] += 2;
+        setItems[itemDetail.race] += 2;
         break;
       case ItemSlotPauldron:
-        setItems[item.detail.race] += 16;
+        setItems[itemDetail.race] += 16;
         break;
       case ItemSlotPads:
-        setItems[item.detail.race] += 512;
+        setItems[itemDetail.race] += 512;
         break;
       case ItemSlotGloves:
-        setItems[item.detail.race] += 2048;
+        setItems[itemDetail.race] += 2048;
         break;
       case ItemSlotBoots:
-        setItems[item.detail.race] += 4096;
+        setItems[itemDetail.race] += 4096;
         break;
     }
   }

@@ -4,7 +4,7 @@ import { IGameSocket } from '../game_socket';
 import { SendAbility } from '../functions/sendAbility';
 import { SendWeightChange } from '../functions/sendWeightChange';
 import { SendItemMove } from '../functions/sendItemMove';
-import { ICharacterItem } from '../../core/database/models';
+import { ICharacterItem, GetItemDetail } from '../../core/database/models';
 import { SendLookChange } from '../functions/sendLookChange';
 
 const EQUIP_MAX = 14;
@@ -56,7 +56,7 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
 
       let targetSpot = c.items[dst + 42];
       if (dst == 5 || dst == 6) { // magic bag
-        if (targetSpot || item.detail.slot != 25) throw 1; // if there is already a bag or item is not bag
+        if (targetSpot || GetItemDetail(item.id).slot != 25) throw 1; // if there is already a bag or item is not bag
       }
 
       c.items[pos + 14] = targetSpot;
@@ -132,9 +132,10 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
       let leftHand = c.items[8];
       let rightHand = c.items[6];
 
-      if (item.detail.slot == 1 || (item.detail.slot == 0 && dst == 6)) {
+      let itemDetail = GetItemDetail(item.id);
+      if (itemDetail.slot == 1 || (itemDetail.slot == 0 && dst == 6)) {
         if (leftHand) {
-          if (leftHand.detail.slot == 4) { // drop the left hand
+          if (GetItemDetail(leftHand.id).slot == 4) { // drop the left hand
             c.items[6] = item;
             c.items[pos + 14] = leftHand;
             c.items[8] = null;
@@ -146,9 +147,9 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
           c.items[pos + 14] = targetSpot;
           c.items[dst] = item;
         }
-      } else if (item.detail.slot == 2 || (item.detail.slot == 0 && dst == 8)) {
+      } else if (itemDetail.slot == 2 || (itemDetail.slot == 0 && dst == 8)) {
         if (rightHand) {
-          if (rightHand.detail.slot == 3) {
+          if (GetItemDetail(rightHand.id).slot == 3) {
             c.items[8] = item;
             c.items[pos + 14] = rightHand;
             c.items[6] = null;
@@ -160,7 +161,7 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
           c.items[pos + 14] = targetSpot;
           c.items[dst] = item;
         }
-      } else if (item.detail.slot == 3) {
+      } else if (itemDetail.slot == 3) {
         if (leftHand && rightHand) throw 1; // dont allow it
         else if (leftHand) {
           c.items[6] = item;
@@ -170,7 +171,7 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
           c.items[pos + 14] = targetSpot;
           c.items[dst] = item;
         }
-      } else if (item.detail.slot == 4) {
+      } else if (itemDetail.slot == 4) {
         if (leftHand && rightHand) throw 1; // dont allow it
         else if (rightHand) {
           c.items[8] = item;
@@ -215,9 +216,9 @@ export enum ItemMoveType {
 }
 
 function IsValidPosForItem(socket: IGameSocket, item: ICharacterItem, slot: number) {
-  if (!item.detail) return false;
+  let detail = GetItemDetail(item.id);
+  if (!detail) return false;
 
-  let detail = item.detail;
 
   let oneHandedItem = false;
   switch (detail.slot) {
@@ -307,7 +308,7 @@ function IsValidPosForItem(socket: IGameSocket, item: ICharacterItem, slot: numb
     let otherHand = socket.character.items[slot == 8 ? 6 : 8];
 
     if (otherHand) {
-      let otherHandSlot = otherHand.detail.slot;
+      let otherHandSlot = GetItemDetail(otherHand.id).slot;
 
       if (otherHandSlot == 3 || otherHandSlot == 4) {
         let rightHand = socket.character.items[6];

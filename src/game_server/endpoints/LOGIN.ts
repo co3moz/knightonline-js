@@ -13,7 +13,8 @@ export const LOGIN: IGameEndpoint = async function (socket: IGameSocket, body: Q
   }
 
   if ((sessionCode.length != 30 || password.length > 28)) {
-    socket.terminate('invalid credentails');
+    console.log('[GAME] Invalid account (%s) access from %s', sessionCode, socket.remoteAddress);
+    socket.terminate();
     return;
   }
 
@@ -22,7 +23,8 @@ export const LOGIN: IGameEndpoint = async function (socket: IGameSocket, body: Q
   }).exec();
 
   if (!user || user.session != sessionCode || user.password != password) {
-    socket.terminate('invalid credentails');
+    console.log('[GAME] Invalid account (%s) access from %s', sessionCode, socket.remoteAddress);
+    socket.terminate();
     return;
   }
 
@@ -42,6 +44,8 @@ export const LOGIN: IGameEndpoint = async function (socket: IGameSocket, body: Q
 
   socket.user = user;
   UserMap[user.account] = socket;
+
+  console.log('[GAME] Account connected (%s) from %s', user.account, socket.remoteAddress);
 
   socket.send([
     opcode,

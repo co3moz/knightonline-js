@@ -23,10 +23,12 @@ export const LOGIN_REQ: ILoginEndpoint = async function (socket: ILoginSocket, b
     }).exec();
 
     if (!account) {
+      console.log('[LOGIN] Invalid account (%s) access from %s', accountName, socket.remoteAddress);
       throw AuthenticationCode.NOT_FOUND;
     }
 
     if (account.password != password) {
+      console.log('[LOGIN] Invalid account (%s) access from %s', account.account, socket.remoteAddress);
       throw AuthenticationCode.INVALID;
     }
 
@@ -36,6 +38,7 @@ export const LOGIN_REQ: ILoginEndpoint = async function (socket: ILoginSocket, b
 
     if (account.otp) {
       if (account.otpLastFail && account.otpLastFail > new Date(Date.now() - 1000 * 60 * 30) && account.otpTryCount > 5) {
+        console.log('[LOGIN] Invalid account (%s) access from %s (OTP BAN)', account.account, socket.remoteAddress);
         throw AuthenticationCode.OTP_BAN; // special for otp ban
       }
 
@@ -77,6 +80,9 @@ export const LOGIN_REQ: ILoginEndpoint = async function (socket: ILoginSocket, b
     socket.send([
       opcode, 0, 0, 0x01, ...short(premiumHours), ...string(account.session)
     ]);
+
+    
+    console.log('[LOGIN] Account connected (%s) from %s', account.account, socket.remoteAddress);
   } else if (resultCode == AuthenticationCode.BANNED) {
     socket.send([
       opcode, 0, 0, 0x04, 0xFF, 0xFF, ...string(accountName), ...string(account.bannedMessage)

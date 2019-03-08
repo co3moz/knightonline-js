@@ -41,7 +41,8 @@ export enum GameEndpointCodes {
   ITEM_MOVE = 0x1F,
   POINT_CHANGE = 0x28,
   NPC_EVENT = 0x20,
-  ITEM_TRADE = 0x21
+  ITEM_TRADE = 0x21,
+  WAREHOUSE = 0x45
 }
 
 export function GameEndpoint(name: string): IGameEndpoint {

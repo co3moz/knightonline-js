@@ -6,8 +6,7 @@ export function GenerateItem(detail: IItem, amount: number = 1, flag: number = 0
     durability: detail.durability,
     amount,
     serial: GenerateItemSerial(),
-    flag: 0,
-    detail
+    flag
   }
 }
 

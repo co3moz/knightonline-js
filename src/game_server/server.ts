@@ -41,6 +41,12 @@ export default async function GameServer() {
         if (UserMap[socket.user.account]) {
           delete UserMap[socket.user.account];
         }
+
+        if (socket.character) {
+          console.log('[GAME] Character disconnected (%s) from %s', socket.character.name, socket.remoteAddress);
+        } else {
+          console.log('[GAME] Account disconnected (%s) from %s', socket.user.account, socket.remoteAddress);
+        }
       }
 
       if (socket.character) {

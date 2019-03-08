@@ -7,10 +7,10 @@ export let SetItems: { [itemId: string]: ISetItem } = {};
 
 export async function LoadSetItems() {
   let obj = {};
-  let setItems = await SetItem.find({}).select(['-id', '-_id']).exec();
+  let setItems = await SetItem.find({}).lean().select(['-id', '-_id']).exec();
 
   for (let setItem of setItems) {
-    obj[setItem.id] = setItem.toJSON();
+    obj[setItem.id] = setItem;
   }
 
   SetItems = obj;

@@ -16,7 +16,6 @@ export interface ICharacterItem {
   serial: string
   expire?: number
   flag: number
-  detail: IItem
 }
 
 export interface IQuestItem {
@@ -130,8 +129,7 @@ export const CharacterSchema = new Schema({
     amount: { type: Number },
     serial: { type: String },
     expire: { type: Number },
-    flag: { type: Number },
-    detail: SchemaTypes.Mixed
+    flag: { type: Number }
   }],
   removedItems: [{
     id: { type: Number },

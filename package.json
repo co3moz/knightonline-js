@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node build/app",
+    "start": "tsc && node --expose-gc build/app",
     "smd_test": "mocha test/smd.test.js",
     "test": "mocha test/**/*.test.js"
   },

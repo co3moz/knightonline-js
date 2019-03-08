@@ -17,7 +17,7 @@ export const SERVERLIST: ILoginEndpoint = async function (socket: ILoginSocket, 
 }
 
 async function ServersCache() {
-  let servers = await Server.find().exec();
+  let servers = await Server.find().lean().exec();
 
   return [servers.length].concat(...servers.map(server => [
     ...string(server.ip),

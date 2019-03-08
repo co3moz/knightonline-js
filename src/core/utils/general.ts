@@ -18,3 +18,15 @@ export class TimeDifference {
 export function WaitNextTick(): Promise<void> {
   return new Promise(resolve => setImmediate(resolve))
 }
+
+export function GarbageCollect() {
+  if (global.gc) {
+    let t = TimeDifference.begin();
+    global.gc();
+    let diff = t.end();
+
+    if (diff > 20) {
+      console.log('[GC] It took longer than expected! (%dms)', diff)
+    }
+  }
+}

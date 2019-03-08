@@ -4,13 +4,12 @@ import { WaitNextTick } from "../core/utils/general";
 const drops: IDropDictionary = <IDropDictionary>{}
 let dropIndex = 0;
 
-export function CreateDrop(owners: number[], dropped, specs?: IItem[]) {
+export function CreateDrop(owners: number[], dropped) {
   let index = ++dropIndex;
 
   drops[index] = {
     timestamp: Date.now(),
     owners,
-    specs,
     dropped
   };
 
@@ -54,7 +53,6 @@ export async function ClearDropsTick() {
 export interface IDrop {
   owners: number[] // sessions that can take
   timestamp: number // timestamp that item(s) dropped
-  specs: IItem[] // item details
   dropped: IDropItem[]
 }
 
