@@ -91,7 +91,7 @@ await KOServerFactory({
 })
 ```
 
-Each server capable to handle 3000 connections. More connections will be dropped instantly for safety. _This numbers can be change_. There are some security checks also, but don't forget to add more security definitions on *server iptables*.
+Each server capable to handle 3000 connections. More connections will be dropped instantly for safety. _This numbers can be change_. There are some security checks also, but don't forget to add more security definitions on *server [iptables](https://unix.stackexchange.com/questions/139285/limit-max-connections-per-ip-address-and-new-connections-per-second-with-iptable)*.
 
 When client disconnects, `onDisconnect` function will be called.
 

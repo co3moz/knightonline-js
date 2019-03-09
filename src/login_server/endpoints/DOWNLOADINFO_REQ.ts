@@ -6,12 +6,14 @@ import { ILoginEndpoint } from '../endpoint';
 let versions: any[] = config.get('loginServer.versions');
 
 export const DOWNLOADINFO_REQ: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
-  let downloadSet = [];
+  let result = [];
+  let totalFile = 0;
   let clientVersion = body.short();
 
   for (let version of versions) {
     if (version.version > clientVersion) {
-      downloadSet.push(string(version.fileName));
+      totalFile++;
+      result.push(...string(version.fileName));
     }
   }
 
@@ -19,7 +21,7 @@ export const DOWNLOADINFO_REQ: ILoginEndpoint = async function (socket: ILoginSo
     opcode,
     ...configString('loginServer.ftp.host'),
     ...configString('loginServer.ftp.dir'),
-    ...short(downloadSet.length),
-    ...[].concat(...downloadSet)
+    ...short(totalFile),
+    ...result
   ]);
 }
