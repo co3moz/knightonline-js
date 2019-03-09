@@ -283,16 +283,19 @@ Endpoints are defined in `src/login_server/endpoint.ts`. When request comes from
 #### VERSION_REQ
 
 Why request comes: **User opens the launcher**
+
 Launcher sends: 
 * Current version of files (short)
 
 Server sends:
 * Last version (short)
+
 What happens next: **If version is match, launcher closes (socket close) and game starts**
 
 #### DOWNLOADINFO_REQ
 
 Why request comes: **Launcher received the last version, and current version is not matching last version**
+
 Launcher sends: 
 * Current version of files (short)
 
@@ -301,7 +304,8 @@ Server sends:
 * FTP Directory (short-string)
 * How much file (short)
 * For each file;
-* - File name (short-string)
+  - File name (short-string)
+
 What happens next: **Socket closes, Connects the FTP server, starts to download**
 
 ## Starting
