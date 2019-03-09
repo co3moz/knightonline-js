@@ -46,6 +46,8 @@ If we want to send `HELLO` message, message that we will send will be `"\xAA\x55
 
 All short, integer, long values have to be little-endian style (most significant binaries go to next byte)
 
+> There is short-string and byte-string. byte-string is for sending character names. it basically have 1 byte of length, then content. short-string is 2 byte of length then content. Client and server always know using the right one, if client expects byte-string then server has to send byte-string. Example; "DOGAN" byte-string: "\x05DOGAN" short-string: "\x05\x00DOGAN". 
+
 #### Operation standard
 
 After wrapping the packet with 0x55AA and 0xAA55, we send a byte to define our operation. All operation codes are reversed engineered. Knight Online Client will send specific operation bytes to say things. 
@@ -234,6 +236,22 @@ After connection is establish, import the model from location. then call mongo e
   console.log(account.password); // IAccount helps the developer for typesafe coding..
 ```
 
+### Queue API
+
+This is a basic wrapper class for handling buffers. If we want to read some value from buffer as byte or short or integer or long, we use this wrapper class to handle it.
+
+```ts
+import { Queue } from 'src/core/utils/unit'
+
+let buffer: Buffer = Buffer.from([1, 2, 0]);
+let queue: Queue = Queue.from(buffer);
+
+queue.byte(); // 1
+queue.short(); // 2
+```
+
+This class is used everywhere in the code. When client ask for information, we can parse it easily with this.
+
 ## Login server
 
 Login server is design to tell clients download new patches and welcome to game server. File structure is in `src/login_server` location. Login server has port range of 15100-15109, thats the reason why we set login ports as an array on the configuration file.
@@ -258,7 +276,44 @@ Setting ip to `0.0.0.0` basically tells to operating system, bind every endpoint
 
 We call database to load up before starting server. We might need an information after..
 
+### Life cycle of operations/endpoints
 
+Endpoints are defined in `src/login_server/endpoint.ts`. When request comes from client, first we check the `LoginEndpointCodes` enum defined in this file. User's request will be a byte, so if we look for that value in this enum we will figure out the correct endpoint name. For example, when user send `"\xAA\x55\x01\x00\x01\x55\xAA"`; onData function's data parameter will be `[0x01]`. We wrap it with `Queue` class and get the first byte. It's "0x01". We look it in the `LoginEndpointCodes`. and its `VERSION_REQ`. Then basically we load `src/login_server/endpoints/VERSION_REQ.ts`. 
 
+#### VERSION_REQ
+
+Why request comes: **User opens the launcher**
+Launcher sends: 
+* Current version of files (short)
+
+Server sends:
+* Last version (short)
+What happens next: **If version is match, launcher closes (socket close) and game starts**
+
+#### DOWNLOADINFO_REQ
+
+Why request comes: **Launcher received the last version, and current version is not matching last version**
+Launcher sends: 
+* Current version of files (short)
+
+Server sends:
+* FTP Address (short-string)
+* FTP Directory (short-string)
+* How much file (short)
+* For each file;
+* - File name (short-string)
+What happens next: **Socket closes, Connects the FTP server, starts to download**
+
+## Starting
+
+To start application, you can use `npm start` for simplicity. 
+
+## Debugging
+
+Our accepted IDE is Visual Studio Code. For visual studio code, the configurations for debugging is ready to use. We already push the "Run" task. But if you want to use some other ide for debugging, you can use this;
+
+```sh
+TS_NODE_TRANSPILE_ONLY=true node -r ts-node/register --expose-gc --no-lazy src/app.ts
+```
 
 > Will be continued..
