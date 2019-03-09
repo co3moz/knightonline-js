@@ -143,7 +143,7 @@ This ones are so important, so I will cover up all.
 
 * `connectedAt`: Maybe this value is useful later. It stores when socket is connected. 
 
-* `send`: Sends packet to client, but it can do many magical things. First thing that it can do is wrap the message between 0xAA55 and 0x55AA. Then it will add length of the message. If the magical thing is, knight online client can compress the packet to save some bandwith. If message length is too much, send function will compress the message, then send.
+* `send`: Sends packet to client, but it can do many magical things. First thing that it can do is wrap the message between 0xAA55 and 0x55AA. Then it will add length of the message. The magical thing is, knight online client can compress the packet to save some bandwith. If message length is too much, send function will compress the message, then send.
 
 * `terminate`: Terminates the socket. It will return a promise and this promise will be resolved when socket is fully disconnect. The meaning of fully disconnect is saving all user related things.. It will be useful when another client connects to server with same credentials, so we force the old client to logout. (onDisconnect will be waited to resolve)
 
