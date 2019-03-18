@@ -83,7 +83,7 @@ export const DROP_TAKE: IGameEndpoint = async function (socket: IGameSocket, bod
       SendWeightChange(socket);
 
       if (itemDetail.itemType == 4 && itemDetail.id != 900144023) {
-        AllSend(socket, [
+        AllSend([
           0x7D, // LOGOS SHOUT,
           2,
           4,

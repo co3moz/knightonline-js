@@ -5,26 +5,23 @@ import { Queue, short, readShort } from './utils/unit'
 import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise'
 
 export function KOClientFactory(params: IClientConfiguration): Promise<IKOClientSocket> {
-  let { ip, port, debug, onConnect, name } = params;
-
-  var debugFn;
-
-  if (!debug) {
-    debugFn = () => { }
-  } else if (debug === true) {
-    debugFn = (...params) => console.log('DEBUG (client:' + name + ')', ...params);
-  }
+  let { ip, port, onConnect } = params;
 
   return new Promise(async (resolve, reject) => {
     const client = <IKOClientSocket>new net.Socket();
-    client.debug = debugFn;
     client.connected = false;
 
     let waitingTasks: IWaitingTaskPromise[] = [];
     let waitingSignals: Buffer[] = [];
 
-    client.waitNextData = function (opcode: number, subopcode: number): IWaitingTaskPromise {
-      var task = <IWaitingTaskPromise>CreateDeferredPromise();
+    let resolveWaitingTask = (task: IWaitingTaskPromise, i: number, n: number) => {
+      task.resolve(Queue.from(waitingSignals[i].slice(n)));
+      waitingSignals.splice(i, 1);
+      return task;
+    }
+
+    client.waitNextData = function (opcode: number, subopcode: number, timeout: number): IWaitingTaskPromise {
+      let task = <IWaitingTaskPromise>CreateDeferredPromise(timeout);
       task.opcode = opcode;
       task.subopcode = subopcode;
 
@@ -32,30 +29,18 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
         if (opcode) {
           if (waitingSignals[i][0] == opcode) {
             if (subopcode) {
-              if (waitingSignals[i][1] == subopcode) {
-                task.resolve(Queue.from(waitingSignals[i].slice(2)));
-                waitingSignals.splice(i, 1);
-                return task;
-              }
-            } else {
-              task.resolve(Queue.from(waitingSignals[i].slice(1)));
-              waitingSignals.splice(i, 1);
-              return task;
-            }
+              if (waitingSignals[i][1] == subopcode) return resolveWaitingTask(task, i, 2);
+            } else return resolveWaitingTask(task, i, 1);
           }
-        } else {
-          task.resolve(Queue.from(waitingSignals[i]));
-          waitingSignals.splice(i, 1);
-          return task;
-        }
+        } else return resolveWaitingTask(task, i, 0);
       }
 
       waitingTasks.push(task);
       return task;
     }
 
-    client.terminate = (message?: string) => {
-      if (message) client.debug(message);
+    client.terminate = (message: string) => {
+      console.error('[CLIENT ERROR] %s', message);
       client.end();
     }
 
@@ -65,7 +50,7 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
 
     client.sendAndWait = (data, opcode, subopcode) => {
       client.send(data);
-      return client.waitNextData(opcode, subopcode);
+      return client.waitNextData(opcode, subopcode, 5000);
     }
 
     client.getWaitingSignals = () => {
@@ -76,9 +61,6 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
 
     client.connect(port, ip, function () {
       client.connected = true;
-      if (debug) {
-        client.debug('Connected at ' + ip + ':' + port);
-      }
       if (onConnect) onConnect(client);
       resolve(client);
     });
@@ -87,10 +69,6 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
     let fragCount = 0;
 
     client.on('data', (data: Buffer) => {
-      if (debug) {
-        client.debug('data in | ' + Array.from(data).map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' '));
-      }
-
       if (frag.length > 0) {
         data = Buffer.concat([frag, data]);
         fragCount++;
@@ -131,7 +109,6 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
           // }
 
           data = Buffer.from([0xAA, 0x55, ...short(realLen), ...Array.from(uncompressedData), 0x55, 0xAA, ...data.slice(6 + length)]);
-          client.debug('data uncompressed | ' + Array.from(data).map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' '));
           opcode = data[4];
           subopcode = data[5];
           length = realLen;
@@ -170,17 +147,14 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
     });
 
     client.on('error', function (err) {
-      if (debug) {
-        client.debug('error', err);
-      }
-    })
+      console.error('[CLIENT ERROR]', err);
+    });
 
     client.on('close', function () {
       client.connected = false;
-      console.log('Connection closed');
 
       for (let i of waitingTasks) {
-        i.reject(new Error('connection is closed!'));
+        i.reject(new Error('Connection is closed!'));
       }
     });
   });
@@ -196,8 +170,7 @@ function doesProtocolFooterValid(data, length) {
 
 export interface IKOClientSocket extends net.Socket {
   connected: boolean
-  waitNextData: (opcode?: number, subopcode?: number) => IWaitingTaskPromise
-  debug: ((...args: any[]) => void)
+  waitNextData: (opcode?: number, subopcode?: number, timeout?: number) => IWaitingTaskPromise
   terminate: (message?: string) => void
   send: (response: number[]) => void
   sendAndWait: (data: number[], opcode: number, subopcode?: number) => IWaitingTaskPromise
@@ -207,9 +180,8 @@ export interface IKOClientSocket extends net.Socket {
 export interface IClientConfiguration {
   ip: string
   port: number
-  debug?: boolean | ((...args: any[]) => void)
-  onConnect?: (socket: IKOClientSocket) => void
   name: string
+  onConnect?: (socket: IKOClientSocket) => void
 }
 
 export interface IWaitingTaskPromise extends IDeferredPromise {

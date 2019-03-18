@@ -3,22 +3,27 @@
  */
 export class UniqueQueue {
   private array: number[];
-  private constructor(width: number, min: number) {
-    let data = Array(width);
-    let i = width;
+  private size: number;
+  
+  private constructor(size: number, min: number) {
+    let data = Array(size);
+    let i = size;
 
-    while (i--) data[i] = width - i + min;
+    while (i--) data[i] = size - i + min;
     this.array = data;
+    this.size = size;
   }
+
 
   /**
    * Creates stack
-   * @param width how much item hold
+   * @param size how much item hold
    * @param min numbers starts with
    */
-  public static from(width: number, min: number = 0) {
-    return new UniqueQueue(width, min);
+  public static from(size: number, min: number = 0) {
+    return new UniqueQueue(size, min);
   }
+
 
   /**
    * Puts the number back to stack
@@ -28,10 +33,27 @@ export class UniqueQueue {
     return this.array.push(i);
   }
 
+
   /**
    * Gets new number from stack. It might be undefined
    */
   reserve() {
     return this.array.pop();
+  }
+
+
+  /**
+   * How much number is available.
+   */
+  freeSize() {
+    return this.array.length;
+  }
+
+
+  /**
+   * How much number is used.
+   */
+  reservedSize() {
+    return this.size - this.freeSize();
   }
 }

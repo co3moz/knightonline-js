@@ -10,18 +10,12 @@ export const RSessionMap: ISessionDictionary = {};
 export const RNPCRegionMap: INPCRegionDictionary = {};
 export const RNPCMap: INPCDictionary = {};
 
-export function GetRegionName(socket: IGameSocket) {
-  let c = socket.character;
-  if (!c) return '';
-
-  let q = RUserMap[c.name];
-  if (q) {
-    return q.s;
-  }
-
-  return '';
-}
-
+/**
+ * Creates or Updates user region object. This function has to be called when user move / spawn / teleport..
+ * 
+ * @param socket User
+ * @param disableEvent Should I disable "OnRegionUpdate" event before be fired? default: false
+ */
 export function RegionUpdate(socket: IGameSocket, disableEvent = false): boolean {
   let c = socket.character;
   if (!c) return false;
@@ -29,10 +23,11 @@ export function RegionUpdate(socket: IGameSocket, disableEvent = false): boolean
   let z = c.z / 35 >> 0;
   let s = `${c.zone}x${x}z${z}`;
 
-  if (RUserMap[c.name]) {
-    if (RUserMap[c.name].s == s) return false;
+  let userRegionObj = RUserMap[c.name];
+  if (userRegionObj) {
+    if (userRegionObj.s == s) return false;
 
-    RegionRemove(socket);
+    RegionRemove(socket, true);
   }
 
   if (!RRegionMap[s]) {
@@ -45,7 +40,14 @@ export function RegionUpdate(socket: IGameSocket, disableEvent = false): boolean
 
   RRegionMap[s].push(socket);
   RZoneMap[c.zone].push(socket);
-  RUserMap[c.name] = <IRegionUser>{ s, zone: c.zone, x, z, socket };
+  if (userRegionObj) {
+    userRegionObj.s = s;
+    userRegionObj.zone = c.zone;
+    userRegionObj.x = x;
+    userRegionObj.z = z;
+  } else {
+    RUserMap[c.name] = <IRegionUser>{ s, zone: c.zone, x, z, socket };
+  }
   RSessionMap[socket.session] = socket;
 
   if (!disableEvent) {
@@ -60,10 +62,11 @@ export function RegionUpdateNPC(npc: INPCInstance) {
   let z = npc.z / 35 >> 0;
   let s = `${npc.zone}x${x}z${z}`;
 
-  if (RNPCMap[npc.uuid]) {
-    if (RNPCMap[npc.uuid].s == s) return false; // no need to update
+  let npcRegionObj = RNPCMap[npc.uuid];
+  if (npcRegionObj) {
+    if (npcRegionObj.s == s) return false; // no need to update
 
-    RegionRemoveNPC(npc);
+    RegionRemoveNPC(npc, true);
   }
 
   if (!RNPCRegionMap[s]) {
@@ -71,27 +74,42 @@ export function RegionUpdateNPC(npc: INPCInstance) {
   }
 
   RNPCRegionMap[s].push(npc);
-  RNPCMap[npc.uuid] = <IRegionNPC>{ s, zone: npc.zone, x, z, npc };
+  if (npcRegionObj) {
+    npcRegionObj.s = s;
+    npcRegionObj.zone = npc.zone;
+    npcRegionObj.x = x;
+    npcRegionObj.z = z;
+  } else {
+    RNPCMap[npc.uuid] = <IRegionNPC>{ s, zone: npc.zone, x, z, npc };
+  }
   return true;
 }
 
-export function RegionRemove(socket: IGameSocket) {
+
+
+/**
+ * Removes user from region system. Soft delete wont remove the region instances, that way we prevent unnecessary memory allocations.
+ * 
+ * @param socket User
+ * @param softDelete Should I keep the region instance? default: false
+ */
+export function RegionRemove(socket: IGameSocket, softDelete = false) {
   let c = socket.character;
   if (!c) return;
   delete RSessionMap[socket.session];
-  
+
   let us = RUserMap[c.name];
 
   if (us) {
-    delete RUserMap[c.name];
+    if (!softDelete) {
+      delete RUserMap[c.name];
+    }
 
     let userRegion = RRegionMap[us.s];
     let userRegionIndex = userRegion.findIndex(x => x == socket);
-    userRegion.splice(userRegionIndex, 1);
-
-    if (userRegion.length == 0) {
-      delete RRegionMap[us.s];
-    }
+    userRegion.splice(userRegionIndex, 1); 
+    
+    // We won't check list for being empty. It will be constant alloc/realloc that we won't "really" need.
 
     let userZone = RZoneMap[us.zone];
     let userZoneIndex = userZone.findIndex(x => x == socket);
@@ -99,11 +117,13 @@ export function RegionRemove(socket: IGameSocket) {
   }
 }
 
-export function RegionRemoveNPC(npc) {
+export function RegionRemoveNPC(npc: INPCInstance, softDelete = false) {
   let n = RNPCMap[npc.uuid];
 
   if (n) {
-    delete RNPCMap[npc.uuid];
+    if (!softDelete) {
+      delete RNPCMap[npc.uuid];
+    }
 
     let region = RNPCRegionMap[n.s];
     let index = region.findIndex(x => x == npc);
@@ -115,31 +135,17 @@ export function RegionRemoveNPC(npc) {
   }
 }
 
-export function* RegionQuery(socket, opts?: IQueryOptions) {
+export function* RegionQuery(socket) {
   let c = socket.character;
   let s = RUserMap[c.name];
   if (!s) return;
 
-  if (opts && opts.all) { // query users without caring location?
-    for (let key in RUserMap) {
-      yield RUserMap[key].socket;
-    }
-    return;
-  }
-
-  if (opts && opts.zone) { // query users by zone only?
-    yield* RZoneMap[s.zone];
-    return;
-  }
-
-  let fix = `${s.zone}x`
-
+  let fix = s.zone + 'x';
   let cx = s.x;
   let cz = s.z;
-  let d = (opts ? opts.d : null) || 1;
 
-  for (let x = -d; x <= d; x++) {
-    for (let y = -d; y <= d; y++) {
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
       let s = `${fix}${cx + x}z${cz + y}`;
       if (RRegionMap[s]) {
         yield* RRegionMap[s];
@@ -148,18 +154,31 @@ export function* RegionQuery(socket, opts?: IQueryOptions) {
   }
 }
 
-export function* RegionQueryNPC(socket, d = 1) {
+export function* RegionAllQuery() {
+  for (let key in RUserMap) {
+    yield RUserMap[key].socket;
+  }
+}
+
+export function* RegionZoneQuery(socket: IGameSocket) {
   let c = socket.character;
   let s = RUserMap[c.name];
   if (!s) return;
 
-  let fix = `${s.zone}x`
+  yield* RZoneMap[s.zone];
+}
 
+export function* RegionQueryNPC(socket: IGameSocket) {
+  let c = socket.character;
+  let s = RUserMap[c.name];
+  if (!s) return;
+
+  let fix = s.zone + 'x';
   let cx = s.x;
   let cz = s.z;
 
-  for (let x = -d; x <= d; x++) {
-    for (let y = -d; y <= d; y++) {
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
       let s = `${fix}${cx + x}z${cz + y}`;
       if (RNPCRegionMap[s]) {
         yield* RNPCRegionMap[s];
@@ -168,16 +187,13 @@ export function* RegionQueryNPC(socket, d = 1) {
   }
 }
 
-export function* RegionQueryUsersByNpc(regionNPC) {
-  let fix = `${regionNPC.zone}x`
+export function* RegionQueryUsersByNpc(instance: INPCInstance) {
+  let fix = instance.zone + 'x';
+  let cx = instance.x / 35 >> 0;
+  let cz = instance.z / 35 >> 0;
 
-  let cx = regionNPC.x / 35 >> 0;
-  let cz = regionNPC.z / 35 >> 0;
-
-  let d = 1;
-
-  for (let x = -d; x <= d; x++) {
-    for (let y = -d; y <= d; y++) {
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
       let s = `${fix}${cx + x}z${cz + y}`;
       if (RRegionMap[s]) {
         yield* RRegionMap[s];
@@ -186,42 +202,71 @@ export function* RegionQueryUsersByNpc(regionNPC) {
   }
 }
 
+/**
+ * Sends data to near players of the player.
+ * 
+ * @param socket Which player is in the center
+ * @param packet Data
+ */
 export function RegionSend(socket: IGameSocket, packet: number[]): void {
   for (let s of RegionQuery(socket)) {
     s.send(packet);
   }
 }
 
+
+/**
+ * Sends data to near players of the npc
+ * @param npc Which npc is in the center
+ * @param packet Data
+ */
 export function RegionSendByNpc(npc: INPCInstance, packet: number[]): void {
   for (let s of RegionQueryUsersByNpc(npc)) {
     s.send(packet);
   }
 }
 
+
+/**
+ * Sends data to zone of the player
+ * @param socket Which player's zone will be used
+ * @param packet Data
+ */
 export function ZoneSend(socket: IGameSocket, packet: number[]): void {
-  for (let s of RegionQuery(socket, { zone: true })) {
+  for (let s of RegionZoneQuery(socket)) {
     s.send(packet);
   }
 }
 
-export function AllSend(socket: IGameSocket, packet: number[]): void {
-  for (let s of RegionQuery(socket, { all: true })) {
+/**
+ * Sends data to all players which in the map (not the ones; connected but not joined)
+ * 
+ * @param packet Data
+ */
+export function AllSend(packet: number[]): void {
+  for (let s of RegionAllQuery()) {
     s.send(packet);
   }
 }
 
-export interface IRegionCharacter {
 
-}
-
+/**
+ * Session storage map. 
+ * session(number)->socket(IGameSocket)
+ */
 export interface ISessionDictionary {
   [session: number]: IGameSocket
 }
 
 
+/**
+ * Region user storage map
+ * playerName(string)->regionUser(IRegionUser)
+ */
 export interface IUserDictionary {
   [user: string]: IRegionUser
 }
+
 
 export interface INPCDictionary {
   [npcUUID: number]: IRegionNPC
@@ -271,10 +316,4 @@ export interface IRegionNPC {
 
   /** NPC instance */
   npc: INPCInstance
-}
-
-interface IQueryOptions {
-  zone?: boolean
-  all?: boolean
-  d?: number
 }

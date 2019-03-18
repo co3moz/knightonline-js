@@ -134,8 +134,6 @@ export function OnNPCDead(npc: INPCInstance) {
           2
         ]);
       }
-
-
     }
   }
 }

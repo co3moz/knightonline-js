@@ -1,7 +1,7 @@
 import { IGameEndpoint } from "../endpoint";
 import { IGameSocket } from "../game_socket";
 import { Queue, byte_string, short } from "../../core/utils/unit";
-import { RegionQuery } from "../region";
+import { RegionZoneQuery } from "../region";
 
 export const USER_INFO: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
   let c = socket.character;
@@ -10,7 +10,7 @@ export const USER_INFO: IGameEndpoint = async function (socket: IGameSocket, bod
   if (subOpcode == 0x01) { // send all user data in same zone
     let result = [opcode, subOpcode, 1, c.zone, 0, 0, 0]; // last 0, 0 is count
     let userCount = 0;
-    for (let userSocket of RegionQuery(socket, { zone: true })) { // request all users in the zone
+    for (let userSocket of RegionZoneQuery(socket)) { // request all users in the zone
       userCount++;
 
       let uc = userSocket.character;

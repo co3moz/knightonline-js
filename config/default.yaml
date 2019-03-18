@@ -8,8 +8,12 @@ redis:
   host: '127.0.0.1'
   port: 6379
 
+web:
+  ip: 127.0.0.1
+  port: 15000
+
 loginServer:
-  ip: 0.0.0.0
+  ip: 127.0.0.1
   ports: 
     - 15100
     - 15101
@@ -31,7 +35,7 @@ loginServer:
       fileName: none
 
 gameServer:
-  ip: 0.0.0.0
+  ip: 127.0.0.1
   ports: 
     - 15001
   clientExeVersion: 2228

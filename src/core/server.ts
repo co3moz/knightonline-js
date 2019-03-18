@@ -25,6 +25,7 @@ export async function KOServerFactory(params: IServerConfiguration): Promise<IKO
     var server = <IKOServer>net.createServer(serverHandler(params));
 
     server.maxConnections = 10000;
+    server.params = params;
 
     let stopping = false;
     server.stop = () => {
@@ -122,7 +123,7 @@ function serverHandler(params: IServerConfiguration) {
 
     socket.terminate = (message) => {
       if (message) {
-        console.log('[SOCKET] Terminated because of "' + message + '" session: ' + session+ ' from: ' + socket.remoteAddress);
+        console.log('[SOCKET] Terminated because of "' + message + '" session: ' + session + ' from: ' + socket.remoteAddress);
       }
       socket.end();
 
@@ -242,4 +243,5 @@ export interface IServerConfiguration {
 export interface IKOServer extends net.Server {
   stop: () => Promise<void>
   querySocketList: () => IKOSocket[]
+  params: IServerConfiguration
 }

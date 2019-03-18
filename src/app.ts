@@ -3,21 +3,30 @@ import GameServer from "./game_server/server";
 import { OnServerTick } from "./game_server/events/onServerTick";
 import { IKOServer } from "./core/server";
 import { Database, DisconnectFromDatabase } from "./core/database";
-import { GarbageCollect } from "./core/utils/general";
+import { GarbageCollect, GetPackageJSON } from "./core/utils/general";
+import WebServer from "./web/server";
+import { RedisConnect } from "./core/redis/connect";
 
 async function main() {
+  let packageJSON = await GetPackageJSON();
+  console.log('[MAIN] %s v%s', packageJSON.name, packageJSON.version);
+  await Database();
+  await RedisConnect();
+  
   console.log('[MAIN] Servers are queued');
 
   const servers: IKOServer[] = [];
   servers.push(...await LoginServer());
-  servers.push(...await GameServer());
+  servers.push(await GameServer());
+  await WebServer();
 
   const tick = setInterval(OnServerTick, 250);
 
   GarbageCollect();
 
-  process.on('SIGINT', CloseSignal.bind(null, 'SIGINT', servers, tick));
-  process.on('SIGTERM', CloseSignal.bind(null, 'SIGTERM', servers, tick));
+  let bind = CloseSignal.bind(null, 'SIGINT', servers, tick);
+  process.on('SIGINT', bind);
+  process.on('SIGTERM', bind);
 }
 
 async function CloseSignal(signal: string, servers: IKOServer[], tick: NodeJS.Timeout) {

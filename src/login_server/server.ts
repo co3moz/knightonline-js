@@ -1,12 +1,16 @@
 import * as config from 'config'
 import { Database } from '../core/database'
 import { RedisConnect } from '../core/redis/connect'
-import { KOServerFactory } from '../core/server';
+import { KOServerFactory, IKOServer } from '../core/server';
 import { Queue } from '../core/utils/unit';
 import { LoginEndpointCodes, LoginEndpoint } from './endpoint';
 import { ILoginSocket } from './login_socket';
 
+
+let loginServerCache: IKOServer[] = null;
 export default async function LoginServer() {
+  if (loginServerCache) return loginServerCache;
+
   console.log('[SERVER] Login server is going to start...');
   await Database();
   await RedisConnect();
@@ -16,7 +20,7 @@ export default async function LoginServer() {
 
   console.log('[SERVER] Looks like latest server version is ' + serverVersion);
 
-  return await KOServerFactory({
+  return loginServerCache = await KOServerFactory({
     ip: config.get('loginServer.ip'),
     ports: config.get('loginServer.ports'),
     timeout: 5000,

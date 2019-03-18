@@ -10,7 +10,10 @@ import { RegionRemove } from './region';
 import { AISystemStart } from './ai_system/start';
 import { OnUserExit } from './events/onUserExit';
 
+let gameServerCache: IKOServer = null;
 export default async function GameServer() {
+  if (gameServerCache) return gameServerCache;
+
   console.log('[SERVER] Game server is going to start...');
   await Database();
   await RedisConnect();
@@ -19,7 +22,7 @@ export default async function GameServer() {
 
   await AISystemStart();
 
-  return await KOServerFactory({
+  return gameServerCache = (await KOServerFactory({
     ip: config.get('gameServer.ip'),
     ports: config.get('gameServer.ports'),
     timeout: 5000,
@@ -71,7 +74,7 @@ export default async function GameServer() {
 
       await endpoint(socket, body, opcode)
     }
-  });
+  }))[0];
 }
 
 

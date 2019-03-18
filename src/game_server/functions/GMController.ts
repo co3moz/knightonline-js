@@ -1,10 +1,9 @@
 import { IGameSocket } from "../game_socket";
 import { SendMessageToPlayer, ChatMessageType } from "./sendChatMessage";
-import { AllSend, RegionQuery, RUserMap, RSessionMap, RegionQueryUsersByNpc, RNPCMap } from "../region";
+import { AllSend, RegionQuery, RSessionMap, RNPCMap, RegionAllQuery } from "../region";
 import { string, byte_string } from "../../core/utils/unit";
 import { SendWarp } from "./sendWarp";
 import { Npc } from "../../core/database/models";
-import { SendRegionNpcIn } from "./sendRegionInOut";
 import { SendTargetHP } from "./sendTargetHP";
 import { SummonNPC } from "../ai_system/summon";
 
@@ -21,7 +20,7 @@ export const GM_COMMANDS = {
       return SendUsageMessageForGM(socket, `USAGE: notice text`);
     }
 
-    AllSend(socket, [
+    AllSend([
       opcode, ChatMessageType.WAR_SYSTEM, 0, 0, 0, 0, ...string(`### NOTICE: ${text} ###`, 'ascii')
     ]);
   },
@@ -32,7 +31,7 @@ export const GM_COMMANDS = {
       return SendUsageMessageForGM(socket, `USAGE: chat text`);
     }
 
-    AllSend(socket, [
+    AllSend([
       opcode, ChatMessageType.PUBLIC, 0, 0, 0, 0, ...string(`### NOTICE: ${text} ###`, 'ascii')
     ]);
   },
@@ -47,9 +46,9 @@ export const GM_COMMANDS = {
       opcode, ChatMessageType.PRIVATE, 0, 0, 0, ...byte_string('[SERVER]'), ...string(text, 'ascii')
     ];
 
-    for (let s of RegionQuery(socket, { all: true })) {
-      message[2] = s.user.nation;
-      s.send(message);
+    for (let userSocket of RegionAllQuery()) {
+      message[2] = userSocket.user.nation;
+      userSocket.send(message);
     }
   },
 

@@ -12,7 +12,6 @@ export async function TestClient() {
   let gameConnection: IKOClientSocket | null;
   let dbConnection: mongoose.Connection | null;
   let data: any;
-  let debug = false;
   let loadItems = false;
 
 
@@ -20,7 +19,6 @@ export async function TestClient() {
     console.log('loading test client for testing ko-js');
     console.break();
     table({
-      debug,
       loadItems
     });
     console.break();
@@ -37,7 +35,6 @@ export async function TestClient() {
     loginConnection = await KOClientFactory({
       ip: config.get('testClient.ip'),
       port: (<number>config.get('testClient.port')) + (Math.random() * 9 >>> 0),
-      debug,
       name: 'loginServer'
     });
     console.log('connected to login server!');
@@ -125,7 +122,6 @@ export async function TestClient() {
     gameConnection = await KOClientFactory({
       ip: picked[0].ip,
       port: 15001,
-      debug,
       name: 'gameServer'
     });
     console.log('connected to game server!');
@@ -362,27 +358,28 @@ export async function TestClient() {
 
     table(userList, 'user');
 
-    gameConnection.send([0x09, 0x00, 0x00]); // send direction as short(0)
+    // gameConnection.send([0x09, 0x00, 0x00]); // send direction as short(0)
 
-
-    setTimeout(function () {
-      gameConnection.send([
-        0x06,
-        ...short(player.x * 10 - 500), ...short(player.z * 10), ...short(player.y * 10),
-        0x00, 0x00, 0x00, // speed and echo thing
-        ...short(player.x * 10 - 500), ...short(player.z * 10), ...short(player.y * 10)
-      ]); // send movement
-    }, 5000);
 
     // setTimeout(function () {
-    //   gcon.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
+    //   gameConnection.send([
+    //     0x06,
+    //     ...short(player.x * 10 - 500), ...short(player.z * 10), ...short(player.y * 10),
+    //     0x00, 0x00, 0x00, // speed and echo thing
+    //     ...short(player.x * 10 - 500), ...short(player.z * 10), ...short(player.y * 10)
+    //   ]); // send movement
     // }, 5000);
 
-    let d = 0;
-    setInterval(function () {
-      d += 5;
-      gameConnection.send([0x09, ...short(d % 500)]);
-    }, 60000)
+    setTimeout(function () {
+      // gameConnection.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
+      gameConnection.send([0x48]); // zone home
+    }, 1500);
+
+    // let d = 0;
+    // setInterval(function () {
+    //   d += 5;
+    //   gameConnection.send([0x09, ...short(d % 500)]);
+    // }, 60000)
 
     while (gameConnection.connected) {
       data = await gameConnection.waitNextData(); // get next waiting
@@ -443,6 +440,13 @@ export async function TestClient() {
             console.break();
           }
         }
+      } else if(opcode == 0x1e) { // warp
+        let x = data.short() / 10;
+        let z = data.short() / 10;
+
+        table({
+          x, z
+        })
       } else if (opcode == 0x2E) { // notice
 
         let subOpcode = data.byte();
@@ -573,9 +577,9 @@ export async function TestClient() {
             weapon2: data.int(),
             nation: data.byte(),
             level: data.byte(),
-            x: data.short(),
-            z: data.short(),
-            y: data.short(),
+            x: data.short() / 10,
+            z: data.short() / 10,
+            y: data.short() / 10,
             state: data.int(),
             oType: data.byte(),
             unk2: data.short(),

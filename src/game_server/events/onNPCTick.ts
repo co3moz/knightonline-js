@@ -15,7 +15,7 @@ export async function OnNPCTick() {
     let ioSafe = 0;
 
     for (let uuid in NPCMap) {
-      if (++ioSafe > 50) {
+      if (++ioSafe > 100) {
         ioSafe = 0;
         await WaitNextTick();
       }

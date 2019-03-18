@@ -1,4 +1,4 @@
-import { TestClient } from './client'
+import { TestClient } from './test-client'
 
 (async function () {
   TestClient().catch(x => {
