@@ -11,7 +11,7 @@ export async function Database(): Promise<mongoose.Connection> {
   }
 
   connection = await ConnectToDatabase();
-
+  
   await SettingDefaults();
   await ServerDefaults();
   await SetItemDefaults();
