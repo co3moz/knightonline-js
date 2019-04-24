@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node --expose-gc build/app",
-    "test": "tsc && nole -L ./build/**/*.test.js"
+    "test": "tsc && nole -T ./build/**/*.test.js"
   },
   "author": "co3moz",
   "license": "MIT",
