@@ -1,6 +1,8 @@
 Knight Online TS Server-side Project
 =======================
 
+Curiosity of Knight Online's backbone lead to me construct this. It is not finished at all. A man needs motivation..
+
 ## Project structure
 Project is developed with typescript. You have to compile the code before running. Also all tests have to be written as typescript. Typescript default configurations are;
 
