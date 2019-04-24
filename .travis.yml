@@ -1,3 +1,11 @@
 language: node_js
 node_js:
   - "10"
+services: 
+  - mongodb
+  - redis-server
+before_script:
+  - sleep 15
+  - mongo testdb --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+addons:
+  hostname: travis
