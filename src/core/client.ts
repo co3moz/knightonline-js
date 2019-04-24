@@ -40,7 +40,9 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
     }
 
     client.terminate = (message: string) => {
-      console.error('[CLIENT ERROR] %s', message);
+      if (message) {
+        console.error('[CLIENT ERROR]', message);
+      }
       client.end();
     }
 

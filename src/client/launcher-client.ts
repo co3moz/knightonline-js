@@ -8,8 +8,8 @@ export async function ConnectKOServerForLauncher(ip: string, port: number) {
   let data: Queue;
 
   try {
-    connection = await KOClientFactory({ ip, port, name: 'launcher-test' });
-
+    connection = await KOClientFactory({ ip, port, name: 'launcher-client' });
+    
     data = await connection.sendAndWait([0x01, ...short(1299)], 0x01);
 
     let latestVersion = data.short();
@@ -24,7 +24,7 @@ export async function ConnectKOServerForLauncher(ip: string, port: number) {
     for (var i = 0; i < totalFiles; i++) {
       files.push(data.string());
     }
-
+    
     return {
       latestVersion,
       ftpAddress,

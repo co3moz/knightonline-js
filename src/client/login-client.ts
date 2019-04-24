@@ -8,7 +8,7 @@ export async function ConnectLoginClient(ip: string, port: number, user: string,
   let data: Queue;
 
   try {
-    connection = await KOClientFactory({ ip, port, name: 'login-test' });
+    connection = await KOClientFactory({ ip, port, name: 'login-client' });
     
     data = await connection.sendAndWait([0xF3, ...string(user), ...string(PasswordHash(password))], 0xF3);
     data.skip(2);

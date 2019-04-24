@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "outDir": "build",
     "alwaysStrict": true,
     "removeComments": true,
@@ -12,8 +13,7 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.js"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

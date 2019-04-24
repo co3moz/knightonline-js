@@ -6,33 +6,36 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node --expose-gc build/app",
-    "smd_test": "mocha test/smd.test.js",
-    "test": "mocha test/**/*.test.js"
+    "test": "tsc && nole -L ./build/**/*.test.js"
   },
   "author": "co3moz",
   "license": "MIT",
   "dependencies": {
     "@types/bluebird": "^3.5.25",
+    "@types/chai": "^4.1.7",
     "@types/config": "0.0.34",
     "@types/glob": "^7.1.1",
     "@types/long": "^4.0.0",
+    "@types/mocha": "^5.2.6",
     "@types/mongodb": "^3.1.19",
     "@types/mongoose": "^5.3.17",
     "@types/node": "^11.9.5",
     "@types/redis": "^2.8.10",
     "bluebird": "^3.5.1",
+    "chai": "^4.2.0",
     "config": "^1.30.0",
     "crc-32": "^1.2.0",
+    "cross-env": "^5.2.0",
     "csv-streamify": "^4.0.0",
     "fastify": "^2.1.0",
     "fs-extra": "^6.0.1",
     "glob": "^7.1.2",
-    "js-yaml": "^3.11.0",
+    "js-yaml": "^3.13.0",
     "long": "^4.0.0",
     "lzfjs": "^1.0.1",
-    "mocha": "^5.2.0",
     "mongoose": "^5.4.13",
     "natives": "^1.1.6",
+    "nole": "^1.0.8",
     "redis": "^2.8.0",
     "typescript": "^3.3.3",
     "unzip": "^0.1.11"
@@ -41,6 +44,6 @@
     "node": ">= 10"
   },
   "devDependencies": {
-    "ts-node": "^8.0.2"
+    "ts-node": "^8.0.3"
   }
 }

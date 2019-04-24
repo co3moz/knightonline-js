@@ -6,120 +6,23 @@ import { PasswordHash } from '../core/utils/password_hash'
 import { AuthenticationCode } from '../login_server/endpoints/LOGIN_REQ'
 import { Database } from '../core/database'
 import { GameEndpointCodes } from '../game_server/endpoint';
+import { ConnectLoginClient } from './login-client';
 
 export async function TestClient() {
-  let loginConnection: IKOClientSocket | null;
-  let gameConnection: IKOClientSocket | null;
-  let dbConnection: mongoose.Connection | null;
+  let connection: IKOClientSocket | null;
   let data: any;
-  let loadItems = false;
 
 
   try {
     console.log('loading test client for testing ko-js');
-    console.break();
-    table({
-      loadItems
-    });
-    console.break();
+    const { ip, port, user, password, server } = config.get('testClient');
 
-    if (loadItems) {
-      console.log('connecting to db...');
-      dbConnection = await Database();
-      console.log('connected to db');
-      console.break();
-    }
+    let login = await ConnectLoginClient(ip, port + (Math.random() * 9 >>> 0), user, password);
 
-
-    console.log('connecting to login server...');
-    loginConnection = await KOClientFactory({
-      ip: config.get('testClient.ip'),
-      port: (<number>config.get('testClient.port')) + (Math.random() * 9 >>> 0),
-      name: 'loginServer'
-    });
-    console.log('connected to login server!');
-    console.break();
-
-    data = await loginConnection.sendAndWait([0x01, ...short(1299)], 0x01);
-
-    table({
-      latestVersion: data.short()
-    });
-
-
-    data = await loginConnection.sendAndWait([0x02, ...short(config.get('testClient.version'))], 0x02);
-
-    let ftpAddress = data.string();
-    let ftpRoot = data.string();
-    let totalFiles = data.short();
-    let files: string[] = [];
-    for (var i = 0; i < totalFiles; i++) {
-      files.push(data.string());
-    }
-
-    table({
-      ftpAddress,
-      ftpRoot
-    });
-
-    table(files, 'files');
-
-    data = await loginConnection.sendAndWait([0xF3, ...string(config.get('testClient.user')), ...string(PasswordHash(config.get('testClient.password')))], 0xF3);
-    data.skip(2);
-
-    let resultCode = data.byte();
-    let premiumHours = data.short();
-    let sessionCode = data.string();
-
-    table({
-      sessionCode, resultCode: AuthenticationCode[resultCode], premiumHours
-    });
-
-    if (resultCode != 1) return;
-
-    /** TODO: ENCRYPTION */
-
-    data = await loginConnection.sendAndWait([0xF6], 0xF6);
-
-    table({
-      header: data.string(),
-      data: data.string()
-    });
-
-    data = await loginConnection.sendAndWait([0xF5, 1, 0], 0xF5);
-    data.skip(2); // dummy 1, 0 
-
-    let serverCount = data.byte();
-    let servers: any[] = [];
-
-    for (i = 0; i < serverCount; i++) {
-      servers.push({
-        ip: data.string(),
-        lanip: data.string(),
-        name: data.string(),
-        onlineCount: data.short(),
-        serverId: data.short(),
-        groupId: data.short(),
-        userPremiumLimit: data.short(),
-        userFreeLimit: data.short(),
-        unkwn: data.byte(),
-        karusKing: data.string(),
-        karusNotice: data.string(),
-        elmoradKing: data.string(),
-        elmoradNotice: data.string()
-      });
-    }
-    table(servers, 'servers');
-
-
-    loginConnection.terminate();
-    loginConnection = null;
-
-    let pickedConfig = config.get('testClient.server');
-    let picked = servers.filter(x => x.name == pickedConfig);
+    let picked = login.servers.filter(x => x.name == server);
 
     console.log('connecting to game server...' + picked[0].name);
-    gameConnection = await KOClientFactory({
+    connection = await KOClientFactory({
       ip: picked[0].ip,
       port: 15001,
       name: 'gameServer'
@@ -127,15 +30,7 @@ export async function TestClient() {
     console.log('connected to game server!');
     console.break();
 
-    // data = await gcon.sendAndWait([opCodes._INTERNAL_QUERY, ...crypto.createHmac('sha1', config.get('gameServer.internalCommunicationSecret')).update(Buffer.from([0x01])).digest(), ...[0x01]], opCodes._INTERNAL_QUERY);
-    // table({
-    //   _internal_query_opcode: data.byte(),
-    //   _internal_query_userCount: data.short()
-    // })
-
-    // await delay(1000);
-
-    data = await gameConnection.sendAndWait([0x2B, 0xFF, 0xFF], 0x2B);
+    data = await connection.sendAndWait([0x2B, 0xFF, 0xFF], 0x2B);
     data.skip(1);
 
     table({
@@ -144,15 +39,15 @@ export async function TestClient() {
       error: data.byte()
     });
 
-    data = await gameConnection.sendAndWait([0x01, ...string(sessionCode), ...string(PasswordHash(config.get('testClient.password')))], 0x01);
+    data = await connection.sendAndWait([0x01, ...string(login.sessionCode), ...string(password)], 0x01);
 
     table({
       nation: data.byte()
     });
 
-    data = await gameConnection.sendAndWait([0x9F, 0x01], 0x9F);
+    data = await connection.sendAndWait([0x9F, 0x01], 0x9F);
 
-    data = await gameConnection.sendAndWait([0x0C, 0x01], 0x0C);
+    data = await connection.sendAndWait([0x0C, 0x01], 0x0C);
     data.skip(2);
 
     let selectedChar;
@@ -183,15 +78,15 @@ export async function TestClient() {
     table(characters, 'chars');
 
 
-    data = await gameConnection.sendAndWait([0x04, ...string(sessionCode), ...string(selectedChar), 31], 0x04);
+    data = await connection.sendAndWait([0x04, ...string(login.sessionCode), ...string(selectedChar), 31], 0x04);
     data.skip(1); // 1
 
 
-    gameConnection.send([0x6A, 0x02]); // inventory data request, no need but we send it anyway
-    gameConnection.send([0x73, 0x02, 0x03, 0x02]); // rental thing, we dont expect anything again
-    gameConnection.send([0x72, 0x06, 0x29, 0xFA, 0xCE, 0x56, 0x02, 0, 0, 0]); // another request that we really do not know
+    connection.send([0x6A, 0x02]); // inventory data request, no need but we send it anyway
+    connection.send([0x73, 0x02, 0x03, 0x02]); // rental thing, we dont expect anything again
+    connection.send([0x72, 0x06, 0x29, 0xFA, 0xCE, 0x56, 0x02, 0, 0, 0]); // another request that we really do not know
 
-    data = await gameConnection.sendAndWait([0x6B], 0x6B);
+    data = await connection.sendAndWait([0x6B], 0x6B);
     data.skip(2); // short 1
 
     table({
@@ -199,9 +94,9 @@ export async function TestClient() {
     });
 
 
-    data = await gameConnection.sendAndWait([0x0D, 1, ...byte_string(selectedChar)], 0x0D);
+    data = await connection.sendAndWait([0x0D, 1, ...byte_string(selectedChar)], 0x0D);
 
-    data = await gameConnection.waitNextData(0x0E);
+    data = await connection.waitNextData(0x0E);
 
     let player: Dictionary<any> = {}
     let items: any[] = [];
@@ -258,14 +153,9 @@ export async function TestClient() {
       let expr = data.int();
 
       if (itemId) {
-        let item;
-        if (loadItems) {
-          item = await dbConnection.models.Item.findOne({ id: itemId }).exec();
-        }
-
         items.push({
           location: itemLoc[i] ? itemLoc[i] : i,
-          name: item ? item.name : itemId,
+          name: itemId,
           durability,
           amount,
           flag,
@@ -291,7 +181,7 @@ export async function TestClient() {
     table(player);
     table(items, 'items');
 
-    data = await gameConnection.waitNextData(0x64, 0x01); // quest 1
+    data = await connection.waitNextData(0x64, 0x01); // quest 1
 
     let amount = data.short();
 
@@ -302,7 +192,7 @@ export async function TestClient() {
     }
 
 
-    data = await gameConnection.sendAndWait([0x3C, 0x41], 0x3C, 0x41); // knights top 10 request
+    data = await connection.sendAndWait([0x3C, 0x41], 0x3C, 0x41); // knights top 10 request
     data.skip(2); // short 0
 
     let knights: any[] = [[], []];
@@ -321,16 +211,16 @@ export async function TestClient() {
     table(knights[0], 'karus');
     table(knights[1], 'elmorad');
 
-    gameConnection.send([0x49, 0x01]); // friend list
-    gameConnection.send([0x87, 0, 0]); // helmet data (0, 0) as hide data of (helmet, cospre)
-    gameConnection.send([0x3C, 0x22]); // request knight ally list
-    gameConnection.send([0x79, 0x2]); // request skill data
-    gameConnection.send([0x6A, 0x06, 0x01]); // request letter count
-    gameConnection.send([0x0D, 0x02, ...byte_string(selectedChar)]); // game start 0x02
+    connection.send([0x49, 0x01]); // friend list
+    connection.send([0x87, 0, 0]); // helmet data (0, 0) as hide data of (helmet, cospre)
+    connection.send([0x3C, 0x22]); // request knight ally list
+    connection.send([0x79, 0x2]); // request skill data
+    connection.send([0x6A, 0x06, 0x01]); // request letter count
+    connection.send([0x0D, 0x02, ...byte_string(selectedChar)]); // game start 0x02
 
     // await delay(1000);
 
-    data = await gameConnection.sendAndWait([0x98, 0x1], 0x98, 0x1);
+    data = await connection.sendAndWait([0x98, 0x1], 0x98, 0x1);
     data.skip(1); // 1
 
     table({
@@ -358,11 +248,11 @@ export async function TestClient() {
 
     table(userList, 'user');
 
-    // gameConnection.send([0x09, 0x00, 0x00]); // send direction as short(0)
+    // connection.send([0x09, 0x00, 0x00]); // send direction as short(0)
 
 
     // setTimeout(function () {
-    //   gameConnection.send([
+    //   connection.send([
     //     0x06,
     //     ...short(player.x * 10 - 500), ...short(player.z * 10), ...short(player.y * 10),
     //     0x00, 0x00, 0x00, // speed and echo thing
@@ -371,18 +261,18 @@ export async function TestClient() {
     // }, 5000);
 
     setTimeout(function () {
-      // gameConnection.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
-      gameConnection.send([0x48]); // zone home
+      // connection.send([0x29, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]); // zone home
+      connection.send([0x48]); // zone home
     }, 1500);
 
     // let d = 0;
     // setInterval(function () {
     //   d += 5;
-    //   gameConnection.send([0x09, ...short(d % 500)]);
+    //   connection.send([0x09, ...short(d % 500)]);
     // }, 60000)
 
-    while (gameConnection.connected) {
-      data = await gameConnection.waitNextData(); // get next waiting
+    while (connection.connected) {
+      data = await connection.waitNextData(); // get next waiting
       let opcode = data.byte();
 
       if (opcode == 0x15) {
@@ -400,7 +290,7 @@ export async function TestClient() {
             userInRegion: userIds
           })
 
-          gameConnection.send([ // ASK FOR MORE INFO
+          connection.send([ // ASK FOR MORE INFO
             0x16,
             ...short(userIds.length),
             ...[].concat(...userIds.map(x => short(x)))
@@ -426,7 +316,7 @@ export async function TestClient() {
         table(message);
 
         if (message.type == 2) { // private message
-          let op35 = await gameConnection.sendAndWait([GameEndpointCodes.CHAT_TARGET, 0x01, ...string(message.name)], 0x35, 0x01);
+          let op35 = await connection.sendAndWait([GameEndpointCodes.CHAT_TARGET, 0x01, ...string(message.name)], 0x35, 0x01);
           let canI = op35.short();
           if (canI == 0) {
             console.log('Cannot echo chat, because user is not seem online');
@@ -435,12 +325,12 @@ export async function TestClient() {
             console.log('Cannot echo chat, because user blocked private messages');
             console.break();
           } else {
-            gameConnection.send([GameEndpointCodes.CHAT, message.type, ...string(message.message, 'ascii')])
+            connection.send([GameEndpointCodes.CHAT, message.type, ...string(message.message, 'ascii')])
             console.log('Echo sent to ' + message.name);
             console.break();
           }
         }
-      } else if(opcode == 0x1e) { // warp
+      } else if (opcode == 0x1e) { // warp
         let x = data.short() / 10;
         let z = data.short() / 10;
 
@@ -554,7 +444,7 @@ export async function TestClient() {
           npcInRegion: npcInRegion
         });
 
-        gameConnection.send([ // ASK FOR MORE INFO
+        connection.send([ // ASK FOR MORE INFO
           0x1D,
           ...short(npcInRegion.length),
           ...[].concat(...npcInRegion.map(x => short(x)))
@@ -746,18 +636,11 @@ export async function TestClient() {
 
     console.log('END!')
 
-    console.log(gameConnection.getWaitingSignals());
+    console.log(connection.getWaitingSignals());
 
   } finally {
-    if (loginConnection) {
-      loginConnection.terminate();
-    }
-    if (gameConnection) {
-      gameConnection.terminate();
-    }
-
-    if (dbConnection) {
-      dbConnection.close();
+    if (connection) {
+      connection.terminate();
     }
   }
 }
