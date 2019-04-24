@@ -7,3 +7,12 @@ database:
 redis:
   host: '127.0.0.1'
   port: 6379
+
+  
+defaults:
+  account: true
+  item: false
+  npc: true
+  server: true
+  set_item: true
+  setting: true

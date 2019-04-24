@@ -12,6 +12,14 @@ web:
   ip: 127.0.0.1
   port: 15000
 
+defaults:
+  account: true
+  item: true
+  npc: true
+  server: true
+  set_item: true
+  setting: true
+
 loginServer:
   ip: 127.0.0.1
   ports: 
