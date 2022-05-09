@@ -42,7 +42,10 @@ export enum GameEndpointCodes {
   POINT_CHANGE = 0x28,
   NPC_EVENT = 0x20,
   ITEM_TRADE = 0x21,
-  WAREHOUSE = 0x45
+  WAREHOUSE = 0x45,
+  MAGIC_PROCESS = 0x31,
+  ITEM_REPAIR = 0x3b,
+  OBJECT_EVENT = 0x33
 }
 
 export function GameEndpoint(name: string): IGameEndpoint {
