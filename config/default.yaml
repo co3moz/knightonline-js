@@ -9,7 +9,7 @@ redis:
   port: 6379
 
 web:
-  ip: 127.0.0.1
+  ip: 192.168.1.51
   port: 15000
 
 defaults:
@@ -19,9 +19,10 @@ defaults:
   server: true
   set_item: true
   setting: true
+  object: true
 
 loginServer:
-  ip: 127.0.0.1
+  ip: 192.168.1.51
   ports: 
     - 15100
     - 15101
@@ -43,7 +44,7 @@ loginServer:
       fileName: none
 
 gameServer:
-  ip: 127.0.0.1
+  ip: 192.168.1.51
   ports: 
     - 15001
   clientExeVersion: 2228
@@ -51,7 +52,7 @@ gameServer:
 testClient:
   ip: '127.0.0.1'
   port: 15100
-  version: 2227
+  version: 2228
   user: 'test'
   password: '1'
   server: 'TEST|SERVER 1'
