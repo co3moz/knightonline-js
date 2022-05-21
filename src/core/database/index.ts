@@ -2,7 +2,7 @@ import * as config from 'config'
 import * as mongoose from 'mongoose'
 
 import { ConnectToDatabase } from './utils/connect'
-import { SettingDefaults, ServerDefaults, SetItemDefaults, ItemDefaults, NpcDefaults, AccountDefaults } from './defaults';
+import { SettingDefaults, ServerDefaults, SetItemDefaults, ObjectDefaults, ItemDefaults, NpcDefaults, AccountDefaults } from './defaults';
 
 let connection: mongoose.Connection = null;
 
@@ -21,6 +21,7 @@ export async function Database(): Promise<mongoose.Connection> {
   if (defaults.item) await ItemDefaults();
   if (defaults.npc) await NpcDefaults();
   if (defaults.account) await AccountDefaults();
+  if (defaults.object) await ObjectDefaults();
 
   return connection;
 }
