@@ -1,5 +1,8 @@
 import { glob } from "glob";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function DefaultChecker() {
   try {

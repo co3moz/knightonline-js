@@ -1,5 +1,8 @@
 import fse, { type FileHandle } from "fs/promises";
-import * as path from "path";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function SMDReader(file: string) {
   // no need for smd reading
@@ -175,7 +178,7 @@ async function int(fd: FileHandle) {
 
 async function uint(fd: FileHandle) {
   let buf = Buffer.allocUnsafe(4);
-  await fd.read( buf, 0, 4);
+  await fd.read(buf, 0, 4);
   return buf.readUInt32LE(0);
 }
 

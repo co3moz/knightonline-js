@@ -2,6 +2,9 @@ import csv from "csv-streamify";
 import unzip from "extract-zip";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function CSVReader(
   file: string,
