@@ -1,8 +1,15 @@
-import * as config from 'config'
-import * as mongoose from 'mongoose'
+import config from "config";
+import mongoose from "mongoose";
 
-import { ConnectToDatabase } from './utils/connect'
-import { SettingDefaults, ServerDefaults, SetItemDefaults, ItemDefaults, NpcDefaults, AccountDefaults } from './defaults';
+import { ConnectToDatabase } from "./utils/connect";
+import {
+  SettingDefaults,
+  ServerDefaults,
+  SetItemDefaults,
+  ItemDefaults,
+  NpcDefaults,
+  AccountDefaults,
+} from "./defaults";
 
 let connection: mongoose.Connection = null;
 
@@ -13,7 +20,7 @@ export async function Database(): Promise<mongoose.Connection> {
 
   connection = await ConnectToDatabase();
 
-  let defaults: any = config.get('defaults');
+  let defaults: any = config.get("defaults");
 
   if (defaults.setting) await SettingDefaults();
   if (defaults.server) await ServerDefaults();

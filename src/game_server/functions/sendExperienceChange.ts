@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { GetLevelUp } from "./getLevelUp";
 import { SendLevelChange } from "./sendLevelChange";
 import { long } from "../../core/utils/unit";
@@ -25,8 +25,8 @@ export function SendExperienceChange(socket: IGameSocket, experience: number) {
 
   // Yeah, user might not gain any exp because of maxExp. But we will report no matter what..
   socket.send([
-    0x1A, // EXP_CHANGE OPCODE
+    0x1a, // EXP_CHANGE OPCODE
     0,
-    ...long(c.exp)
+    ...long(c.exp),
   ]);
 }

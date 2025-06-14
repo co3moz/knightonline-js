@@ -1,16 +1,16 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { short, int } from "../../core/utils/unit";
 
 export function SendItemMove(socket: IGameSocket, command: number) {
   let v = socket.variables;
 
   if (!command) {
-    socket.send([
-      0x1F, 1
-    ])
+    socket.send([0x1f, 1]);
   } else {
     socket.send([
-      0x1F, 1, command,
+      0x1f,
+      1,
+      command,
       ...short(v.totalHit),
       ...short(v.totalAc),
       ...int(v.maxWeight),
@@ -27,7 +27,7 @@ export function SendItemMove(socket: IGameSocket, command: number) {
       ...short(v.lightningR),
       ...short(v.magicR),
       ...short(v.curseR),
-      ...short(v.poisonR)
-    ])
+      ...short(v.poisonR),
+    ]);
   }
 }

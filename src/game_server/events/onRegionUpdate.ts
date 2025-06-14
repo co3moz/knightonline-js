@@ -1,7 +1,19 @@
-import { IGameSocket } from "../game_socket";
-import { SendRegionUserOut, SendRegionNpcOut, SendRegionUserIn, SendRegionNpcIn, RegionInCase } from "../functions/sendRegionInOut";
+import type { IGameSocket } from "../game_socket";
+import {
+  SendRegionUserOut,
+  SendRegionNpcOut,
+  SendRegionUserIn,
+  SendRegionNpcIn,
+  RegionInCase,
+} from "../functions/sendRegionInOut";
 import { BuildUserDetail } from "../functions/buildUserDetail";
-import { RSessionMap, RegionQuery, RegionQueryNPC, RNPCMap, IRegionNPC } from "../region";
+import {
+  RSessionMap,
+  RegionQuery,
+  RegionQueryNPC,
+  RNPCMap,
+  type IRegionNPC,
+} from "../region";
 
 export function OnRegionUpdate(socket: IGameSocket) {
   if (!socket.ingame) return;
@@ -19,13 +31,13 @@ export function OnRegionUpdate(socket: IGameSocket) {
   }
 
   for (let oldSession of oldSessions) {
-    if (!newSessions.find(x => x == oldSession)) {
+    if (!newSessions.find((x) => x == oldSession)) {
       SendRegionUserOut(socket, oldSession);
     }
   }
 
   for (let oldNpcSession of oldNPCSessions) {
-    if (!newNPCSessions.find(x => x == oldNpcSession)) {
+    if (!newNPCSessions.find((x) => x == oldNpcSession)) {
       SendRegionNpcOut(socket, oldNpcSession);
     }
   }
@@ -33,7 +45,7 @@ export function OnRegionUpdate(socket: IGameSocket) {
   let cache;
 
   for (let newSession of newSessions) {
-    if (!oldSessions.find(x => x == newSession)) {
+    if (!oldSessions.find((x) => x == newSession)) {
       let userSocket = RSessionMap[newSession];
 
       if (userSocket) {
@@ -41,13 +53,19 @@ export function OnRegionUpdate(socket: IGameSocket) {
           cache = BuildUserDetail(socket);
         }
 
-        SendRegionUserIn(userSocket, socket.session, RegionInCase.NORMAL, false, cache);
+        SendRegionUserIn(
+          userSocket,
+          socket.session,
+          RegionInCase.NORMAL,
+          false,
+          cache
+        );
       }
     }
   }
 
   for (let newNPCSession of newNPCSessions) {
-    if (!oldNPCSessions.find(x => x == newNPCSession)) {
+    if (!oldNPCSessions.find((x) => x == newNPCSession)) {
       let npc: IRegionNPC = RNPCMap[newNPCSession];
 
       if (npc) {

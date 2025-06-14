@@ -1,15 +1,13 @@
 database:
   uri: mongodb://127.0.0.1:27017/knight-online
   options:
-    useNewUrlParser: true
-    useCreateIndex: true
 
 redis:
   host: '127.0.0.1'
   port: 6379
 
 web:
-  ip: 127.0.0.1
+  host: '127.0.0.1'
   port: 15000
 
 defaults:

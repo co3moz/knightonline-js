@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { short } from "../../core/utils/unit";
 import { ZoneRules, ZoneFlags } from "../var/zone_rules";
 
@@ -7,10 +7,11 @@ export function SendZoneAbility(socket: IGameSocket): void {
   if (!zoneRule) return;
 
   socket.send([
-    0x5E, 1, // ZONEABILITY
+    0x5e,
+    1, // ZONEABILITY
     +!!(zoneRule.flag & ZoneFlags.TRADE_OTHER_NATION),
     zoneRule.type,
     +!!(zoneRule.flag & ZoneFlags.TALK_OTHER_NATION),
-    ...short(zoneRule.tariff) //TODO: dynamic tariff's for later
+    ...short(zoneRule.tariff), //TODO: dynamic tariff's for later
   ]);
 }

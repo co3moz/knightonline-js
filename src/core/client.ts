@@ -1,10 +1,15 @@
-import * as net from 'net'
-import * as lzfjs from 'lzfjs'
-import * as crc32 from 'crc-32'
-import { Queue, short, readShort } from './utils/unit'
-import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise'
+import net from "net";
+import lzfjs from "lzfjs";
+import crc32 from "crc-32";
+import { Queue, short, readShort } from "./utils/unit";
+import {
+  CreateDeferredPromise,
+  type IDeferredPromise,
+} from "./utils/deferred_promise";
 
-export function KOClientFactory(params: IClientConfiguration): Promise<IKOClientSocket> {
+export function KOClientFactory(
+  params: IClientConfiguration
+): Promise<IKOClientSocket> {
   let { ip, port, onConnect } = params;
 
   return new Promise(async (resolve, reject) => {
@@ -14,13 +19,21 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
     let waitingTasks: IWaitingTaskPromise[] = [];
     let waitingSignals: Buffer[] = [];
 
-    let resolveWaitingTask = (task: IWaitingTaskPromise, i: number, n: number) => {
+    let resolveWaitingTask = (
+      task: IWaitingTaskPromise,
+      i: number,
+      n: number
+    ) => {
       task.resolve(Queue.from(waitingSignals[i].slice(n)));
       waitingSignals.splice(i, 1);
       return task;
-    }
+    };
 
-    client.waitNextData = function (opcode: number, subopcode: number, timeout: number): IWaitingTaskPromise {
+    client.waitNextData = function (
+      opcode: number,
+      subopcode: number,
+      timeout: number
+    ): IWaitingTaskPromise {
       let task = <IWaitingTaskPromise>CreateDeferredPromise(timeout);
       task.opcode = opcode;
       task.subopcode = subopcode;
@@ -29,7 +42,8 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
         if (opcode) {
           if (waitingSignals[i][0] == opcode) {
             if (subopcode) {
-              if (waitingSignals[i][1] == subopcode) return resolveWaitingTask(task, i, 2);
+              if (waitingSignals[i][1] == subopcode)
+                return resolveWaitingTask(task, i, 2);
             } else return resolveWaitingTask(task, i, 1);
           }
         } else return resolveWaitingTask(task, i, 0);
@@ -37,29 +51,38 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
 
       waitingTasks.push(task);
       return task;
-    }
+    };
 
     client.terminate = (message: string) => {
       if (message) {
-        console.error('[CLIENT ERROR]', message);
+        console.error("[CLIENT ERROR]", message);
       }
       client.end();
-    }
+    };
 
-    client.send = response => {
-      client.write(Buffer.from([0xAA, 0x55, ...short(response.length), ...response, 0x55, 0xAA]));
-    }
+    client.send = (response) => {
+      client.write(
+        Buffer.from([
+          0xaa,
+          0x55,
+          ...short(response.length),
+          ...response,
+          0x55,
+          0xaa,
+        ])
+      );
+    };
 
     client.sendAndWait = (data, opcode, subopcode) => {
       client.send(data);
       return client.waitNextData(opcode, subopcode, 5000);
-    }
+    };
 
     client.getWaitingSignals = () => {
       let w = waitingSignals;
       waitingSignals = [];
       return w;
-    }
+    };
 
     client.connect(port, ip, function () {
       client.connected = true;
@@ -70,19 +93,21 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
     let frag: Buffer = Buffer.allocUnsafe(0);
     let fragCount = 0;
 
-    client.on('data', (data: Buffer) => {
+    client.on("data", (data: Buffer) => {
       if (frag.length > 0) {
         data = Buffer.concat([frag, data]);
         fragCount++;
       }
 
-      while (data.length > 0) { // multiple data control
+      while (data.length > 0) {
+        // multiple data control
         let length = readShort(data, 2);
 
-        if (doesProtocolHeaderValid(data)) return client.terminate('invalid protocol begin')
+        if (doesProtocolHeaderValid(data))
+          return client.terminate("invalid protocol begin");
         if (doesProtocolFooterValid(data, length)) {
           if (fragCount > 10) {
-            return client.terminate('too much fragmentation not allowed');
+            return client.terminate("too much fragmentation not allowed");
           }
           frag = data;
           return;
@@ -98,24 +123,35 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
         let subopcode = data[5];
         let didSent = false;
 
-        if (opcode == 0x42) { // COMPRESSED_PACKAGE
+        if (opcode == 0x42) {
+          // COMPRESSED_PACKAGE
+          console.log("compressed packet");
           const body = Queue.from(data.slice(5, 4 + length));
           let len = body.int();
           let realLen = body.int();
           let crc = body.int();
           let compressedData = body.sub(len);
-          let uncompressedData = lzfjs.decompress(new Uint8Array(compressedData));
+          let uncompressedData = lzfjs.decompress(
+            new Uint8Array(compressedData)
+          );
           let crcUncompressedData = crc32.buf(uncompressedData, ~-1);
           // if (crcUncompressedData != crc || uncompressedData.length != realLen || compressedData.length != len) {
           //   throw new Error('invalid compressed data!');
           // }
 
-          data = Buffer.from([0xAA, 0x55, ...short(realLen), ...Array.from(uncompressedData), 0x55, 0xAA, ...data.slice(6 + length)]);
+          data = Buffer.from([
+            0xaa,
+            0x55,
+            ...short(realLen),
+            ...(Array.from(uncompressedData) as number[]),
+            0x55,
+            0xaa,
+            ...data.subarray(6 + length),
+          ]);
           opcode = data[4];
           subopcode = data[5];
           length = realLen;
         }
-
 
         for (let i = 0; i < waitingTasks.length; i++) {
           let task = waitingTasks[i];
@@ -148,45 +184,54 @@ export function KOClientFactory(params: IClientConfiguration): Promise<IKOClient
       }
     });
 
-    client.on('error', function (err) {
-      console.error('[CLIENT ERROR]', err);
+    client.on("error", function (err) {
+      console.error("[CLIENT ERROR]", err);
     });
 
-    client.on('close', function () {
+    client.on("close", function () {
       client.connected = false;
 
       for (let i of waitingTasks) {
-        i.reject(new Error('Connection is closed!'));
+        i.reject(new Error("Connection is closed!"));
       }
     });
   });
 }
 
 function doesProtocolHeaderValid(data) {
-  return data[0] != 0xAA || data[1] != 0x55;
+  return data[0] != 0xaa || data[1] != 0x55;
 }
 
 function doesProtocolFooterValid(data, length) {
-  return data[4 + length] != 0x55 || data[5 + length] != 0xAA
+  return data[4 + length] != 0x55 || data[5 + length] != 0xaa;
 }
 
 export interface IKOClientSocket extends net.Socket {
-  connected: boolean
-  waitNextData: (opcode?: number, subopcode?: number, timeout?: number) => IWaitingTaskPromise
-  terminate: (message?: string) => void
-  send: (response: number[]) => void
-  sendAndWait: (data: number[], opcode: number, subopcode?: number) => IWaitingTaskPromise
-  getWaitingSignals: () => Buffer[]
+  connected: boolean;
+  waitNextData: (
+    opcode?: number,
+    subopcode?: number,
+    timeout?: number
+  ) => IWaitingTaskPromise;
+  terminate: (message?: string) => void;
+  send: (response: number[]) => void;
+  sendAndWait: (
+    data: number[],
+    opcode: number,
+    subopcode?: number
+  ) => IWaitingTaskPromise;
+  getWaitingSignals: () => Buffer[];
 }
 
 export interface IClientConfiguration {
-  ip: string
-  port: number
-  name: string
-  onConnect?: (socket: IKOClientSocket) => void
+  ip: string;
+  port: number;
+  name: string;
+  onConnect?: (socket: IKOClientSocket) => void;
+  onPacket?: (t: any) => void;
 }
 
 export interface IWaitingTaskPromise extends IDeferredPromise {
-  opcode: number
-  subopcode: number
+  opcode: number;
+  subopcode: number;
 }

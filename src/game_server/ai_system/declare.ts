@@ -1,34 +1,42 @@
-import { INpc, ISpawn } from "../../core/database/models";
+import type { INpc, ISpawn } from "../../core/database/models";
 
 export interface INPCInstance {
-  npc: INpc
-  spawn: ISpawn
+  npc: INpc;
+  spawn: ISpawn;
 
-  uuid: number
-  zone: number
-  x: number // current x
-  z: number // current z
-  tx: number // target x
-  tz: number // target z
-  direction: number
-  hp: number
-  mp: number
-  maxHp: number
-  maxMp: number
+  uuid: number;
+  zone: number;
+  x: number; // current x
+  z: number; // current z
+  tx: number; // target x
+  tz: number; // target z
+  direction: number;
+  hp: number;
+  mp: number;
+  maxHp: number;
+  maxMp: number;
 
-  damagedBy?: INPCDamageDirectory
-  status: 'init' | 'standing' | 'moving' | 'attacking' | 'tracing' | 'fighting' | 'back' | 'dead'
-  timestamp: number
-  wait: number
-  initialized: boolean
-  agressive: boolean
+  damagedBy?: INPCDamageDirectory;
+  status:
+    | "init"
+    | "standing"
+    | "moving"
+    | "attacking"
+    | "tracing"
+    | "fighting"
+    | "back"
+    | "dead";
+  timestamp: number;
+  wait: number;
+  initialized: boolean;
+  agressive: boolean;
 
-  cache: number[]
+  cache: number[];
 }
 
 export type Damage = number;
 export interface INPCDamageDirectory {
-  [session: number]: Damage
+  [session: number]: Damage;
 }
 
 export enum NPCType {
@@ -135,5 +143,5 @@ export enum NPCType {
   NPC_BATTLE_MONUMENT = 211,
   NPC_BORDER_MONUMENT = 212,
   NPC_BYGROUP3 = 213,
-  NPC_CZ_MONUMENT = 220
+  NPC_CZ_MONUMENT = 220,
 }

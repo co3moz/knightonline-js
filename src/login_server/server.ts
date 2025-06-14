@@ -1,28 +1,28 @@
-import * as config from 'config'
-import { Database } from '../core/database'
-import { RedisConnect } from '../core/redis/connect'
-import { KOServerFactory, IKOServer } from '../core/server';
-import { Queue } from '../core/utils/unit';
-import { LoginEndpointCodes, LoginEndpoint } from './endpoint';
-import { ILoginSocket } from './login_socket';
-
+import config from "config";
+import { Database } from "../core/database";
+import { RedisConnect } from "../core/redis/connect";
+import { KOServerFactory, type IKOServer } from "../core/server";
+import { Queue } from "../core/utils/unit";
+import { LoginEndpointCodes, LoginEndpoint } from "./endpoint";
+import type { ILoginSocket } from "./login_socket";
 
 let loginServerCache: IKOServer[] = null;
-export default async function LoginServer() {
+
+export async function LoginServer() {
   if (loginServerCache) return loginServerCache;
 
-  console.log('[SERVER] Login server is going to start...');
+  console.log("[SERVER] Login server is going to start...");
   await Database();
   await RedisConnect();
 
-  let versions: any[] = config.get('loginServer.versions');
+  let versions: any[] = config.get("loginServer.versions");
   let { version: serverVersion } = versions[versions.length - 1];
 
-  console.log('[SERVER] Looks like latest server version is ' + serverVersion);
+  console.log("[SERVER] Looks like latest server version is " + serverVersion);
 
-  return loginServerCache = await KOServerFactory({
-    ip: config.get('loginServer.ip'),
-    ports: config.get('loginServer.ports'),
+  return (loginServerCache = await KOServerFactory({
+    ip: config.get("loginServer.ip"),
+    ports: config.get("loginServer.ports"),
     timeout: 5000,
 
     onData: async (socket: ILoginSocket, data: Buffer) => {
@@ -33,9 +33,7 @@ export default async function LoginServer() {
       let endpoint = LoginEndpoint(LoginEndpointCodes[opcode]);
       if (!endpoint) return;
 
-      await endpoint(socket, body, opcode)
-    }
-  });
+      await endpoint(socket, body, opcode);
+    },
+  }));
 }
-
-

@@ -1,9 +1,13 @@
-import { Queue, short } from '../../core/utils/unit';
-import { IGameEndpoint } from '../endpoint';
-import { IGameSocket } from '../game_socket';
-import { RegionSend } from '../region';
+import { Queue, short } from "../../core/utils/unit";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
+import { RegionSend } from "../region";
 
-export const HELMET_STATUS_CHANGE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const HELMET_STATUS_CHANGE: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   if (socket.character.hp == 0) {
     return;
   }
@@ -16,6 +20,6 @@ export const HELMET_STATUS_CHANGE: IGameEndpoint = async function (socket: IGame
     opcode,
     v.isHelmetHiding,
     v.isCospreHiding,
-    ...short(socket.session)
+    ...short(socket.session),
   ]);
-}
+};

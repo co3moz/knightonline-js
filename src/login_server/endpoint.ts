@@ -1,5 +1,5 @@
 import { Queue } from "../core/utils/unit";
-import { ILoginSocket } from "./login_socket";
+import type { ILoginSocket } from "./login_socket";
 import * as Endpoints from './endpoints'
 
 export enum LoginEndpointCodes {

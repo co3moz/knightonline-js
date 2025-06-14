@@ -1,5 +1,6 @@
-import redis from './index'
+import { redisClient, redisConnection } from "./index";
 
-export function RedisConnect() {
-  return redis.setAsync('online', Date.now());
+export async function RedisConnect() {
+  await redisConnection;
+  await redisClient.set("online", Date.now());
 }

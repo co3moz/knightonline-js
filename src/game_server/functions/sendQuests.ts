@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { short } from "../../core/utils/unit";
 
 export function SendQuests(socket: IGameSocket) {
@@ -14,6 +14,6 @@ export function SendQuests(socket: IGameSocket) {
     0x64, // QUEST
     1,
     ...short(quests.length),
-    ...result
+    ...result,
   ]);
 }

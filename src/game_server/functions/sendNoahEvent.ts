@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { RegionSend } from "../region";
 import { short } from "../../core/utils/unit";
 import { SendNoahChange, GoldGainType } from "./sendNoahChange";
@@ -11,11 +11,18 @@ export function SendNoahEvent(socket: IGameSocket, noah: number) {
   if (!multiplier) return false;
 
   RegionSend(socket, [
-    0x4A, // GOLD_CHANGE
+    0x4a, // GOLD_CHANGE
     GoldGainType.Event, // Event
-    ...short(740), 0, 0, 0, 0, 0, 0, ...short(multiplier), ...short(socket.session)
+    ...short(740),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    ...short(multiplier),
+    ...short(socket.session),
   ]);
-
 
   SendNoahChange(socket, multiplier * noah);
 
@@ -24,7 +31,7 @@ export function SendNoahEvent(socket: IGameSocket, noah: number) {
 
 /**
  * Calculates chance of noah event.
- * 
+ *
  *    0     0.2 => 1000
  *  0.2     0.6 => 500
  *  0.6     1.4 => 100

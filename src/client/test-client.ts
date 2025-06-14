@@ -1,53 +1,62 @@
-import * as config from 'config'
-import * as mongoose from 'mongoose'
-import { KOClientFactory, IKOClientSocket } from '../core/client'
-import { short, string, byte_string } from '../core/utils/unit'
-import { PasswordHash } from '../core/utils/password_hash'
-import { AuthenticationCode } from '../login_server/endpoints/LOGIN_REQ'
-import { Database } from '../core/database'
-import { GameEndpointCodes } from '../game_server/endpoint';
-import { ConnectLoginClient } from './login-client';
+import config from "config";
+import { KOClientFactory, type IKOClientSocket } from "../core/client";
+import { short, string, byte_string } from "../core/utils/unit";
+import { GameEndpointCodes } from "../game_server/endpoint";
+import { ConnectLoginClient } from "./login-client";
 
 export async function TestClient() {
   let connection: IKOClientSocket | null;
   let data: any;
 
-
   try {
-    console.log('loading test client for testing ko-js');
-    const { ip, port, user, password, server } = config.get('testClient');
+    console.log("loading test client for testing ko-js");
+    const { ip, port, user, password, server } = config.get<{
+      ip: string;
+      port: number;
+      user: string;
+      password: string;
+      server: string;
+    }>("testClient");
 
-    let login = await ConnectLoginClient(ip, port + (Math.random() * 9 >>> 0), user, password);
+    let login = await ConnectLoginClient(
+      ip,
+      port + ((Math.random() * 9) >>> 0),
+      user,
+      password
+    );
 
-    let picked = login.servers.filter(x => x.name == server);
+    let picked = login.servers.filter((x) => x.name == server);
 
-    console.log('connecting to game server...' + picked[0].name);
+    console.log("connecting to game server..." + picked[0].name);
     connection = await KOClientFactory({
       ip: picked[0].ip,
       port: 15001,
-      name: 'gameServer'
+      name: "gameServer",
     });
-    console.log('connected to game server!');
+    console.log("connected to game server!");
     console.break();
 
-    data = await connection.sendAndWait([0x2B, 0xFF, 0xFF], 0x2B);
+    data = await connection.sendAndWait([0x2b, 0xff, 0xff], 0x2b);
     data.skip(1);
 
     table({
       clientExeVersion: data.short(),
       cryption: data.skip(8),
-      error: data.byte()
+      error: data.byte(),
     });
 
-    data = await connection.sendAndWait([0x01, ...string(login.sessionCode), ...string(password)], 0x01);
+    data = await connection.sendAndWait(
+      [0x01, ...string(login.sessionCode), ...string(password)],
+      0x01
+    );
 
     table({
-      nation: data.byte()
+      nation: data.byte(),
     });
 
-    data = await connection.sendAndWait([0x9F, 0x01], 0x9F);
+    data = await connection.sendAndWait([0x9f, 0x01], 0x9f);
 
-    data = await connection.sendAndWait([0x0C, 0x01], 0x0C);
+    data = await connection.sendAndWait([0x0c, 0x01], 0x0c);
     data.skip(2);
 
     let selectedChar;
@@ -69,36 +78,39 @@ export async function TestClient() {
         level: data.byte(),
         face: data.byte(),
         hair: data.skip(4),
-        zone: zones[data.byte()]
+        zone: zones[data.byte()],
       });
 
       data.skip(6 * 8);
     }
 
-    table(characters, 'chars');
+    table(characters, "chars");
 
-
-    data = await connection.sendAndWait([0x04, ...string(login.sessionCode), ...string(selectedChar), 31], 0x04);
+    data = await connection.sendAndWait(
+      [0x04, ...string(login.sessionCode), ...string(selectedChar), 31],
+      0x04
+    );
     data.skip(1); // 1
 
-
-    connection.send([0x6A, 0x02]); // inventory data request, no need but we send it anyway
+    connection.send([0x6a, 0x02]); // inventory data request, no need but we send it anyway
     connection.send([0x73, 0x02, 0x03, 0x02]); // rental thing, we dont expect anything again
-    connection.send([0x72, 0x06, 0x29, 0xFA, 0xCE, 0x56, 0x02, 0, 0, 0]); // another request that we really do not know
+    connection.send([0x72, 0x06, 0x29, 0xfa, 0xce, 0x56, 0x02, 0, 0, 0]); // another request that we really do not know
 
-    data = await connection.sendAndWait([0x6B], 0x6B);
+    data = await connection.sendAndWait([0x6b], 0x6b);
     data.skip(2); // short 1
 
     table({
-      serverNo: data.short()
+      serverNo: data.short(),
     });
 
+    data = await connection.sendAndWait(
+      [0x0d, 1, ...byte_string(selectedChar)],
+      0x0d
+    );
 
-    data = await connection.sendAndWait([0x0D, 1, ...byte_string(selectedChar)], 0x0D);
+    data = await connection.waitNextData(0x0e);
 
-    data = await connection.waitNextData(0x0E);
-
-    let player: Dictionary<any> = {}
+    let player: Dictionary<any> = {};
     let items: any[] = [];
 
     player.socketId = data.short();
@@ -106,7 +118,7 @@ export async function TestClient() {
     player.x = data.short() / 10;
     player.z = data.short() / 10;
     player.y = data.short() / 10;
-    player.nation = data.byte() == 1 ? 'KARUS' : 'ELMORAD';
+    player.nation = data.byte() == 1 ? "KARUS" : "ELMORAD";
     player.race = data.byte();
     player.klass = simplifyKlass(data.short());
     player.face = data.byte();
@@ -139,7 +151,7 @@ export async function TestClient() {
     player.ac = data.short();
     player.resistance = `f: ${data.byte()} co: ${data.byte()} l: ${data.byte()} m: ${data.byte()} cu: ${data.byte()} p: ${data.byte()}`;
     player.money = data.int();
-    player.gm = data.byte() == 0
+    player.gm = data.byte() == 0;
     data.skip(2);
     player.skill = data.skip(9);
 
@@ -160,7 +172,7 @@ export async function TestClient() {
           amount,
           flag,
           rentalTime,
-          expr
+          expr,
         });
       }
     }
@@ -177,9 +189,8 @@ export async function TestClient() {
     player.skillTitle = data.short();
     player.returnStatus = data.int();
 
-
     table(player);
-    table(items, 'items');
+    table(items, "items");
 
     data = await connection.waitNextData(0x64, 0x01); // quest 1
 
@@ -187,12 +198,11 @@ export async function TestClient() {
 
     for (let i = 0; i < amount; i++) {
       table({
-        [`q[${data.short()}]`]: data.byte()
-      })
+        [`q[${data.short()}]`]: data.byte(),
+      });
     }
 
-
-    data = await connection.sendAndWait([0x3C, 0x41], 0x3C, 0x41); // knights top 10 request
+    data = await connection.sendAndWait([0x3c, 0x41], 0x3c, 0x41); // knights top 10 request
     data.skip(2); // short 0
 
     let knights: any[] = [[], []];
@@ -201,22 +211,21 @@ export async function TestClient() {
         knights[m].push({
           id: data.short(),
           name: data.string(),
-          markVersion: data.short()
+          markVersion: data.short(),
         });
         data.skip(2);
       }
     }
 
-
-    table(knights[0], 'karus');
-    table(knights[1], 'elmorad');
+    table(knights[0], "karus");
+    table(knights[1], "elmorad");
 
     connection.send([0x49, 0x01]); // friend list
     connection.send([0x87, 0, 0]); // helmet data (0, 0) as hide data of (helmet, cospre)
-    connection.send([0x3C, 0x22]); // request knight ally list
+    connection.send([0x3c, 0x22]); // request knight ally list
     connection.send([0x79, 0x2]); // request skill data
-    connection.send([0x6A, 0x06, 0x01]); // request letter count
-    connection.send([0x0D, 0x02, ...byte_string(selectedChar)]); // game start 0x02
+    connection.send([0x6a, 0x06, 0x01]); // request letter count
+    connection.send([0x0d, 0x02, ...byte_string(selectedChar)]); // game start 0x02
 
     // await delay(1000);
 
@@ -224,17 +233,17 @@ export async function TestClient() {
     data.skip(1); // 1
 
     table({
-      zone: data.byte()
-    })
+      zone: data.byte(),
+    });
 
-    data.skip(1); // 0 
+    data.skip(1); // 0
 
     let userList: any[] = [];
     let userCount = data.short();
     for (let i = 0; i < userCount; i++) {
       userList.push({
         name: data.byte_string(),
-        nation: data.byte() == 1 ? 'KARUS' : 'ELMORAD',
+        nation: data.byte() == 1 ? "KARUS" : "ELMORAD",
         unk1: data.short(),
         x: data.short() / 10,
         z: data.short() / 10,
@@ -242,14 +251,13 @@ export async function TestClient() {
         flag: data.byte(),
         grade: data.byte(),
         version: data.short(),
-        unk2: data.short()
+        unk2: data.short(),
       });
     }
 
-    table(userList, 'user');
+    table(userList, "user");
 
     // connection.send([0x09, 0x00, 0x00]); // send direction as short(0)
-
 
     // setTimeout(function () {
     //   connection.send([
@@ -287,57 +295,73 @@ export async function TestClient() {
           }
 
           table({
-            userInRegion: userIds
-          })
+            userInRegion: userIds,
+          });
 
-          connection.send([ // ASK FOR MORE INFO
+          connection.send([
+            // ASK FOR MORE INFO
             0x16,
             ...short(userIds.length),
-            ...[].concat(...userIds.map(x => short(x)))
+            ...[].concat(...userIds.map((x) => short(x))),
           ]);
         } else if (subOpcode == 0) {
           table({
-            userInRegion: 'reset'
+            userInRegion: "reset",
           });
         } else if (subOpcode == 2) {
           table({
-            userInRegion: 'end'
+            userInRegion: "end",
           });
         }
-      } else if (opcode == GameEndpointCodes.CHAT) { // chat
+      } else if (opcode == GameEndpointCodes.CHAT) {
+        // chat
         let message = {
-          op: 'chat',
+          op: "chat",
           type: data.byte(),
-          nation: data.byte() == 1 ? 'KARUS' : 'ELMORAD',
+          nation: data.byte() == 1 ? "KARUS" : "ELMORAD",
           session: data.short(),
           name: data.byte_string(),
-          message: data.string('ascii')
+          message: data.string("ascii"),
         };
         table(message);
 
-        if (message.type == 2) { // private message
-          let op35 = await connection.sendAndWait([GameEndpointCodes.CHAT_TARGET, 0x01, ...string(message.name)], 0x35, 0x01);
+        if (message.type == 2) {
+          // private message
+          let op35 = await connection.sendAndWait(
+            [GameEndpointCodes.CHAT_TARGET, 0x01, ...string(message.name)],
+            0x35,
+            0x01
+          );
           let canI = op35.short();
           if (canI == 0) {
-            console.log('Cannot echo chat, because user is not seem online');
+            console.log("Cannot echo chat, because user is not seem online");
             console.break();
-          } else if (canI == 0xFF) {
-            console.log('Cannot echo chat, because user blocked private messages');
+          } else if (canI == 0xff) {
+            console.log(
+              "Cannot echo chat, because user blocked private messages"
+            );
             console.break();
           } else {
-            connection.send([GameEndpointCodes.CHAT, message.type, ...string(message.message, 'ascii')])
-            console.log('Echo sent to ' + message.name);
+            connection.send([
+              GameEndpointCodes.CHAT,
+              message.type,
+              ...string(message.message, "ascii"),
+            ]);
+            console.log("Echo sent to " + message.name);
             console.break();
           }
         }
-      } else if (opcode == 0x1e) { // warp
+      } else if (opcode == 0x1e) {
+        // warp
         let x = data.short() / 10;
         let z = data.short() / 10;
 
         table({
-          x, z
-        })
-      } else if (opcode == 0x2E) { // notice
+          x,
+          z,
+        });
+      } else if (opcode == 0x2e) {
+        // notice
 
         let subOpcode = data.byte();
         if (subOpcode == 1) {
@@ -345,33 +369,36 @@ export async function TestClient() {
 
           for (let i = 0; i < amount; i++) {
             table({
-              [`notice#1 ${data.byte_string()}`]: data.byte_string()
-            })
+              [`notice#1 ${data.byte_string()}`]: data.byte_string(),
+            });
           }
         } else if (subOpcode == 2) {
           let amount = data.byte();
 
           for (let i = 0; i < amount; i++) {
             table({
-              [`notice#2 ${data.string()}`]: data.string()
-            })
+              [`notice#2 ${data.string()}`]: data.string(),
+            });
           }
         }
-      } else if (opcode == 0x6A) { // letter system
+      } else if (opcode == 0x6a) {
+        // letter system
         let subOpcode = data.byte();
 
-        if (subOpcode == 0x06) { // count
+        if (subOpcode == 0x06) {
+          // count
           data.skip(1); // 1
 
           table({
-            unreadLetterCount: data.byte()
+            unreadLetterCount: data.byte(),
           });
         }
-
-      } else if (opcode == 0x79) { // skill
+      } else if (opcode == 0x79) {
+        // skill
         let subOpcode = data.byte();
 
-        if (subOpcode == 2) { // skill data
+        if (subOpcode == 2) {
+          // skill data
           let skillCount = data.short();
           let skills = [];
           for (let i = 0; i < skillCount; i++) {
@@ -379,22 +406,28 @@ export async function TestClient() {
           }
 
           table({
-            skills: skills
+            skills: skills,
           });
         }
-      } else if (opcode == 0x49) { // friend stuff
+      } else if (opcode == 0x49) {
+        // friend stuff
         let subOpcode = data.byte();
 
-        if (subOpcode == 2) { // friend list
+        if (subOpcode == 2) {
+          // friend list
           let friendCount = data.short();
 
           for (let i = 0; i < friendCount; i++) {
             table({
-              [`friend [${data.string()}]`]: { sid: data.short(), status: data.byte() }
-            })
+              [`friend [${data.string()}]`]: {
+                sid: data.short(),
+                status: data.byte(),
+              },
+            });
           }
         }
-      } else if (opcode == 0x64) { // quest data
+      } else if (opcode == 0x64) {
+        // quest data
         let subOpcode = data.byte();
 
         if (subOpcode == 1) {
@@ -402,37 +435,49 @@ export async function TestClient() {
 
           for (let i = 0; i < amount; i++) {
             table({
-              [`quest#1 [${data.short()}]`]: data.byte()
-            })
+              [`quest#1 [${data.short()}]`]: data.byte(),
+            });
           }
         }
-      } else if (opcode == 0x14) { // weather data
+      } else if (opcode == 0x14) {
+        // weather data
         table({
-          weather: [data.byte(), data.short()]
+          weather: [data.byte(), data.short()],
         });
-      } else if (opcode == 0x13) { // time data
+      } else if (opcode == 0x13) {
+        // time data
         table({
-          time: [data.short(), data.short(), data.short(), data.short(), data.short()]
+          time: [
+            data.short(),
+            data.short(),
+            data.short(),
+            data.short(),
+            data.short(),
+          ],
         });
-      } else if (opcode == 0x71) { // premium shit
+      } else if (opcode == 0x71) {
+        // premium shit
         table({
           accountStatus: data.byte(),
           premiumType: data.byte(),
-          premiumTime: data.int()
+          premiumTime: data.int(),
         });
-      } else if (opcode == 0x5E) { // tariff change
+      } else if (opcode == 0x5e) {
+        // tariff change
         data.skip(1); // byte(1) fixed
         table({
           canTradeWithOtherNation: !!data.byte(),
           zoneType: data.byte(),
           canTalkToOtherNation: !!data.byte(),
-          mapTariff: data.short()
+          mapTariff: data.short(),
         });
-      } else if (opcode == 0x54) { // weight change
+      } else if (opcode == 0x54) {
+        // weight change
         table({
-          itemWeightChangedTo: data.int()
+          itemWeightChangedTo: data.int(),
         });
-      } else if (opcode == 0x1C) { // NPCs IN RANGE
+      } else if (opcode == 0x1c) {
+        // NPCs IN RANGE
         let npcCount = data.short();
         let npcInRegion = [];
 
@@ -441,15 +486,17 @@ export async function TestClient() {
         }
 
         table({
-          npcInRegion: npcInRegion
+          npcInRegion: npcInRegion,
         });
 
-        connection.send([ // ASK FOR MORE INFO
-          0x1D,
+        connection.send([
+          // ASK FOR MORE INFO
+          0x1d,
           ...short(npcInRegion.length),
-          ...[].concat(...npcInRegion.map(x => short(x)))
+          ...[].concat(...npcInRegion.map((x) => short(x))),
         ]);
-      } else if (opcode == 0x1D) { // NPC MORE INFO COMING
+      } else if (opcode == 0x1d) {
+        // NPC MORE INFO COMING
         let npcCount = data.short();
         let npcs = [];
 
@@ -457,7 +504,7 @@ export async function TestClient() {
           npcs.push({
             id: data.short(),
             sid: data.short(),
-            isMonster: data.byte() == 1 ? 'true' : 'false',
+            isMonster: data.byte() == 1 ? "true" : "false",
             pid: data.short(),
             sellingGroup: data.int(),
             type: data.byte(),
@@ -478,8 +525,9 @@ export async function TestClient() {
           });
         }
 
-        table(npcs, 'INCOMING_NPC_INFO');
-      } else if (opcode == 0xA) { // NPC IN_OUT
+        table(npcs, "INCOMING_NPC_INFO");
+      } else if (opcode == 0xa) {
+        // NPC IN_OUT
         let type = data.byte();
         let id = data.short();
 
@@ -487,7 +535,7 @@ export async function TestClient() {
           table({
             npcIn: id,
             pid: data.short(),
-            isMonster: data.byte() == 1 ? 'true' : 'false',
+            isMonster: data.byte() == 1 ? "true" : "false",
             sid: data.short(),
             sellingGroup: data.int(),
             type: data.byte(),
@@ -508,10 +556,11 @@ export async function TestClient() {
           });
         } else if (type == 2) {
           table({
-            npcOut: id
+            npcOut: id,
           });
         }
-      } else if (opcode == 0xB) { // NPC MOVE
+      } else if (opcode == 0xb) {
+        // NPC MOVE
         /*data.byte();
 
         table({
@@ -521,37 +570,52 @@ export async function TestClient() {
           y: data.short(),
           speed: data.short()
         });*/
-      } else if (opcode == 0x6) { // User MOVE
-        let move = [data.short(), data.short(), data.short(), data.short(), data.short()];
+      } else if (opcode == 0x6) {
+        // User MOVE
+        let move = [
+          data.short(),
+          data.short(),
+          data.short(),
+          data.short(),
+          data.short(),
+        ];
         data.byte();
         move.push(data.short(), data.short(), data.short());
 
         table({
-          move
+          move,
         });
-      } else if (opcode == 0x9) { // User Rotate
+      } else if (opcode == 0x9) {
+        // User Rotate
         table({
-          rotate: [data.short(), data.short()]
+          rotate: [data.short(), data.short()],
         });
-      } else if (opcode == 0x7) { // User INOUT
+      } else if (opcode == 0x7) {
+        // User INOUT
         let type = data.short();
         let id = data.short();
 
         if (type == 2) {
-          table({
-            type: 'out of view',
-            id
-          }, 'USER_INOUT');
+          table(
+            {
+              type: "out of view",
+              id,
+            },
+            "USER_INOUT"
+          );
         } else {
-          table({
-            type,
-            id,
-            details: data.array()
-          }, 'USER_INOUT');
+          table(
+            {
+              type,
+              id,
+              details: data.array(),
+            },
+            "USER_INOUT"
+          );
         }
       } else if (opcode == 0x81) {
         table({
-          story: data.skip(6)
+          story: data.skip(6),
         });
       } else if (opcode == 0x29) {
         let session = data.short();
@@ -561,26 +625,25 @@ export async function TestClient() {
         if (type == 1) {
           if (value == 1) {
             table({
-              standUp: [session]
+              standUp: [session],
             });
           } else if (value == 2) {
             table({
-              sitdown: [session]
+              sitdown: [session],
             });
           }
         } else if (type == 3) {
-          let z = 'unknown';
-          if (value == 1) z = 'normal';
-          else if (value == 2) z = 'giant';
-          else if (value == 3) z = 'dwarf';
-          else if (value == 4) z = 'blinking';
-          else if (value == 6) z = 'giant_target';
+          let z = "unknown";
+          if (value == 1) z = "normal";
+          else if (value == 2) z = "giant";
+          else if (value == 3) z = "dwarf";
+          else if (value == 4) z = "blinking";
+          else if (value == 6) z = "giant_target";
 
           table({
-            abnormalChange: [session, z]
+            abnormalChange: [session, z],
           });
         }
-
       } else if (opcode == 0x16) {
         let userCount = data.short();
         let users = [];
@@ -622,22 +685,28 @@ export async function TestClient() {
 
           user.zone = data.byte();
 
-          data.skip(21)
+          data.skip(21);
 
           users.push(user);
         }
 
-        table(users, 'INCOMING_USER');
+        table(users, "INCOMING_USER");
       } else {
-        console.log('Unhandled opcode has arrived! (0x' + opcode.toString(16) + ') body: ' + data.array().map(x => (x < 16 ? '0' : '') + x.toString(16).toUpperCase()).join(' '));
+        console.log(
+          "Unhandled opcode has arrived! (0x" +
+            opcode.toString(16) +
+            ") body: " +
+            data
+              .array()
+              .map((x) => (x < 16 ? "0" : "") + x.toString(16).toUpperCase())
+              .join(" ")
+        );
       }
-
     }
 
-    console.log('END!')
+    console.log("END!");
 
     console.log(connection.getWaitingSignals());
-
   } finally {
     if (connection) {
       connection.terminate();
@@ -659,8 +728,8 @@ let itemLoc = {
   LEG: 10,
   LEFTRING: 11,
   GLOVE: 12,
-  FOOT: 13
-}
+  FOOT: 13,
+};
 
 let zones = {
   ZONE_KARUS: 1,
@@ -710,11 +779,11 @@ let zones = {
   ZONE_PRISON: 92,
   ZONE_ISILOON_ARENA: 93,
   ZONE_FELANKOR_ARENA: 94,
-  ZONE_OLD_MORADON: 91
-}
+  ZONE_OLD_MORADON: 91,
+};
 
-Object.keys(itemLoc).forEach(x => itemLoc[itemLoc[x]] = x);
-Object.keys(zones).forEach(x => zones[zones[x]] = x);
+Object.keys(itemLoc).forEach((x) => (itemLoc[itemLoc[x]] = x));
+Object.keys(zones).forEach((x) => (zones[zones[x]] = x));
 
 function simplifyKlass(klass) {
   if (klass >= 100 && klass < 200) {
@@ -722,66 +791,68 @@ function simplifyKlass(klass) {
   } else if (klass >= 200 && klass < 300) {
     klass -= 200;
   } else {
-    return 'unknown';
+    return "unknown";
   }
 
   if (klass == 1 || klass == 5 || klass == 6) {
-    return 'warrior';
+    return "warrior";
   }
 
   if (klass == 2 || klass == 7 || klass == 8) {
-    return 'rogue';
+    return "rogue";
   }
 
   if (klass == 3 || klass == 9 || klass == 10) {
-    return 'mage';
+    return "mage";
   }
 
   if (klass == 4 || klass == 11 || klass == 12) {
-    return 'priest';
+    return "priest";
   }
 
   if (klass == 5 || klass == 13 || klass == 14) {
-    return 'kurian';
+    return "kurian";
   }
 
-  return 'unknown';
+  return "unknown";
 }
 
 const table = function (data: any[] | object, name?: string) {
   if (data instanceof Array) {
-    console.log(name + ' len:' + data.length);
+    console.log(name + " len:" + data.length);
     for (let key in data) {
-      let header = (name + '.' + key).padStart(30);
+      let header = (name + "." + key).padStart(30);
 
       if (data[key].constructor == String) {
-        console.log(header + ':  ' + keep(data[key]));
+        console.log(header + ":  " + keep(data[key]));
       } else {
         let m = data[key];
-        var txt = '';
+        var txt = "";
         for (let k in m) {
-          txt += k + keep(m[k]) + ' ';
+          txt += k + keep(m[k]) + " ";
         }
-        console.log(header + ':  ' + txt);
+        console.log(header + ":  " + txt);
       }
     }
   } else {
     for (let key in data) {
-      console.log(((name ? name + '::' : '') + key).padStart(30) + ':  ' + keep(data[key]));
+      console.log(
+        ((name ? name + "::" : "") + key).padStart(30) + ":  " + keep(data[key])
+      );
     }
   }
 
   console.break();
-}
+};
 
 function keep(data) {
-  if (data == undefined) return 'undefined';
+  if (data == undefined) return "undefined";
   if (data.constructor == String) {
     return `"${data}"`;
   }
 
   if (data.constructor == Array || data.constructor == Buffer) {
-    return `[${data.join(' ')}]`;
+    return `[${data.join(" ")}]`;
   }
 
   if (data.constructor == Boolean) {
@@ -791,16 +862,16 @@ function keep(data) {
   return `(${data})`;
 }
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-console.break = () => console.log('-'.repeat(50));
+console.break = () => console.log("-".repeat(50));
 
 declare global {
   interface Console {
-    break: () => void
+    break: () => void;
   }
 }
 
 interface Dictionary<T> {
-  [key: string]: T
+  [key: string]: T;
 }

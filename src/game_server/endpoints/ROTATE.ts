@@ -1,5 +1,5 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue, short } from "../../core/utils/unit";
 import { RegionSend } from "../region";
 

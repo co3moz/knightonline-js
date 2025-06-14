@@ -1,12 +1,15 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { short } from "../../core/utils/unit";
 import { RSessionMap, RegionQuery, RegionQueryNPC } from "../region";
 import { BuildUserDetail } from "./buildUserDetail";
-import { INPCInstance } from "../ai_system/declare";
+import type { INPCInstance } from "../ai_system/declare";
 import { BuildNPCDetail } from "./buildNPCDetail";
 
-
-export function SendRegionUserOut(socket: IGameSocket, whichSessionOut: number, onlyOneWay?: boolean) {
+export function SendRegionUserOut(
+  socket: IGameSocket,
+  whichSessionOut: number,
+  onlyOneWay?: boolean
+) {
   if (!socket) return;
   if (socket.session == whichSessionOut) return;
 
@@ -14,9 +17,10 @@ export function SendRegionUserOut(socket: IGameSocket, whichSessionOut: number, 
     delete socket.visiblePlayers[whichSessionOut];
 
     socket.send([
-      0x07,  // USER_IN_OUT
-      2, 0, // hide
-      ...short(whichSessionOut)
+      0x07, // USER_IN_OUT
+      2,
+      0, // hide
+      ...short(whichSessionOut),
     ]);
   }
 
@@ -30,9 +34,10 @@ export function SendRegionUserOutForMe(socket: IGameSocket) {
 
   const map = socket.visiblePlayers;
   const packet = [
-    0x07,  // USER_IN_OUT
-    2, 0, // hide
-    ...short(socket.session)
+    0x07, // USER_IN_OUT
+    2,
+    0, // hide
+    ...short(socket.session),
   ];
 
   for (let session in map) {
@@ -42,10 +47,15 @@ export function SendRegionUserOutForMe(socket: IGameSocket) {
   }
 }
 
-export function SendRegionUserIn(socket: IGameSocket, whichSessionIn: number, inCase: RegionInCase, onlyOneWay?: boolean, cached?: number[]) {
+export function SendRegionUserIn(
+  socket: IGameSocket,
+  whichSessionIn: number,
+  inCase: RegionInCase,
+  onlyOneWay?: boolean,
+  cached?: number[]
+) {
   if (!socket) return;
   if (socket.session == whichSessionIn) return;
-
 
   if (!socket.visiblePlayers[whichSessionIn]) {
     socket.visiblePlayers[whichSessionIn] = true;
@@ -59,16 +69,22 @@ export function SendRegionUserIn(socket: IGameSocket, whichSessionIn: number, in
 
     if (cached) {
       socket.send([
-        0x07,  // USER_IN_OUT
-        inCase, 0, // show
+        0x07, // USER_IN_OUT
+        inCase,
+        0, // show
         ...short(whichSessionIn),
-        ...cached
+        ...cached,
       ]);
     }
   }
 
   if (!onlyOneWay) {
-    SendRegionUserIn(RSessionMap[whichSessionIn], socket.session, RegionInCase.NORMAL, true);
+    SendRegionUserIn(
+      RSessionMap[whichSessionIn],
+      socket.session,
+      RegionInCase.NORMAL,
+      true
+    );
   }
 }
 
@@ -91,18 +107,16 @@ export function SendRegionUserInMultiple(socket: IGameSocket, warp?: boolean) {
     SendRegionUserIn(userSocket, socket.session, warpCase, true, userDetail);
   }
 
-
-  result[2] = userCount & 0xFF;
+  result[2] = userCount & 0xff;
   result[3] = userCount >>> 8;
 
   socket.send(result);
   socket.send([0x15, 2]);
 
-
-  result = [0x1D, 0, 0];
-  let visibleNPCs = socket.visibleNPCs = {};
+  result = [0x1d, 0, 0];
+  let visibleNPCs = (socket.visibleNPCs = {});
   let total = 0;
-  
+
   for (let npc of RegionQueryNPC(socket)) {
     visibleNPCs[npc.uuid] = true;
     total++;
@@ -110,13 +124,16 @@ export function SendRegionUserInMultiple(socket: IGameSocket, warp?: boolean) {
     result.push(...BuildNPCDetail(npc));
   }
 
-  result[1] = total & 0xFF;
+  result[1] = total & 0xff;
   result[2] = total >>> 8;
 
   socket.send(result);
 }
 
-export function SendRegionUserInDetailMultiple(socket: IGameSocket, sessions: number[]) {
+export function SendRegionUserInDetailMultiple(
+  socket: IGameSocket,
+  sessions: number[]
+) {
   let result = [0x16, 0, 0];
 
   let userCount = 0;
@@ -132,7 +149,7 @@ export function SendRegionUserInDetailMultiple(socket: IGameSocket, sessions: nu
     result.push(...BuildUserDetail(userSocket));
   }
 
-  result[1] = userCount & 0xFF;
+  result[1] = userCount & 0xff;
   result[2] = userCount >>> 8;
 
   socket.send(result);
@@ -145,9 +162,9 @@ export function SendRegionNpcOut(socket: IGameSocket, uuid: number) {
     delete socket.visibleNPCs[uuid];
 
     socket.send([
-      0x0A, // NPC_IN_OUT
+      0x0a, // NPC_IN_OUT
       2, // OUT
-      ...short(uuid)
+      ...short(uuid),
     ]);
   }
 }
@@ -161,10 +178,10 @@ export function SendRegionNpcIn(socket: IGameSocket, npc: INPCInstance) {
     socket.visibleNPCs[uuid] = true;
 
     socket.send([
-      0x0A, // NPC_IN_OUT
+      0x0a, // NPC_IN_OUT
       1, // IN
       ...short(npc.uuid),
-      ...BuildNPCDetail(npc)
+      ...BuildNPCDetail(npc),
     ]);
   }
 }
@@ -172,5 +189,5 @@ export function SendRegionNpcIn(socket: IGameSocket, npc: INPCInstance) {
 export enum RegionInCase {
   NORMAL = 1,
   SPAWN = 3,
-  WARP = 4
+  WARP = 4,
 }

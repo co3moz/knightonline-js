@@ -1,6 +1,7 @@
 {
   "name": "ko-js",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "type": "module",
   "private": true,
   "main": "src/index.js",
   "scripts": {
@@ -11,39 +12,29 @@
   "author": "co3moz",
   "license": "MIT",
   "dependencies": {
-    "@types/bluebird": "^3.5.25",
-    "@types/chai": "^4.1.7",
-    "@types/config": "0.0.34",
-    "@types/glob": "^7.1.1",
-    "@types/long": "^4.0.0",
-    "@types/mocha": "^5.2.6",
-    "@types/mongodb": "^3.1.19",
-    "@types/mongoose": "^5.3.17",
-    "@types/node": "^11.9.5",
-    "@types/redis": "^2.8.10",
-    "bluebird": "^3.5.1",
-    "chai": "^4.2.0",
-    "config": "^1.30.0",
-    "crc-32": "^1.2.0",
-    "cross-env": "^5.2.0",
+    "chai": "^5.2.0",
+    "config": "^4.0.0",
+    "crc-32": "^1.2.2",
+    "cross-env": "^7.0.3",
     "csv-streamify": "^4.0.0",
-    "fastify": "^2.1.0",
-    "fs-extra": "^6.0.1",
-    "glob": "^7.1.2",
-    "js-yaml": "^3.13.0",
-    "long": "^4.0.0",
+    "extract-zip": "^2.0.1",
+    "fastify": "^5.4.0",
+    "glob": "^11.0.3",
+    "js-yaml": "^4.1.0",
+    "long": "^5.3.2",
     "lzfjs": "^1.0.1",
-    "mongoose": "^5.4.13",
-    "natives": "^1.1.6",
-    "nole": "^1.0.8",
-    "redis": "^2.8.0",
-    "typescript": "^3.3.3",
-    "unzip": "^0.1.11"
+    "mongoose": "^8.15.2",
+    "nole": "^2.2.2",
+    "redis": "^5.5.6",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">= 10"
   },
   "devDependencies": {
-    "ts-node": "^8.0.3"
+    "@types/chai": "^5.2.2",
+    "@types/config": "3.3.5",
+    "@types/node": "^22.15.31"
   }
 }

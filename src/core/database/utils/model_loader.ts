@@ -1,25 +1,15 @@
-import * as glob from 'glob'
-import * as path from 'path'
+import { glob } from "glob";
+import path from "path";
 
-export function ModelLoader() {
-  return new Promise((resolve, reject) => {
-    glob(path.resolve(__dirname, '../models/**/*.ts'), async (err, files) => {
-      if (err) {
-        console.error('model loader failed!');
-        return reject(err);
-      }
+export async function ModelLoader() {
+  try {
+    const files = await glob(path.resolve(__dirname, "../models/**/*.ts"));
 
-      try {
-        for (let file of files) {
-          await import(file);
-        }
-
-      } catch (e) {
-        console.error('model loader failed!');
-        return reject(e);
-      }
-
-      resolve();
-    });
-  });
+    for (let file of files) {
+      await import(file);
+    }
+  } catch (e) {
+    console.error("model loader failed!");
+    throw e;
+  }
 }

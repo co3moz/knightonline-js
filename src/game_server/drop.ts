@@ -1,7 +1,6 @@
-import { IItem } from "../core/database/models";
 import { WaitNextTick } from "../core/utils/general";
 
-const drops: IDropDictionary = <IDropDictionary>{}
+const drops: IDropDictionary = <IDropDictionary>{};
 let dropIndex = 0;
 
 export function CreateDrop(owners: number[], dropped) {
@@ -10,7 +9,7 @@ export function CreateDrop(owners: number[], dropped) {
   drops[index] = {
     timestamp: Date.now(),
     owners,
-    dropped
+    dropped,
   };
 
   return index;
@@ -20,13 +19,11 @@ export function GetDrop(dropIndex: number) {
   return drops[dropIndex];
 }
 
-
 export function RemoveDrop(dropIndex: number) {
   if (drops[dropIndex]) {
     delete drops[dropIndex];
   }
 }
-
 
 export async function ClearDropsTick() {
   let timeout = Date.now() - 10 * 60 * 1000; // 10 mins
@@ -46,21 +43,21 @@ export async function ClearDropsTick() {
   }
 
   if (cleared) {
-    console.log('[TICK] %d drops cleared!', cleared);
+    console.log("[TICK] %d drops cleared!", cleared);
   }
 }
 
 export interface IDrop {
-  owners: number[] // sessions that can take
-  timestamp: number // timestamp that item(s) dropped
-  dropped: IDropItem[]
+  owners: number[]; // sessions that can take
+  timestamp: number; // timestamp that item(s) dropped
+  dropped: IDropItem[];
 }
 
 export interface IDropItem {
-  item: number // item id
-  amount: number // item count
+  item: number; // item id
+  amount: number; // item count
 }
 
 export interface IDropDictionary {
-  [dropIndex: number]: IDrop
+  [dropIndex: number]: IDrop;
 }

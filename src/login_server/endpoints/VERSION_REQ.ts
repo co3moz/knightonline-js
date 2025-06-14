@@ -1,16 +1,17 @@
-import * as config from 'config'
-import { short, Queue } from '../../core/utils/unit';
-import { ILoginSocket } from '../login_socket';
-import { ILoginEndpoint } from '../endpoint';
+import config from "config";
+import { short, Queue } from "../../core/utils/unit";
+import type { ILoginSocket } from "../login_socket";
+import type { ILoginEndpoint } from "../endpoint";
 
-let versions: any[] = config.get('loginServer.versions');
+let versions: any[] = config.get("loginServer.versions");
 let { version: serverVersion } = versions[versions.length - 1];
 
-export const VERSION_REQ: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
+export const VERSION_REQ: ILoginEndpoint = async function (
+  socket: ILoginSocket,
+  body: Queue,
+  opcode: number
+) {
   let clientVersion = body.short();
 
-  socket.send([
-    opcode,
-    ...short(serverVersion)
-  ]);
-}
+  socket.send([opcode, ...short(serverVersion)]);
+};

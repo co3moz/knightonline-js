@@ -1,29 +1,31 @@
-import { Queue } from '../../core/utils/unit';
-import { IGameEndpoint } from '../endpoint';
-import { IGameSocket } from '../game_socket';
-import { SendAbility } from '../functions/sendAbility';
-import { SendWeightChange } from '../functions/sendWeightChange';
-import { SendItemMove } from '../functions/sendItemMove';
-import { ICharacterItem, GetItemDetail } from '../../core/database/models';
-import { SendLookChange } from '../functions/sendLookChange';
+import { Queue } from "../../core/utils/unit";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
+import { SendAbility } from "../functions/sendAbility";
+import { SendWeightChange } from "../functions/sendWeightChange";
+import { SendItemMove } from "../functions/sendItemMove";
+import { type ICharacterItem, GetItemDetail } from "../../core/database/models";
+import { SendLookChange } from "../functions/sendLookChange";
 
 const EQUIP_MAX = 14;
 const INVENTORY_MAX = 28;
 
-export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const ITEM_MOVE: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let type = body.byte();
 
-  if (type == 2) { // rearranging..  
-    return socket.send([
-      opcode, 2, 0
-    ]);
+  if (type == 2) {
+    // rearranging..
+    return socket.send([opcode, 2, 0]);
   }
 
   type = body.byte();
   let itemID = body.int();
   let pos = body.byte();
   let dst = body.byte();
-
 
   let c = socket.character;
 
@@ -55,13 +57,13 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
       if (!IsValidPosForItem(socket, item, dst)) throw 1;
 
       let targetSpot = c.items[dst + 42];
-      if (dst == 5 || dst == 6) { // magic bag
+      if (dst == 5 || dst == 6) {
+        // magic bag
         if (targetSpot || GetItemDetail(item.id).slot != 25) throw 1; // if there is already a bag or item is not bag
       }
 
       c.items[pos + 14] = targetSpot;
       c.items[dst + 42] = item;
-
 
       SendAbility(socket, false);
       SendLookChange(socket, dst, item);
@@ -73,7 +75,6 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
 
       if (!item) throw 1;
       if (item.id != itemID) throw 1;
-
 
       let targetSpot = c.items[dst + 14];
 
@@ -135,7 +136,8 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
       let itemDetail = GetItemDetail(item.id);
       if (itemDetail.slot == 1 || (itemDetail.slot == 0 && dst == 6)) {
         if (leftHand) {
-          if (GetItemDetail(leftHand.id).slot == 4) { // drop the left hand
+          if (GetItemDetail(leftHand.id).slot == 4) {
+            // drop the left hand
             c.items[6] = item;
             c.items[pos + 14] = leftHand;
             c.items[8] = null;
@@ -192,14 +194,12 @@ export const ITEM_MOVE: IGameEndpoint = async function (socket: IGameSocket, bod
       throw 1;
     }
 
-
     SendItemMove(socket, 1);
     SendWeightChange(socket);
-
   } catch (e) {
     SendItemMove(socket, 0);
   }
-}
+};
 
 export enum ItemMoveType {
   INVENTORY_TO_EQUIP = 1,
@@ -212,13 +212,16 @@ export enum ItemMoveType {
   COSPRE_TO_INVENTORY = 8,
   INVENTORY_TO_MBAG = 9,
   MBAG_TO_INVENTORY = 10,
-  MBAG_TO_MBAG = 11
+  MBAG_TO_MBAG = 11,
 }
 
-function IsValidPosForItem(socket: IGameSocket, item: ICharacterItem, slot: number) {
+function IsValidPosForItem(
+  socket: IGameSocket,
+  item: ICharacterItem,
+  slot: number
+) {
   let detail = GetItemDetail(item.id);
   if (!detail) return false;
-
 
   let oneHandedItem = false;
   switch (detail.slot) {
@@ -301,7 +304,8 @@ function IsValidPosForItem(socket: IGameSocket, item: ICharacterItem, slot: numb
     case 20:
       if (slot != 20) return false;
       break;
-    default: return false;
+    default:
+      return false;
   }
 
   if (oneHandedItem) {

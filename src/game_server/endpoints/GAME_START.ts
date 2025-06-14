@@ -1,5 +1,5 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue, short } from "../../core/utils/unit";
 import { RegionUpdate } from "../region";
 import { SendQuests } from "../functions/sendQuests";
@@ -11,8 +11,11 @@ import { SendZoneAbility } from "../functions/sendZoneAbility";
 import { SendRegionUserInMultiple } from "../functions/sendRegionInOut";
 import { SendBlinkStart } from "../functions/sendBlink";
 
-
-export const GAME_START: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const GAME_START: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let subOpCode = body.byte();
 
   if (socket.ingame) {
@@ -27,9 +30,7 @@ export const GAME_START: IGameEndpoint = async function (socket: IGameSocket, bo
     SendMyInfo(socket);
     SendZoneAbility(socket);
 
-    socket.send([
-      opcode
-    ]);
+    socket.send([opcode]);
   } else if (subOpCode == 2) {
     RegionUpdate(socket); // put user in region
     socket.ingame = true;
@@ -37,7 +38,4 @@ export const GAME_START: IGameEndpoint = async function (socket: IGameSocket, bo
     SendRegionUserInMultiple(socket);
     SendBlinkStart(socket);
   }
-}
-
-
-
+};

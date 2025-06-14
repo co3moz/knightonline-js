@@ -1,11 +1,15 @@
-import * as config from 'config'
-import { Queue, string, configString, short } from '../../core/utils/unit';
-import { ILoginSocket } from '../login_socket';
-import { ILoginEndpoint } from '../endpoint';
+import config from "config";
+import { Queue, string, configString, short } from "../../core/utils/unit";
+import type { ILoginSocket } from "../login_socket";
+import type { ILoginEndpoint } from "../endpoint";
 
-let versions: any[] = config.get('loginServer.versions');
+let versions: any[] = config.get("loginServer.versions");
 
-export const DOWNLOADINFO_REQ: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
+export const DOWNLOADINFO_REQ: ILoginEndpoint = async function (
+  socket: ILoginSocket,
+  body: Queue,
+  opcode: number
+) {
   let result = [];
   let totalFile = 0;
   let clientVersion = body.short();
@@ -19,9 +23,9 @@ export const DOWNLOADINFO_REQ: ILoginEndpoint = async function (socket: ILoginSo
 
   socket.send([
     opcode,
-    ...configString('loginServer.ftp.host'),
-    ...configString('loginServer.ftp.dir'),
+    ...configString("loginServer.ftp.host"),
+    ...configString("loginServer.ftp.dir"),
     ...short(totalFile),
-    ...result
+    ...result,
   ]);
-}
+};

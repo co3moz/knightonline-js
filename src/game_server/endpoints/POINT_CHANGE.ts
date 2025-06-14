@@ -1,9 +1,13 @@
-import { Queue, short } from '../../core/utils/unit';
-import { IGameEndpoint } from '../endpoint';
-import { IGameSocket } from '../game_socket';
-import { SendAbility } from '../functions/sendAbility';
+import { Queue, short } from "../../core/utils/unit";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
+import { SendAbility } from "../functions/sendAbility";
 
-export const POINT_CHANGE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const POINT_CHANGE: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let type = body.byte();
 
   let stat = StatType[type - 1];
@@ -19,14 +23,20 @@ export const POINT_CHANGE: IGameEndpoint = async function (socket: IGameSocket, 
   SendAbility(socket);
 
   socket.send([
-    opcode, type, ...short(c[stat]), ...short(v.maxHp), ...short(v.maxMp), ...short(v.totalHit), ...short(v.maxWeight)
+    opcode,
+    type,
+    ...short(c[stat]),
+    ...short(v.maxHp),
+    ...short(v.maxMp),
+    ...short(v.totalHit),
+    ...short(v.maxWeight),
   ]);
-}
+};
 
 enum StatType {
   statStr = 0,
   statHp = 1,
   statDex = 2,
   statMp = 3,
-  statInt = 4
+  statInt = 4,
 }

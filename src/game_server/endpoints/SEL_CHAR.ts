@@ -1,57 +1,58 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket, IVariables, IVisiblePlayers } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket, IVariables, IVisiblePlayers } from "../game_socket";
 import { Queue, short } from "../../core/utils/unit";
-import { Character, Warehouse, Item, PrepareItems } from "../../core/database/models";
+import {
+  Character,
+  Warehouse,
+  Item,
+  PrepareItems,
+} from "../../core/database/models";
 import { CharacterMap } from "../shared";
 import { SendAbility } from "../functions/sendAbility";
 
-export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const SEL_CHAR: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let session = body.string();
   let charName = body.string();
   let init = body.byte();
 
   let user = socket.user;
   if (!user || user.session != session) {
-    return socket.terminate('illegal access to another account');
+    return socket.terminate("illegal access to another account");
   }
 
   if (user.banned) {
-    return socket.terminate('banned account');
+    return socket.terminate("banned account");
   }
 
-  if (!charName) return socket.send([
-    opcode, 0
-  ]);
+  if (!charName) return socket.send([opcode, 0]);
 
   let character = await Character.findOne({
-    name: charName
+    name: charName,
   }).exec();
 
-  if (!character) return socket.send([
-    opcode, 0
-  ]);
+  if (!character) return socket.send([opcode, 0]);
 
-  if (!socket.user.characters.find(x => x == charName)) {
-    return socket.send([
-      opcode, 0
-    ]);
+  if (!socket.user.characters.find((x) => x == charName)) {
+    return socket.send([opcode, 0]);
   }
 
   let activeSocket = CharacterMap[charName];
   if (activeSocket && activeSocket != socket) {
-    CharacterMap[charName].terminate('another character select request');
+    CharacterMap[charName].terminate("another character select request");
     delete CharacterMap[charName];
 
-    return socket.send([
-      opcode, 0
-    ]);
+    return socket.send([opcode, 0]);
   }
 
   socket.character = character;
   CharacterMap[charName] = socket;
 
   socket.warehouse = await Warehouse.findOne({
-    _id: socket.user.warehouse
+    _id: socket.user.warehouse,
   }).exec();
 
   /*if (user.nation == 'KARUS') {
@@ -69,7 +70,7 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
   /** TODO: IF WAR IS OVER MOVE CHAR TO CORRECT ZONE */
 
   if (character.level > 83) {
-    return socket.terminate('character level cannot be more than 83');
+    return socket.terminate("character level cannot be more than 83");
   }
 
   /* let starterQuest = character.quests.find(quest => quest.id == questIds.STARTER_SEED_QUEST);
@@ -97,14 +98,17 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
   /* TODO: RENTAL*/
   // TODO: clan stuff
 
-
   socket.variables = <IVariables>{};
   socket.visiblePlayers = {};
   socket.visibleNPCs = {};
 
   SendAbility(socket);
 
-  console.log('[GAME] Character connected (%s) from %s', character.name, socket.remoteAddress);
+  console.log(
+    "[GAME] Character connected (%s) from %s",
+    character.name,
+    socket.remoteAddress
+  );
 
   socket.send([
     opcode,
@@ -113,6 +117,6 @@ export const SEL_CHAR: IGameEndpoint = async function (socket: IGameSocket, body
     ...short(character.x * 10),
     ...short(character.z * 10),
     ...short(character.y * 10),
-    1
+    1,
   ]);
-}
+};

@@ -1,5 +1,5 @@
 import { short, int } from "../../core/utils/unit";
-import { INPCInstance } from "../ai_system/declare";
+import type { INPCInstance } from "../ai_system/declare";
 
 export function BuildNPCDetail(npc: INPCInstance) {
   // if (npc.cache) {

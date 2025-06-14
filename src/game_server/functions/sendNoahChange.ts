@@ -1,8 +1,12 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { int } from "../../core/utils/unit";
 
 const MAX_NOAH = 2100000000;
-export function SendNoahChange(socket: IGameSocket, noah: number, shouldISendPacket = true) {
+export function SendNoahChange(
+  socket: IGameSocket,
+  noah: number,
+  shouldISendPacket = true
+) {
   let c = socket.character;
   if (noah < 0) {
     if (c.money + noah < 0) {
@@ -14,10 +18,10 @@ export function SendNoahChange(socket: IGameSocket, noah: number, shouldISendPac
 
   if (shouldISendPacket) {
     socket.send([
-      0x4A, // GOLD_CHANGE
+      0x4a, // GOLD_CHANGE
       noah < 0 ? GoldGainType.Loss : GoldGainType.Gain,
       ...int(Math.abs(noah)),
-      ...int(c.money)
+      ...int(c.money),
     ]);
   }
 
@@ -27,5 +31,5 @@ export function SendNoahChange(socket: IGameSocket, noah: number, shouldISendPac
 export enum GoldGainType {
   Gain = 1,
   Loss = 2,
-  Event = 5
+  Event = 5,
 }

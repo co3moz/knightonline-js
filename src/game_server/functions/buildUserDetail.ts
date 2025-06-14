@@ -1,8 +1,24 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { byte_string, short, int } from "../../core/utils/unit";
 import { ItemSlot } from "../var/item_slot";
 
-const UserDetailSlots = [ItemSlot.BREAST, ItemSlot.LEG, ItemSlot.HEAD, ItemSlot.GLOVE, ItemSlot.FOOT, ItemSlot.SHOULDER, ItemSlot.RIGHTHAND, ItemSlot.LEFTHAND, ItemSlot.CWING, ItemSlot.CHELMET, ItemSlot.CLEFT, ItemSlot.CRIGHT, ItemSlot.CTOP, ItemSlot.FAIRY, ItemSlot.FAIRY];
+const UserDetailSlots = [
+  ItemSlot.BREAST,
+  ItemSlot.LEG,
+  ItemSlot.HEAD,
+  ItemSlot.GLOVE,
+  ItemSlot.FOOT,
+  ItemSlot.SHOULDER,
+  ItemSlot.RIGHTHAND,
+  ItemSlot.LEFTHAND,
+  ItemSlot.CWING,
+  ItemSlot.CHELMET,
+  ItemSlot.CLEFT,
+  ItemSlot.CRIGHT,
+  ItemSlot.CTOP,
+  ItemSlot.FAIRY,
+  ItemSlot.FAIRY,
+];
 
 export function BuildUserDetail(socket: IGameSocket): number[] {
   const result: number[] = [];
@@ -14,7 +30,7 @@ export function BuildUserDetail(socket: IGameSocket): number[] {
   result.push(...short(uu.nation));
   result.push(...short(-1)); // clan Id
   result.push(0); // fame
-  result.push(0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0); // clan_details..
+  result.push(0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0, 0, 0, 0, 0, 0); // clan_details..
   result.push(uc.level);
   result.push(uc.race);
   result.push(...short(uc.klass));
@@ -49,7 +65,7 @@ export function BuildUserDetail(socket: IGameSocket): number[] {
   }
 
   result.push(uc.zone);
-  result.push(0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0/* genie */); //?
+  result.push(0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 /* genie */); //?
   result.push(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1); //?
 
   return result;

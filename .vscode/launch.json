@@ -7,21 +7,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run",
-      "args": [
-        "${workspaceFolder}\\src\\app.ts"
-      ],
-      "runtimeArgs": [
-        "--nolazy",
-        "-r",
-        "ts-node/register",
-        "--expose-gc"
-      ],
-      "protocol": "inspector",
+      "runtimeExecutable": "tsx",
+      "name": "Launch",
+      "cwd": "${workspaceRoot}",
+      "args": ["./src/app.ts"],
       "sourceMaps": true,
+      "outputCapture": "std",
       "env": {
-        "TS_NODE_TRANSPILE_ONLY": "true"
-      },
+        "PRETTY": "1"
+      }
     }
   ]
 }

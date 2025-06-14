@@ -1,5 +1,5 @@
 import { Queue } from "../core/utils/unit";
-import { IGameSocket } from "./game_socket";
+import type { IGameSocket } from "./game_socket";
 import * as Endpoints from './endpoints'
 
 export enum GameEndpointCodes {

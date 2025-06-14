@@ -1,7 +1,6 @@
 import { Npc } from "../../core/database/models";
 import { NPCUUID, NPCMap } from "./uuid";
-import { RegionUpdateNPC } from "../region";
-import { INPCInstance } from "./declare";
+import type { INPCInstance } from "./declare";
 
 let loaded = false;
 
@@ -10,7 +9,7 @@ export async function AISystemStart() {
   loaded = true;
 
   console.log("[NPC] loading..");
-  let rawNpcs = await Npc.find({}).lean().select(['-_id']).exec();
+  let rawNpcs = await Npc.find({}).lean().select(["-_id"]).exec();
 
   let npcCount = 0;
   let monsterCount = 0;
@@ -24,7 +23,8 @@ export async function AISystemStart() {
     }
 
     for (let spawn of npc.spawn) {
-      if (spawn.zone == 21) { // rn do only moradon
+      if (spawn.zone == 21) {
+        // rn do only moradon
         let amount = spawn.amount || 1;
 
         for (let i = 0; i < amount; i++) {
@@ -36,9 +36,9 @@ export async function AISystemStart() {
             spawn,
 
             uuid: NPCUUID.reserve(),
-            status: 'init',
+            status: "init",
             timestamp: now,
-            wait: 0
+            wait: 0,
           };
 
           NPCMap[npcObj.uuid] = npcObj;
@@ -53,5 +53,10 @@ export async function AISystemStart() {
     }
   }
 
-  console.log("[NPC] total: %d, mobs: %d, skipped: %d", npcCount, monsterCount, skipped);
+  console.log(
+    "[NPC] total: %d, mobs: %d, skipped: %d",
+    npcCount,
+    monsterCount,
+    skipped
+  );
 }

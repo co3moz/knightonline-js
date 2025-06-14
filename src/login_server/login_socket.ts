@@ -1,4 +1,3 @@
-import { IKOSocket } from "../core/server";
+import type { IKOSocket } from "../core/server";
 
-export interface ILoginSocket extends IKOSocket {
-}
+export interface ILoginSocket extends IKOSocket {}

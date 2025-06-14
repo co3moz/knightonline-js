@@ -1,8 +1,13 @@
-import * as fse from 'fs-extra'
-import * as path from 'path'
+import fse, { type FileHandle } from "fs/promises";
+import * as path from "path";
 
-export async function SMDReader(file: string)  { // no need for smd reading
-  let fd = await fse.open(path.resolve(__dirname, '../../../data/' + file + '.smd'), "r");
+export async function SMDReader(file: string) {
+  // no need for smd reading
+  let fd = await fse.open(
+    path.resolve(__dirname, "../../../data/" + file + ".smd"),
+    "r"
+  );
+
   let mapSize = await int(fd);
   let mapUnitDistance = await float(fd);
 
@@ -10,32 +15,38 @@ export async function SMDReader(file: string)  { // no need for smd reading
   let mapWidth = (mapSize - 1) * mapUnitDistance;
 
   if (mapWidth <= 0.0 || mapWidth > 4096 * 16) {
-    throw new Error('map width does not look correct!');
+    throw new Error("map width does not look correct!");
   }
 
   let collisionWidth = await float(fd);
   let collisionLength = await float(fd);
 
-
-  if (collisionWidth <= 0.0 || collisionWidth > 4096 * 16 ||
-    collisionLength <= 0.0 || collisionLength > 4096 * 16) {
-      throw new Error('colection sizes does not look correct!');
+  if (
+    collisionWidth <= 0.0 ||
+    collisionWidth > 4096 * 16 ||
+    collisionLength <= 0.0 ||
+    collisionLength > 4096 * 16
+  ) {
+    throw new Error("colection sizes does not look correct!");
   }
 
   if ((mapSize - 1) * mapUnitDistance != collisionWidth) {
-    throw new Error('collision and map width does not match');
+    throw new Error("collision and map width does not match");
   }
 
   let regionX = collisionWidth / 48 + 1;
   let regionZ = collisionWidth / 48 + 1;
-
 
   let collisionFaceCount = await int(fd);
   let collisions = [];
   if (collisionFaceCount > 0) {
     let faces = await float_array(fd, 3 /*x, y, z*/ * 3 * collisionFaceCount);
     for (var i = 0; i < collisionFaceCount; i++) {
-      collisions.push({ x: faces[i * 3], y: faces[i * 3 + 1], z: faces[i * 3 + 2] });
+      collisions.push({
+        x: faces[i * 3],
+        y: faces[i * 3 + 1],
+        z: faces[i * 3 + 2],
+      });
     }
   }
 
@@ -52,7 +63,7 @@ export async function SMDReader(file: string)  { // no need for smd reading
       let cell = {
         shapeCount: 0,
         shapeIndices: null,
-        subCells: []
+        subCells: [],
       };
 
       cell.shapeCount = await int(fd);
@@ -73,16 +84,14 @@ export async function SMDReader(file: string)  { // no need for smd reading
 
           arr[z] = {
             polyCount,
-            verIndices
-          }
+            verIndices,
+          };
         }
       }
 
       cells[x][z] = cell;
-
     }
   }
-
 
   let eventObjectCount = await int(fd);
   let eventObjects = [];
@@ -101,11 +110,10 @@ export async function SMDReader(file: string)  { // no need for smd reading
       /*y: buf.readFloatLE(22),
       z: buf.readFloatLE(26),
       byLife: buf.readUInt8(30)*/
-    })
+    });
   }
 
   let ppn = await short_array(fd, mapSize * mapSize);
-
 
   let eventRegeneObjectCount = await int(fd);
   let eventRegeneObjects = [];
@@ -118,10 +126,9 @@ export async function SMDReader(file: string)  { // no need for smd reading
       posZ: buf.readFloatLE(8),
       areaZ: buf.readFloatLE(12),
       areaX: buf.readFloatLE(16),
-      regenePoint: i
+      regenePoint: i,
     });
   }
-
 
   let warpCount = await int(fd);
   let warps = [];
@@ -138,54 +145,55 @@ export async function SMDReader(file: string)  { // no need for smd reading
       y: buf.readFloatLE(304),
       z: buf.readFloatLE(308),
       range: buf.readFloatLE(312),
-      nation: buf.readInt16LE(316)
+      nation: buf.readInt16LE(316),
     });
   }
 
-
-  await fse.close(fd);
+  await fd.close();
 
   return {
     file,
-    mapSize, mapUnitDistance,
-    collisionWidth, collisionLength, collisions,
+    mapSize,
+    mapUnitDistance,
+    collisionWidth,
+    collisionLength,
+    collisions,
     cells,
     height,
     ppn,
     eventObjects,
     eventRegeneObjects,
-    warps
-  }
+    warps,
+  };
 }
 
-
-async function int(fd) {
+async function int(fd: FileHandle) {
   let buf = Buffer.allocUnsafe(4);
-  await fse.read(fd, buf, 0, 4);
+  await fd.read(buf, 0, 4);
   return buf.readInt32LE(0);
 }
 
-async function uint(fd) {
+async function uint(fd: FileHandle) {
   let buf = Buffer.allocUnsafe(4);
-  await fse.read(fd, buf, 0, 4);
+  await fd.read( buf, 0, 4);
   return buf.readUInt32LE(0);
 }
 
-async function ushort(fd) {
+async function ushort(fd: FileHandle) {
   let buf = Buffer.allocUnsafe(2);
-  await fse.read(fd, buf, 0, 2);
+  await fd.read(buf, 0, 2);
   return buf.readUInt16LE(0);
 }
 
-async function float(fd) {
+async function float(fd: FileHandle) {
   let buf = Buffer.allocUnsafe(4);
-  await fse.read(fd, buf, 0, 4);
+  await fd.read(buf, 0, 4);
   return buf.readFloatLE(0);
 }
 
-async function read_array(fd, bytes) {
+async function read_array(fd: FileHandle, bytes) {
   let buf = Buffer.allocUnsafe(bytes);
-  await fse.read(fd, buf, 0, bytes);
+  await fd.read(buf, 0, bytes);
   return buf;
 }
 
@@ -202,7 +210,6 @@ async function uint_array(fd, size) {
   for (var i = 0; i < size; i++) array.push(buf.readUInt32LE(i * 4));
   return array;
 }
-
 
 async function ushort_array(fd, size) {
   let buf = await read_array(fd, 2 * size);

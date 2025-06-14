@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { RSessionMap } from "../region";
 import { SendRegionUserOut } from "../functions/sendRegionInOut";
 
@@ -17,7 +17,6 @@ export function OnUserExit(socket: IGameSocket) {
       delete visiblePlayers[session];
     }
   }
-
 
   if (socket.variables && socket.variables.expiryBlink) {
     clearTimeout(socket.variables.expiryBlink);

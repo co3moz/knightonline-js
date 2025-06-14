@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { short } from "../../core/utils/unit";
 
 export function SendTime(socket: IGameSocket): void {
@@ -8,9 +8,13 @@ export function SendTime(socket: IGameSocket): void {
   socket.send([
     0x13,
     ...short(now.getFullYear()),
-    now.getMonth() + 1, 0,
-    now.getDate(), 0,
-    now.getHours(), 0,
-    now.getMinutes(), 0
+    now.getMonth() + 1,
+    0,
+    now.getDate(),
+    0,
+    now.getHours(),
+    0,
+    now.getMinutes(),
+    0,
   ]);
 }

@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { short, byte_string, string } from "../../core/utils/unit";
 import { RegionSend } from "../region";
 

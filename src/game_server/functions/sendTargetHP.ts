@@ -1,9 +1,13 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { RSessionMap, RNPCMap } from "../region";
 import { short, int } from "../../core/utils/unit";
 
-export function SendTargetHP(socket: IGameSocket, echo: number, damage: number): void {
-  if (socket.targetType == 'user') {
+export function SendTargetHP(
+  socket: IGameSocket,
+  echo: number,
+  damage: number
+): void {
+  if (socket.targetType == "user") {
     let targetSocket = RSessionMap[socket.target];
 
     if (targetSocket && targetSocket.variables) {
@@ -16,13 +20,13 @@ export function SendTargetHP(socket: IGameSocket, echo: number, damage: number):
         echo,
         ...int(v.maxHp || 0),
         ...int(c.hp),
-        ...short(damage || 0)
+        ...short(damage || 0),
       ]);
     } else {
       socket.target = 0;
-      socket.targetType = 'notarget';
+      socket.targetType = "notarget";
     }
-  } else if (socket.targetType == 'npc') {
+  } else if (socket.targetType == "npc") {
     let regionNPC = RNPCMap[socket.target];
 
     if (regionNPC) {
@@ -34,11 +38,11 @@ export function SendTargetHP(socket: IGameSocket, echo: number, damage: number):
         echo,
         ...int(npc.maxHp || 0),
         ...int(npc.hp),
-        ...short(damage || 0)
+        ...short(damage || 0),
       ]);
     } else {
       socket.target = 0;
-      socket.targetType = 'notarget';
+      socket.targetType = "notarget";
     }
   }
 }

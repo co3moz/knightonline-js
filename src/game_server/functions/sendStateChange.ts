@@ -1,8 +1,12 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { RegionSend } from "../region";
 import { short, int } from "../../core/utils/unit";
 
-export function SendStateChange(socket: IGameSocket, type: number, value: number): void {
+export function SendStateChange(
+  socket: IGameSocket,
+  type: number,
+  value: number
+): void {
   let c = socket.character;
   let v = socket.variables;
 
@@ -24,7 +28,7 @@ export function SendStateChange(socket: IGameSocket, type: number, value: number
     0x29, // STATE_CHANGE
     ...short(socket.session),
     type,
-    ...int(value)
+    ...int(value),
   ]);
 }
 
@@ -32,7 +36,7 @@ export enum UserStates {
   STANDING = 1,
   SITDOWN = 2,
   DEAD = 3,
-  BLINKING = 4
+  BLINKING = 4,
 }
 
 export enum AbnormalStates {

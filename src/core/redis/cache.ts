@@ -1,17 +1,21 @@
-import redis from './index'
+import { redisClient } from "./index";
 
-export async function RedisCaching(name: string, action: () => Promise<any>, cacheTime: number = 60) {
-  let data = await redis.getAsync('cache-' + name);
+export async function RedisCaching(
+  name: string,
+  action: () => Promise<any>,
+  cacheTime: number = 60
+) {
+  let data = await redisClient.get("cache-" + name);
 
   if (data) {
-    return JSON.parse(data);
+    return JSON.parse(data as string);
   }
 
   if (await waitLock(name)) {
-    let data = await redis.getAsync('cache-' + name);
+    let data = await redisClient.get("cache-" + name);
 
     if (data) {
-      return JSON.parse(data);
+      return JSON.parse(data as string);
     }
   }
 
@@ -19,7 +23,7 @@ export async function RedisCaching(name: string, action: () => Promise<any>, cac
 
   try {
     data = await action();
-    await redis.setAsync('cache-' + name, JSON.stringify(data), 'EX', cacheTime);
+    await redisClient.setEx("cache-" + name, cacheTime, JSON.stringify(data));
   } finally {
     unlock(name);
   }
@@ -28,12 +32,12 @@ export async function RedisCaching(name: string, action: () => Promise<any>, cac
 }
 
 const _locks = {};
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function waitLock(name, timeout = 120) {
   if (!_locks[name]) {
     return false;
   }
-  for (; ;) {
+  for (;;) {
     await delay(250);
     if (!_locks[name]) {
       return true;

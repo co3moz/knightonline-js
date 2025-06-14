@@ -1,22 +1,16 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
+    "moduleDetection": "force",
+    "target": "es2020",
+    "module": "Preserve",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "outDir": "build",
-    "alwaysStrict": true,
-    "removeComments": true,
-    "sourceMap": true,
-    "module": "commonjs",
-    "target": "es2017",
-    "lib": [
-      "es2017",
-      "esnext"
-    ]
+    "experimentalDecorators": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "build"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "build"]
 }

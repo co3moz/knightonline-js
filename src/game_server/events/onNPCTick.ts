@@ -1,6 +1,10 @@
-import { INPCInstance } from "../ai_system/declare";
+import type { INPCInstance } from "../ai_system/declare";
 import { NPCMap } from "../ai_system/uuid";
-import { RegionUpdateNPC, RegionQueryUsersByNpc, RegionSendByNpc } from "../region";
+import {
+  RegionUpdateNPC,
+  RegionQueryUsersByNpc,
+  RegionSendByNpc,
+} from "../region";
 import { SendRegionNpcIn } from "../functions/sendRegionInOut";
 import { short } from "../../core/utils/unit";
 import { WaitNextTick } from "../../core/utils/general";
@@ -32,9 +36,8 @@ export async function OnNPCTick() {
 
       let npc = instance.npc;
       let spawn = instance.spawn;
-      if (instance.status == 'init') {
-
-        instance.status = 'standing';
+      if (instance.status == "init") {
+        instance.status = "standing";
         instance.zone = spawn.zone;
 
         instance.x = random(spawn.leftX, spawn.rightX);
@@ -56,7 +59,7 @@ export async function OnNPCTick() {
         }
 
         instance.wait = npc.standtime;
-      } else if (instance.status == 'standing') {
+      } else if (instance.status == "standing") {
         if (CanMove(instance)) {
           instance.tx = random(spawn.leftX, spawn.rightX);
           instance.tz = random(spawn.topZ, spawn.bottomZ);
@@ -64,19 +67,18 @@ export async function OnNPCTick() {
           let distance = TargetPointDistance(instance);
 
           if (distance != 0) {
-            instance.status = 'moving';
+            instance.status = "moving";
             instance.wait = npc.speed;
           }
         }
-
-      } else if (instance.status == 'moving') {
+      } else if (instance.status == "moving") {
         let distance = TargetPointDistance(instance);
         if (distance < npc.speed1) {
           instance.x = instance.tx;
           instance.z = instance.tz;
 
           instance.wait = npc.standtime;
-          instance.status = 'standing';
+          instance.status = "standing";
         } else {
           let ds = npc.speed1 / distance;
           let dx = (instance.tx - instance.x) * ds;
@@ -88,8 +90,8 @@ export async function OnNPCTick() {
 
         RegionUpdateNPC(instance);
         SendNPCMoveToRegion(instance);
-      } else if (instance.status == 'dead') {
-        instance.status = 'init';
+      } else if (instance.status == "dead") {
+        instance.status = "init";
         instance.wait = 0;
       }
     }
@@ -107,21 +109,22 @@ function CanMove(instance: INPCInstance) {
 }
 
 function TargetPointDistance(i: INPCInstance) {
-  let nx = (i.tx - i.x);
-  let nz = (i.tz - i.z);
+  let nx = i.tx - i.x;
+  let nz = i.tz - i.z;
   return Math.sqrt(nx * nx + nz * nz);
 }
 
 function SendNPCMoveToRegion(instance: INPCInstance) {
   // speed is ms we convert it unit/sec
   RegionSendByNpc(instance, [
-    0x0B,
+    0x0b,
     1,
     ...short(instance.uuid),
     ...short(instance.x * 10),
     ...short(instance.z * 10),
-    0, 0,
-    ...short(instance.npc.speed / 100)
+    0,
+    0,
+    ...short(instance.npc.speed / 100),
   ]);
 }
 

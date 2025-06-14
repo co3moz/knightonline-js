@@ -1,18 +1,20 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue } from "../../core/utils/unit";
-import { Character } from '../../core/database/models';
+import { Character } from "../../core/database/models";
 
-export const CHANGE_HAIR: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const CHANGE_HAIR: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   body.skip(1); // no idea why
   let charName = body.byte_string();
   let face = body.byte();
   let hair = body.uint();
 
-  if (!socket.user || !socket.user.characters.find(x => x == charName)) {
-    return socket.send([
-      opcode, 0
-    ]);
+  if (!socket.user || !socket.user.characters.find((x) => x == charName)) {
+    return socket.send([opcode, 0]);
   }
 
   var result = 1;
@@ -22,12 +24,10 @@ export const CHANGE_HAIR: IGameEndpoint = async function (socket: IGameSocket, b
     character.face = face;
     await character.save();
   } catch (e) {
-    console.error('error ocurred on change hair');
+    console.error("error ocurred on change hair");
     console.error(e.stack);
     result = 0;
   }
 
-  socket.send([
-    opcode, result
-  ]);
-}
+  socket.send([opcode, result]);
+};

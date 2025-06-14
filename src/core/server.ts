@@ -1,9 +1,9 @@
-import * as net from 'net';
+import net from 'net';
 import { int, short, readShort } from './utils/unit';
-import { CreateDeferredPromise, IDeferredPromise } from './utils/deferred_promise';
+import { CreateDeferredPromise, type IDeferredPromise } from './utils/deferred_promise';
 import { UniqueQueue } from './utils/unique_queue';
-import * as lzfjs from 'lzfjs';
-import * as crc32 from 'crc-32';
+import lzfjs from 'lzfjs';
+import crc32 from 'crc-32';
 import { Crypt } from './utils/crypt';
 
 export async function KOServerFactory(params: IServerConfiguration): Promise<IKOServer[]> {

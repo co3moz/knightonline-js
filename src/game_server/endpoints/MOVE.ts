@@ -1,10 +1,13 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue, short } from "../../core/utils/unit";
 import { RegionUpdate, RegionSend } from "../region";
-import { SendMessageToPlayer } from "../functions/sendChatMessage";
 
-export const MOVE: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const MOVE: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let c = socket.character;
 
   let willX = body.short();
@@ -19,7 +22,6 @@ export const MOVE: IGameEndpoint = async function (socket: IGameSocket, body: Qu
   let realX = newX / 10;
   let realZ = newZ / 10;
   let realY = newY / 10;
-
 
   let rwillX = willX / 10;
   let rwillZ = willZ / 10;
@@ -43,6 +45,6 @@ export const MOVE: IGameEndpoint = async function (socket: IGameSocket, body: Qu
     echo,
     ...short(newX),
     ...short(newZ),
-    ...short(newY)
+    ...short(newY),
   ]);
-}
+};

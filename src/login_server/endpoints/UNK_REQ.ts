@@ -1,9 +1,11 @@
-import { Queue } from '../../core/utils/unit';
-import { ILoginSocket } from '../login_socket';
-import { ILoginEndpoint } from '../endpoint';
+import { Queue } from "../../core/utils/unit";
+import type { ILoginSocket } from "../login_socket";
+import type { ILoginEndpoint } from "../endpoint";
 
-export const UNK_REQ: ILoginEndpoint = async function (socket: ILoginSocket, body: Queue, opcode: number) {
-  socket.send([
-    0xFD, 0, 0
-  ]);
-}
+export const UNK_REQ: ILoginEndpoint = async function (
+  socket: ILoginSocket,
+  body: Queue,
+  opcode: number
+) {
+  socket.send([0xfd, 0, 0]);
+};

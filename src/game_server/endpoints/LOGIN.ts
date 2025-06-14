@@ -1,10 +1,14 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue, string } from "../../core/utils/unit";
-import { Account } from '../../core/database/models';
-import { UserMap } from '../shared';
+import { Account } from "../../core/database/models";
+import { UserMap } from "../shared";
 
-export const LOGIN: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const LOGIN: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let sessionCode = body.string();
   let password = body.string();
 
@@ -12,18 +16,26 @@ export const LOGIN: IGameEndpoint = async function (socket: IGameSocket, body: Q
     return; // don't allow this request if user already login
   }
 
-  if ((sessionCode.length != 30 || password.length > 28)) {
-    console.log('[GAME] Invalid account (%s) access from %s', sessionCode, socket.remoteAddress);
+  if (sessionCode.length != 30 || password.length > 28) {
+    console.log(
+      "[GAME] Invalid account (%s) access from %s",
+      sessionCode,
+      socket.remoteAddress
+    );
     socket.terminate();
     return;
   }
 
   let user = await Account.findOne({
-    _id: sessionCode.substring(6, 30)
+    _id: sessionCode.substring(6, 30),
   }).exec();
 
   if (!user || user.session != sessionCode || user.password != password) {
-    console.log('[GAME] Invalid account (%s) access from %s', sessionCode, socket.remoteAddress);
+    console.log(
+      "[GAME] Invalid account (%s) access from %s",
+      sessionCode,
+      socket.remoteAddress
+    );
     socket.terminate();
     return;
   }
@@ -34,21 +46,35 @@ export const LOGIN: IGameEndpoint = async function (socket: IGameSocket, body: Q
 
   if (activeSocket && activeSocket != socket) {
     activeSocket.send([
-      0x10, 7, activeSocket.user.nation, 0, 0, 0,
-      ...string('[SERVER] Hesabiniza ' + socket.remoteAddress + ' ip adresinden yeni bir baglanti yapildi!', 'ascii')
+      0x10,
+      7,
+      activeSocket.user.nation,
+      0,
+      0,
+      0,
+      ...string(
+        "[SERVER] Hesabiniza " +
+          socket.remoteAddress +
+          " ip adresinden yeni bir baglanti yapildi!",
+        "ascii"
+      ),
     ]);
 
-    await new Promise(r => setTimeout(r, 100));
-    await activeSocket.terminate('another login request');
+    await new Promise((r) => setTimeout(r, 100));
+    await activeSocket.terminate("another login request");
   }
 
   socket.user = user;
   UserMap[user.account] = socket;
 
-  console.log('[GAME] Account connected (%s) from %s', user.account, socket.remoteAddress);
+  console.log(
+    "[GAME] Account connected (%s) from %s",
+    user.account,
+    socket.remoteAddress
+  );
 
   socket.send([
     opcode,
-    user.characters.length == 0 ? 0 : (user.nation & 0xFF) // if there is no character available, then allow user to change nation
+    user.characters.length == 0 ? 0 : user.nation & 0xff, // if there is no character available, then allow user to change nation
   ]);
-}
+};

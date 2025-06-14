@@ -1,5 +1,5 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue } from "../../core/utils/unit";
 import { Warehouse } from '../../core/database/models';
 
@@ -18,7 +18,7 @@ export const SEL_NATION: IGameEndpoint = async function (socket: IGameSocket, bo
     if (!socket.user.warehouse) {
       let warehouse = new Warehouse({ money: 0 });
       await warehouse.save();
-      socket.user.warehouse = warehouse._id;
+      socket.user.warehouse = warehouse._id.toString();
     }
 
     if (socket.user.characters.length > 0) {

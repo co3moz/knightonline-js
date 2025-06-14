@@ -1,4 +1,4 @@
-import { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket";
 import { SendAbility } from "./sendAbility";
 import { RegionSend } from "../region";
 import { short, long, int } from "../../core/utils/unit";
@@ -15,15 +15,27 @@ export function SendLevelChange(socket: IGameSocket, newLevel: number) {
   let skillTotal = (newLevel - 9) * 2;
 
   if (newLevel > 60) {
-    statTotal += 2 * (newLevel - 60);  // after 60 level each level gives 5 so we increment "+2"
+    statTotal += 2 * (newLevel - 60); // after 60 level each level gives 5 so we increment "+2"
   }
 
   if (newLevel > currentLevel) {
     let { statStr, statHp, statDex, statMp, statInt, statRemaining } = c;
-    let userStatTotal = statStr + statHp + statDex + statMp + statInt + statRemaining;
+    let userStatTotal =
+      statStr + statHp + statDex + statMp + statInt + statRemaining;
 
-    let { skillPointCat1, skillPointCat2, skillPointCat3, skillPointMaster, skillPointFree } = c;
-    let userSkillTotal = skillPointCat1 + skillPointCat2 + skillPointCat3 + skillPointMaster + skillPointFree;
+    let {
+      skillPointCat1,
+      skillPointCat2,
+      skillPointCat3,
+      skillPointMaster,
+      skillPointFree,
+    } = c;
+    let userSkillTotal =
+      skillPointCat1 +
+      skillPointCat2 +
+      skillPointCat3 +
+      skillPointMaster +
+      skillPointFree;
 
     let statGain = Math.max(0, statTotal - userStatTotal);
     let skillGain = Math.max(0, skillTotal - userSkillTotal);
@@ -42,14 +54,18 @@ export function SendLevelChange(socket: IGameSocket, newLevel: number) {
   c.mp = v.maxMp; // level up so give mp
 
   RegionSend(socket, [
-    0x1B, // Level change
+    0x1b, // Level change
     ...short(socket.session),
     newLevel,
     ...short(c.statRemaining),
     c.skillPointFree,
-    ...long(GetLevelUp(newLevel)), ...long(c.exp),
-    ...short(v.maxHp || 0), ...short(c.hp),
-    ...short(v.maxMp || 0), ...short(c.mp),
-    ...int(v.maxWeight), ...int(v.itemWeight),
-  ])
+    ...long(GetLevelUp(newLevel)),
+    ...long(c.exp),
+    ...short(v.maxHp || 0),
+    ...short(c.hp),
+    ...short(v.maxMp || 0),
+    ...short(c.mp),
+    ...int(v.maxWeight),
+    ...int(v.itemWeight),
+  ]);
 }

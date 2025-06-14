@@ -1,5 +1,5 @@
-import { SetItem, ISetItem } from "../core/database/models";
-import { IGameSocket } from "./game_socket";
+import { SetItem, type ISetItem } from "../core/database/models";
+import type { IGameSocket } from "./game_socket";
 
 export const UserMap: { [name: string]: IGameSocket } = {}
 export const CharacterMap: { [name: string]: IGameSocket } = {}

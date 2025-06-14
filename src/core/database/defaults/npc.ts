@@ -1,15 +1,19 @@
-import { CSVReader } from '../utils/csv_reader';
-import { Npc, IDrop } from '../models';
+import { CSVReader } from "../utils/csv_reader";
+import { Npc, type IDrop } from "../models";
 
 export async function NpcDefaults() {
   if (await Npc.findOne({}).exec()) {
     return false;
   }
 
-  let npcs = await CSVReader('npc', NPCTransferObject, 1326);
-  let monsters = await CSVReader('monster', MonsterTransferObject, 1398);
-  let pos = await CSVReader('npc_monster_pos', NPCMonsterPositionTransferObject, 9392);
-  let drops = await CSVReader('monster_drop', MonsterDropTransferObject, 1000);
+  let npcs = await CSVReader("npc", NPCTransferObject, 1326);
+  let monsters = await CSVReader("monster", MonsterTransferObject, 1398);
+  let pos = await CSVReader(
+    "npc_monster_pos",
+    NPCMonsterPositionTransferObject,
+    9392
+  );
+  let drops = await CSVReader("monster_drop", MonsterDropTransferObject, 1000);
 
   let dropsGrouped = groupDrop(drops);
   let positionGrouped = groupPosition(pos);
@@ -27,7 +31,6 @@ export async function NpcDefaults() {
       npc.drops = [];
     }
   }
-
 
   for (let monster of monsters) {
     if (positionGrouped[monster.id]) {
@@ -53,10 +56,14 @@ export async function NpcDefaults() {
       }
       sent += arr.length;
       await Npc.insertMany(arr);
-      console.log('[CSV] NPC patch sent %d status: %f %', sent, (sent / total * 1000 | 0) / 10);
+      console.log(
+        "[CSV] NPC patch sent %d status: %f %",
+        sent,
+        (((sent / total) * 1000) | 0) / 10
+      );
     }
   } catch (e) {
-    console.error('[CSV] Error ocurred on inserting npc!');
+    console.error("[CSV] Error ocurred on inserting npc!");
     throw e;
   }
 
@@ -70,13 +77,16 @@ export async function NpcDefaults() {
       }
       sent += arr.length;
       await Npc.insertMany(arr);
-      console.log('[CSV] Monster patch sent %d status: %f %', sent, (sent / total * 1000 | 0) / 10);
+      console.log(
+        "[CSV] Monster patch sent %d status: %f %",
+        sent,
+        (((sent / total) * 1000) | 0) / 10
+      );
     }
   } catch (e) {
-    console.error('[CSV] Error ocurred on inserting monsters!');
+    console.error("[CSV] Error ocurred on inserting monsters!");
     throw e;
   }
-
 }
 
 function groupPosition(array) {
@@ -98,7 +108,7 @@ function groupPosition(array) {
         let x = +path.substring(i * 8, i * 8 + 4);
         let z = +path.substring(i * 8 + 4, i * 8 + 8);
         if (isNaN(x) || isNaN(z)) continue;
-        points.push({ x, z })
+        points.push({ x, z });
       }
 
       item.points = points;
@@ -121,7 +131,7 @@ function groupPosition(array) {
     item.direction = +item.direction || 0;
 
     if (data[npc]) {
-      data[npc].push(item)
+      data[npc].push(item);
     } else {
       data[npc] = [item];
     }
@@ -131,21 +141,26 @@ function groupPosition(array) {
 }
 
 interface IDropsGroupedByIds {
-  [dropId: number]: IDrop[]
+  [dropId: number]: IDrop[];
 }
 
 interface IDirectionPoint {
-  x: number,
-  z: number
+  x: number;
+  z: number;
 }
 
 interface IRawDrops {
-  id: number
-  item1: string, percent1: string
-  item2: string, percent2: string
-  item3: string, percent3: string
-  item4: string, percent4: string
-  item5: string, percent5: string
+  id: number;
+  item1: string;
+  percent1: string;
+  item2: string;
+  percent2: string;
+  item3: string;
+  percent3: string;
+  item4: string;
+  percent4: string;
+  item5: string;
+  percent5: string;
 }
 
 function groupDrop(array: IRawDrops[]): IDropsGroupedByIds {
@@ -157,16 +172,20 @@ function groupDrop(array: IRawDrops[]): IDropsGroupedByIds {
     let drops = data[id];
     if (!drops) drops = data[id] = [];
 
-    if (item.item1 && item.percent1) drops.push({ item: +item.item1, rate: (+item.percent1) / 10000 });
-    if (item.item2 && item.percent2) drops.push({ item: +item.item2, rate: (+item.percent2) / 10000 });
-    if (item.item3 && item.percent3) drops.push({ item: +item.item3, rate: (+item.percent3) / 10000 });
-    if (item.item4 && item.percent4) drops.push({ item: +item.item4, rate: (+item.percent4) / 10000 });
-    if (item.item5 && item.percent5) drops.push({ item: +item.item5, rate: (+item.percent5) / 10000 });
+    if (item.item1 && item.percent1)
+      drops.push({ item: +item.item1, rate: +item.percent1 / 10000 });
+    if (item.item2 && item.percent2)
+      drops.push({ item: +item.item2, rate: +item.percent2 / 10000 });
+    if (item.item3 && item.percent3)
+      drops.push({ item: +item.item3, rate: +item.percent3 / 10000 });
+    if (item.item4 && item.percent4)
+      drops.push({ item: +item.item4, rate: +item.percent4 / 10000 });
+    if (item.item5 && item.percent5)
+      drops.push({ item: +item.item5, rate: +item.percent5 / 10000 });
   }
 
   return data;
 }
-
 
 const NPCTransferObject = {
   sSid: "id",
@@ -213,8 +232,8 @@ const NPCTransferObject = {
   sItem: "item",
   byDirectAttack: "directAttack",
   byMagicAttack: "magicAttack",
-  sSpeed: "speed"
-}
+  sSpeed: "speed",
+};
 
 const MonsterTransferObject = {
   sSid: "id",
@@ -262,42 +281,42 @@ const MonsterTransferObject = {
   byDirectAttack: "directAttack",
   byMagicAttack: "magicAttack",
   byMoneyType: "moneyType",
-  sSpeed: "speed"
-}
+  sSpeed: "speed",
+};
 
 const NPCMonsterPositionTransferObject = {
-  ZoneID: 'zone',
-  NpcID: 'npc',
-  ActType: 'actType',
-  RegenType: 'regenType',
-  DungeonFamily: 'dungeonFamily',
-  SpecialType: 'specialType',
-  TrapNumber: 'trap',
-  LeftX: 'leftX',
-  TopZ: 'topZ',
-  RightX: 'rightX',
-  BottomZ: 'bottomZ',
-  LimitMinX: 'minx',
-  LimitMinZ: 'minz',
-  LimitMaxX: 'maxx',
-  LimitMaxZ: 'maxz',
-  NumNPC: 'amount',
-  RegTime: 'respawnTime',
-  byDirection: 'direction',
-  DotCnt: 'dot',
-  path: 'path'
-}
+  ZoneID: "zone",
+  NpcID: "npc",
+  ActType: "actType",
+  RegenType: "regenType",
+  DungeonFamily: "dungeonFamily",
+  SpecialType: "specialType",
+  TrapNumber: "trap",
+  LeftX: "leftX",
+  TopZ: "topZ",
+  RightX: "rightX",
+  BottomZ: "bottomZ",
+  LimitMinX: "minx",
+  LimitMinZ: "minz",
+  LimitMaxX: "maxx",
+  LimitMaxZ: "maxz",
+  NumNPC: "amount",
+  RegTime: "respawnTime",
+  byDirection: "direction",
+  DotCnt: "dot",
+  path: "path",
+};
 
 const MonsterDropTransferObject = {
-  sIndex: 'id',
-  iItem01: 'item1',
-  sPersent01: 'percent1',
-  iItem02: 'item2',
-  sPersent02: 'percent2',
-  iItem03: 'item3',
-  sPersent03: 'percent3',
-  iItem04: 'item4',
-  sPersent04: 'percent4',
-  iItem05: 'item5',
-  sPersent05: 'percent5',
-}
+  sIndex: "id",
+  iItem01: "item1",
+  sPersent01: "percent1",
+  iItem02: "item2",
+  sPersent02: "percent2",
+  iItem03: "item3",
+  sPersent03: "percent3",
+  iItem04: "item4",
+  sPersent04: "percent4",
+  iItem05: "item5",
+  sPersent05: "percent5",
+};

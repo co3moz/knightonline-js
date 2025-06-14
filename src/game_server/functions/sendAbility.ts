@@ -1,11 +1,9 @@
-import { IGameSocket, IVariables } from "../game_socket";
-import { ZoneCode } from '../var/zone_codes'
+import type { IGameSocket, IVariables } from "../game_socket";
+import { ZoneCode } from "../var/zone_codes";
 import { Coefficient } from "../var/coefficient";
-import { ISetItem, GetItemDetail } from "../../core/database/models";
+import { type ISetItem, GetItemDetail } from "../../core/database/models";
 import { SetItems } from "../shared";
 import { ItemSlot } from "../var/item_slot";
-import { GameEndpointCodes } from "../endpoint";
-import { short } from "../../core/utils/unit";
 import { SendItemMove } from "./sendItemMove";
 
 const ZONE_SNOW_BATTLE = ZoneCode.ZONE_SNOW_BATTLE;
@@ -45,53 +43,65 @@ export function CalculateUserAbilities(socket: IGameSocket) {
     v.statBuffBonus = [0, 0, 0, 0, 0];
   }
 
-
   if (!v.weaponsDisabled) {
     let rightHandItem = c.items[RIGHTHAND];
     let leftHandItem = c.items[LEFTHAND];
 
     if (rightHandItem) {
       let rightHandItemDetail = GetItemDetail(rightHandItem.id);
-      switch (rightHandItemDetail.kind / 10 | 0) {
-        case 1: hitCoefficient = coefficient.shortSword; break;
-        case 2: hitCoefficient = coefficient.sword; break;
-        case 3: hitCoefficient = coefficient.axe; break;
+      switch ((rightHandItemDetail.kind / 10) | 0) {
+        case 1:
+          hitCoefficient = coefficient.shortSword;
+          break;
+        case 2:
+          hitCoefficient = coefficient.sword;
+          break;
+        case 3:
+          hitCoefficient = coefficient.axe;
+          break;
         case 4:
-        case 18: hitCoefficient = coefficient.club; break;
+        case 18:
+          hitCoefficient = coefficient.club;
+          break;
         case 5:
         case 7:
         case 10:
           hitCoefficient = coefficient.bow;
           v.haveBow = true;
           break;
-        case 11: hitCoefficient = coefficient.staff; break;
+        case 11:
+          hitCoefficient = coefficient.staff;
+          break;
       }
       if (rightHandItem.durability == 0) {
-        itemDamage += ((rightHandItemDetail.damage | 0) + v.addWeaponDamage) / 2
+        itemDamage +=
+          ((rightHandItemDetail.damage | 0) + v.addWeaponDamage) / 2;
       } else {
-        itemDamage += (rightHandItemDetail.damage | 0) + v.addWeaponDamage
+        itemDamage += (rightHandItemDetail.damage | 0) + v.addWeaponDamage;
       }
     }
 
     if (leftHandItem) {
       let leftHandItemDetail = GetItemDetail(leftHandItem.id);
-      switch (leftHandItemDetail.kind / 10 | 0) {
-
+      switch ((leftHandItemDetail.kind / 10) | 0) {
         case 10:
           hitCoefficient = coefficient.bow;
           v.haveBow = true;
 
           if (leftHandItem.durability == 0) {
-            itemDamage += ((leftHandItemDetail.damage | 0) + v.addWeaponDamage) / 2
+            itemDamage +=
+              ((leftHandItemDetail.damage | 0) + v.addWeaponDamage) / 2;
           } else {
-            itemDamage += (leftHandItemDetail.damage | 0) + v.addWeaponDamage
+            itemDamage += (leftHandItemDetail.damage | 0) + v.addWeaponDamage;
           }
           break;
         default:
           if (leftHandItem.durability == 0) {
-            itemDamage += ((leftHandItemDetail.damage | 0) + v.addWeaponDamage) / 4
+            itemDamage +=
+              ((leftHandItemDetail.damage | 0) + v.addWeaponDamage) / 4;
           } else {
-            itemDamage += (leftHandItemDetail.damage | 0) + v.addWeaponDamage / 2
+            itemDamage +=
+              (leftHandItemDetail.damage | 0) + v.addWeaponDamage / 2;
           }
           break;
       }
@@ -104,49 +114,61 @@ export function CalculateUserAbilities(socket: IGameSocket) {
 
   CalculateStatBonus(socket);
 
-  let totalStr = (c.statStr + v.statBonus[0] + v.statBuffBonus[0]);
-  let totalDex = (c.statDex + v.statBonus[2] + v.statBuffBonus[2]);
+  let totalStr = c.statStr + v.statBonus[0] + v.statBuffBonus[0];
+  let totalDex = c.statDex + v.statBonus[2] + v.statBuffBonus[2];
 
   let baseAP = 0;
   let additionalAP = 3;
   let apStat = 0;
 
-  if (c.statStr > 150)
-    baseAP = c.statStr - 150;
+  if (c.statStr > 150) baseAP = c.statStr - 150;
 
-  if (c.statStr == 160)
-    baseAP--;
+  if (c.statStr == 160) baseAP--;
 
   let maxWeightAmount = v.maxWeightAmount || 100;
-  v.maxWeight = ((totalStr + c.level) * 50 + v.maxWeightBonus) * (maxWeightAmount <= 0 ? 1 : maxWeightAmount / 100);
+  v.maxWeight =
+    ((totalStr + c.level) * 50 + v.maxWeightBonus) *
+    (maxWeightAmount <= 0 ? 1 : maxWeightAmount / 100);
 
-  if (c.strKlass == 'rogue') {
+  if (c.strKlass == "rogue") {
     apStat = totalDex;
   } else {
     apStat = totalStr;
     additionalAP += baseAP;
   }
 
-  if (c.strKlass == 'warrior' || c.strKlass == 'priest') {
-    v.totalHit = ((0.010 * itemDamage * (apStat + 40)) + (hitCoefficient * itemDamage * c.level * apStat));
-  } else if (c.strKlass == 'rogue') {
-    v.totalHit = ((0.007 * itemDamage * (apStat + 40)) + (hitCoefficient * itemDamage * c.level * apStat));
-  } else if (c.strKlass == 'mage') {
-    v.totalHit = ((0.005 * itemDamage * (apStat + 40)) + (hitCoefficient * itemDamage * c.level));
+  if (c.strKlass == "warrior" || c.strKlass == "priest") {
+    v.totalHit =
+      0.01 * itemDamage * (apStat + 40) +
+      hitCoefficient * itemDamage * c.level * apStat;
+  } else if (c.strKlass == "rogue") {
+    v.totalHit =
+      0.007 * itemDamage * (apStat + 40) +
+      hitCoefficient * itemDamage * c.level * apStat;
+  } else if (c.strKlass == "mage") {
+    v.totalHit =
+      0.005 * itemDamage * (apStat + 40) +
+      hitCoefficient * itemDamage * c.level;
   }
 
-  v.totalHit = ((v.totalHit + additionalAP) * (100 + v.APBonusAmount) / 100) >>> 0;
+  v.totalHit =
+    (((v.totalHit + additionalAP) * (100 + v.APBonusAmount)) / 100) >>> 0;
 
-  v.totalAc = coefficient.ac * (c.level + v.itemAc) >>> 0;
+  v.totalAc = (coefficient.ac * (c.level + v.itemAc)) >>> 0;
 
   let acPercent = v.acPercent || 100;
-  v.totalAc = v.totalAc * acPercent / 100;
+  v.totalAc = (v.totalAc * acPercent) / 100;
 
   let hitRateAmount = v.hitRateAmount || 100;
   let avoidRateAmount = v.avoidRateAmount || 100;
 
-  v.totalHitRate = ((1 + coefficient.hitRate * c.level * totalDex) * v.itemHitRate / 100) * (hitRateAmount / 100);
-  v.totalEvasionRate = ((1 + coefficient.evasionRate * c.level * totalDex) * v.itemEvasionRate / 100) * (avoidRateAmount / 100);
+  v.totalHitRate =
+    (((1 + coefficient.hitRate * c.level * totalDex) * v.itemHitRate) / 100) *
+    (hitRateAmount / 100);
+  v.totalEvasionRate =
+    (((1 + coefficient.evasionRate * c.level * totalDex) * v.itemEvasionRate) /
+      100) *
+    (avoidRateAmount / 100);
 
   UpdateMaxHp(socket, 0);
   UpdateMaxMp(socket);
@@ -154,7 +176,6 @@ export function CalculateUserAbilities(socket: IGameSocket) {
   v.resistanceBonus = 0;
   // TODO: resistance bonus calculate
 }
-
 
 export function CalculateStatBonus(socket: IGameSocket) {
   let c = socket.character;
@@ -169,7 +190,11 @@ export function CalculateStatBonus(socket: IGameSocket) {
   v.statBonus = [0, 0, 0, 0, 0];
   v.equipedItemBonus = {};
 
-  v.APBonusAmount = v.itemExpGainAmount = v.itemNPBonus = v.itemNoahGainAmount = 0;
+  v.APBonusAmount =
+    v.itemExpGainAmount =
+    v.itemNPBonus =
+    v.itemNoahGainAmount =
+      0;
 
   v.APClassBonusAmount = [0, 0, 0, 0];
   v.ACClassBonusAmount = [0, 0, 0, 0];
@@ -182,22 +207,26 @@ export function CalculateStatBonus(socket: IGameSocket) {
     let itemDetail = GetItemDetail(item.id);
     if (!itemDetail) continue;
 
-    if (i == 47 || i == 48) { // magic bags
+    if (i == 47 || i == 48) {
+      // magic bags
       v.maxWeightBonus += itemDetail.durability;
     } else {
       v.itemWeight += (itemDetail.weight || 0) * (item.amount || 0);
     }
 
-
-    if ((i >= 14 && i < 42)
-      || (v.weaponsDisabled && (i == LEFTHAND || i == RIGHTHAND) && !(itemDetail.kind / 10 >>> 0 == 6))
-      || (i >= 49)
-    ) continue;
+    if (
+      (i >= 14 && i < 42) ||
+      (v.weaponsDisabled &&
+        (i == LEFTHAND || i == RIGHTHAND) &&
+        !((itemDetail.kind / 10) >>> 0 == 6)) ||
+      i >= 49
+    )
+      continue;
 
     let itemAc = itemDetail.defenceAbility || 0;
 
     if (item.durability == 0) {
-      itemAc = itemAc / 10 >>> 0;
+      itemAc = (itemAc / 10) >>> 0;
     }
 
     v.itemMaxHp += itemDetail.maxhpB || 0;
@@ -268,7 +297,8 @@ export function CalculateStatBonus(socket: IGameSocket) {
       v.equipedItemBonus[i][7] = +itemDetail.mirrorDamage;
     }
 
-    if (itemDetail.kind == 255) { // ITEM_KIND_COSPRE
+    if (itemDetail.kind == 255) {
+      // ITEM_KIND_COSPRE
       SetItemApply(SetItems[item.id], v);
     }
 
@@ -344,9 +374,9 @@ export function SetItemApply(setItem: ISetItem, v: IVariables) {
   if (APBonusClassType >= 1 && APBonusClassType <= 4)
     v.APBonusAmount[APBonusClassType - 1] += setItem.APBonusClassPercent || 0;
 
-
   if (ACBonusClassType >= 1 && ACBonusClassType <= 4)
-    v.ACClassBonusAmount[ACBonusClassType - 1] += setItem.ACBonusClassPercent || 0;
+    v.ACClassBonusAmount[ACBonusClassType - 1] +=
+      setItem.ACBonusClassPercent || 0;
 }
 
 export function UpdateMaxHp(socket: IGameSocket, flag: number) {
@@ -357,25 +387,28 @@ export function UpdateMaxHp(socket: IGameSocket, flag: number) {
   if (!coefficient) return;
 
   let maxHpAmount = v.maxHpAmount || 0;
-  let totalHpStat = (c.statHp + v.statBonus[1] + v.statBuffBonus[1]);
+  let totalHpStat = c.statHp + v.statBonus[1] + v.statBuffBonus[1];
 
   if (c.zone == ZONE_SNOW_BATTLE && flag == 0)
-    if (c.fame == 100 || c.rank == 1) // COMMANDER or KING
+    if (c.fame == 100 || c.rank == 1)
+      // COMMANDER or KING
       v.maxHp = 300;
-    else
-      v.maxHp = 100;
-  else if (c.zone == ZONE_CHAOS_DUNGEON && flag == 0)
-    v.maxHp = 10000 / 10;
+    else v.maxHp = 100;
+  else if (c.zone == ZONE_CHAOS_DUNGEON && flag == 0) v.maxHp = 10000 / 10;
   else {
-    v.maxHp = (((coefficient.hp * c.level * c.level * totalHpStat)
-      + 0.1 * (c.level * totalHpStat) + (totalHpStat / 5)) + maxHpAmount + v.itemMaxHp + 20) | 0;
+    v.maxHp =
+      (coefficient.hp * c.level * c.level * totalHpStat +
+        0.1 * (c.level * totalHpStat) +
+        totalHpStat / 5 +
+        maxHpAmount +
+        v.itemMaxHp +
+        20) |
+      0;
 
     if (v.maxHp > 14000) v.maxHp = 14000;
 
-    if (flag == 1)
-      c.hp = v.maxHp;
-    else if (flag == 2)
-      v.maxHp = 100;
+    if (flag == 1) c.hp = v.maxHp;
+    else if (flag == 2) v.maxHp = 100;
   }
 
   if (v.maxHp < c.hp) {
@@ -384,7 +417,6 @@ export function UpdateMaxHp(socket: IGameSocket, flag: number) {
     // HpChange(m_sHp);
   }
 }
-
 
 export function UpdateMaxMp(socket: IGameSocket) {
   let c = socket.character;
@@ -395,16 +427,26 @@ export function UpdateMaxMp(socket: IGameSocket) {
   if (!coefficient) return;
 
   let maxMpAmount = v.maxMpAmount || 0;
-  let totalInt = (c.statInt + v.statBonus[3] + v.statBuffBonus[3]);
-  let totalMp = (c.statMp + v.statBonus[4] + v.statBuffBonus[4]);
-
+  let totalInt = c.statInt + v.statBonus[3] + v.statBuffBonus[3];
+  let totalMp = c.statMp + v.statBonus[4] + v.statBuffBonus[4];
 
   if (coefficient.mp != 0) {
-    v.maxMp = ((coefficient.mp * c.level * c.level * totalInt)
-      + (0.1 * c.level * 2 * totalInt) + (totalInt / 5) + maxMpAmount + v.itemMaxMp + 20) >>> 0;
+    v.maxMp =
+      (coefficient.mp * c.level * c.level * totalInt +
+        0.1 * c.level * 2 * totalInt +
+        totalInt / 5 +
+        maxMpAmount +
+        v.itemMaxMp +
+        20) >>>
+      0;
   } else if (coefficient.sp != 0) {
-    v.maxMp = ((coefficient.sp * c.level * c.level * totalMp)
-      + (0.1 * c.level * 2 * totalMp) + (totalMp / 5) + maxMpAmount + v.itemMaxMp) >>> 0;
+    v.maxMp =
+      (coefficient.sp * c.level * c.level * totalMp +
+        0.1 * c.level * 2 * totalMp +
+        totalMp / 5 +
+        maxMpAmount +
+        v.itemMaxMp) >>>
+      0;
   }
 
   if (v.maxMp < c.mp) {

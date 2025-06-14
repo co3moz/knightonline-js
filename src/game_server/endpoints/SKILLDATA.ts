@@ -1,27 +1,34 @@
-import { IGameEndpoint } from "../endpoint";
-import { IGameSocket } from "../game_socket";
+import type { IGameEndpoint } from "../endpoint";
+import type { IGameSocket } from "../game_socket";
 import { Queue, short, int } from "../../core/utils/unit";
 
-export const SKILLDATA: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const SKILLDATA: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let subOpcode = body.byte();
   let c = socket.character;
 
-  if (subOpcode == 2) { // load
+  if (subOpcode == 2) {
+    // load
     if (c.skillBar.length == 0) {
       return socket.send([
         opcode,
         2, // load
-        0, 0 // 0
-      ])
+        0,
+        0, // 0
+      ]);
     }
 
     return socket.send([
       opcode,
       2, // load
       ...short(c.skillBar.length),
-      ...[].concat(...c.skillBar.map(x => int(x)))
-    ])
-  } else if (subOpcode == 1) { // save
+      ...[].concat(...c.skillBar.map((x) => int(x))),
+    ]);
+  } else if (subOpcode == 1) {
+    // save
     let count = body.short();
     if (count < 0 || count > 64) {
       return;
@@ -34,8 +41,8 @@ export const SKILLDATA: IGameEndpoint = async function (socket: IGameSocket, bod
     }
 
     c.skillBar = skills;
-    c.markModified('skillBar');
+    c.markModified("skillBar");
 
     // no need to response
   }
-}
+};
