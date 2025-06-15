@@ -10,8 +10,8 @@ import {
 } from "../../core/database/models/index.js";
 import { SendLookChange } from "../functions/sendLookChange.js";
 
-const EQUIP_MAX = 14;
-const INVENTORY_MAX = 28;
+export const EQUIP_MAX = 14;
+export const INVENTORY_MAX = 28;
 
 export const ITEM_MOVE: IGameEndpoint = async function (
   socket: IGameSocket,
@@ -227,7 +227,7 @@ function IsValidPosForItem(
   if (!detail) return false;
 
   let oneHandedItem = false;
-  switch (detail.slot) {
+  switch (detail.slot ?? 0) {
     case 0:
       if (slot != 6 && slot != 8) return false;
       oneHandedItem = true;

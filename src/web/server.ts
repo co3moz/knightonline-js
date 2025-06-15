@@ -9,6 +9,8 @@ import {
 import { GameServer } from "../game_server/server.js";
 import { UserMap, CharacterMap } from "../game_server/shared.js";
 import { NPCUUID } from "../game_server/ai_system/uuid.js";
+import { Item, PrepareItems } from "../core/database/models/item.js";
+import { SendItem } from "../game_server/functions/sendItem.js";
 
 export async function WebServer() {
   const app = fastify({
@@ -50,6 +52,25 @@ export async function WebServer() {
 
     if (socket) {
       return socket.character.toJSON();
+    } else {
+      reply.code(404);
+      return null;
+    }
+  });
+
+  app.get<{
+    Params: {
+      id: string;
+      itemId: number;
+    };
+  }>("/users/:id/give-item/:itemId", async (request, reply) => {
+    let socket = CharacterMap[request.params.id];
+
+    if (socket) {
+      await PrepareItems([+request.params.itemId]);
+      const result = SendItem(socket, request.params.itemId, 1);
+
+      return result;
     } else {
       reply.code(404);
       return null;
