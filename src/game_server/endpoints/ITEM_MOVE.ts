@@ -1,11 +1,11 @@
-import { Queue } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { SendAbility } from "../functions/sendAbility";
-import { SendWeightChange } from "../functions/sendWeightChange";
-import { SendItemMove } from "../functions/sendItemMove";
-import { type ICharacterItem, GetItemDetail } from "../../core/database/models";
-import { SendLookChange } from "../functions/sendLookChange";
+import { Queue } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { SendAbility } from "../functions/sendAbility.js";
+import { SendWeightChange } from "../functions/sendWeightChange.js";
+import { SendItemMove } from "../functions/sendItemMove.js";
+import { type ICharacterItem, GetItemDetail } from "@/models";
+import { SendLookChange } from "../functions/sendLookChange.js";
 
 const EQUIP_MAX = 14;
 const INVENTORY_MAX = 28;

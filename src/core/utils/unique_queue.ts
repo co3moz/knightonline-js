@@ -4,7 +4,7 @@
 export class UniqueQueue {
   private array: number[];
   private size: number;
-  
+
   private constructor(size: number, min: number) {
     let data = Array(size);
     let i = size;
@@ -13,7 +13,6 @@ export class UniqueQueue {
     this.array = data;
     this.size = size;
   }
-
 
   /**
    * Creates stack
@@ -24,7 +23,6 @@ export class UniqueQueue {
     return new UniqueQueue(size, min);
   }
 
-
   /**
    * Puts the number back to stack
    * @param i number
@@ -33,7 +31,6 @@ export class UniqueQueue {
     return this.array.push(i);
   }
 
-
   /**
    * Gets new number from stack. It might be undefined
    */
@@ -41,14 +38,12 @@ export class UniqueQueue {
     return this.array.pop();
   }
 
-
   /**
    * How much number is available.
    */
   freeSize() {
     return this.array.length;
   }
-
 
   /**
    * How much number is used.

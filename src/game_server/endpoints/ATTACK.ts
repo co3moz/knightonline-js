@@ -1,11 +1,11 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short } from "../../core/utils/unit";
-import { ItemSlot } from "../var/item_slot";
-import { RNPCMap, RegionSend } from "../region";
-import { GetDamageNPC } from "../functions/getDamage";
-import { SendTargetHP } from "../functions/sendTargetHP";
-import { OnNPCDead } from "../events/onNPCDead";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short } from "../../core/utils/unit.js";
+import { ItemSlot } from "../var/item_slot.js";
+import { RNPCMap, RegionSend } from "../region.js";
+import { GetDamageNPC } from "../functions/getDamage.js";
+import { SendTargetHP } from "../functions/sendTargetHP.js";
+import { OnNPCDead } from "../events/onNPCDead.js";
 
 export const ATTACK: IGameEndpoint = async function (
   socket: IGameSocket,

@@ -180,7 +180,7 @@ export class Queue {
   }
 
   long() {
-    return (longLib.fromBytesLE(<any>this.sub(8))).toNumber();
+    return longLib.fromBytesLE(<any>this.sub(8)).toNumber();
   }
 
   array(): number[] {

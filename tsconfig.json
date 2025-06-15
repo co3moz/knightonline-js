@@ -1,15 +1,22 @@
 {
   "compilerOptions": {
-    "moduleDetection": "force",
-    "target": "es2020",
-    "module": "Preserve",
-    "resolveJsonModule": true,
+    "moduleDetection": "auto",
+    "target": "es2022",
+    "module": "node16",
+    "moduleResolution": "node16",
     "allowJs": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "outDir": "build",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/database": ["./src/core/database/index.js"],
+      "@/redis": ["./src/core/redis/index.js"],
+      "@/models": ["./src/core/database/models/index.js"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "build"]

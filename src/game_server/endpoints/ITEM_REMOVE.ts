@@ -1,8 +1,8 @@
-import { Queue } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { SendAbility } from "../functions/sendAbility";
-import { SendWeightChange } from "../functions/sendWeightChange";
+import { Queue } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { SendAbility } from "../functions/sendAbility.js";
+import { SendWeightChange } from "../functions/sendWeightChange.js";
 
 export const ITEM_REMOVE: IGameEndpoint = async function (
   socket: IGameSocket,

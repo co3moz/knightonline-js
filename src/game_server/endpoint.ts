@@ -1,23 +1,23 @@
-import { Queue } from "../core/utils/unit";
-import type { IGameSocket } from "./game_socket";
-import * as Endpoints from './endpoints'
+import { Queue } from "../core/utils/unit.js";
+import type { IGameSocket } from "./game_socket.js";
+import * as Endpoints from "./endpoints/index.js";
 
 export enum GameEndpointCodes {
-  VERSION_CHECK = 0x2B,
+  VERSION_CHECK = 0x2b,
   LOGIN = 0x1,
-  LOAD_GAME = 0x9F,
+  LOAD_GAME = 0x9f,
   SEL_NATION = 0x05,
-  ALLCHAR_INFO_REQ = 0x0C,
+  ALLCHAR_INFO_REQ = 0x0c,
   NEW_CHAR = 0x02,
   SEL_CHAR = 0x04,
-  CHANGE_HAIR = 0x89, // client calls if hair = 0 
-  SHOPPING_MALL = 0x6A,
+  CHANGE_HAIR = 0x89, // client calls if hair = 0
+  SHOPPING_MALL = 0x6a,
   RENTAL = 0x73, // investigate this
   SPEEDHACK_CHECK = 0x41,
   HACK_TOOL = 0x72,
-  SERVER_INDEX = 0x6B,
-  GAME_START = 0x0D,
-  KNIGHT = 0x3C,
+  SERVER_INDEX = 0x6b,
+  GAME_START = 0x0d,
+  KNIGHT = 0x3c,
   QUEST = 0x64,
   FRIEND = 0x49,
   SKILLDATA = 0x79,
@@ -31,18 +31,18 @@ export enum GameEndpointCodes {
   ZONE_CHANGE = 0x27,
   TARGET_HP = 0x22,
   STATE_CHANGE = 0x29,
-  NPC_DETAILED_REQUEST = 0x1D,
+  NPC_DETAILED_REQUEST = 0x1d,
   ATTACK = 0x08,
   DROP_OPEN = 0x24,
   DROP_TAKE = 0x26,
   HELMET_STATUS_CHANGE = 0x87,
   GENIE = 0x97,
-  ITEM_REMOVE = 0x3F,
-  ITEM_MOVE = 0x1F,
+  ITEM_REMOVE = 0x3f,
+  ITEM_MOVE = 0x1f,
   POINT_CHANGE = 0x28,
   NPC_EVENT = 0x20,
   ITEM_TRADE = 0x21,
-  WAREHOUSE = 0x45
+  WAREHOUSE = 0x45,
 }
 
 export function GameEndpoint(name: string): IGameEndpoint {
@@ -50,5 +50,5 @@ export function GameEndpoint(name: string): IGameEndpoint {
 }
 
 export interface IGameEndpoint {
-  (socket: IGameSocket, body: Queue, opcode: number): Promise<void>
+  (socket: IGameSocket, body: Queue, opcode: number): Promise<void>;
 }

@@ -1,11 +1,11 @@
-import { LoginServer } from "./login_server/server";
-import { GameServer } from "./game_server/server";
-import { OnServerTick } from "./game_server/events/onServerTick";
-import type { IKOServer } from "./core/server";
-import { Database, DisconnectFromDatabase } from "./core/database";
-import { GarbageCollect } from "./core/utils/general";
-import { WebServer } from "./web/server";
-import { RedisConnect } from "./core/redis/connect";
+import { LoginServer } from "./login_server/server.js";
+import { GameServer } from "./game_server/server.js";
+import { OnServerTick } from "./game_server/events/onServerTick.js";
+import type { IKOServer } from "./core/server.js";
+import { Database, DisconnectFromDatabase } from "./core/database/index.js";
+import { GarbageCollect } from "./core/utils/general.js";
+import { WebServer } from "./web/server.js";
+import { RedisConnect } from "@/redis";
 
 async function main() {
   console.log("[MAIN] %s v%s", "ko-js", "1.0.0");

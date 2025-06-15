@@ -1,8 +1,8 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short } from "../../core/utils/unit";
-import { RNPCMap } from "../region";
-import { BuildNPCDetail } from "../functions/buildNPCDetail";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short } from "../../core/utils/unit.js";
+import { RNPCMap } from "../region.js";
+import { BuildNPCDetail } from "../functions/buildNPCDetail.js";
 
 export const NPC_DETAILED_REQUEST: IGameEndpoint = async function (
   socket: IGameSocket,

@@ -1,4 +1,4 @@
-import { WaitNextTick } from "../core/utils/general";
+import { WaitNextTick } from "../core/utils/general.js";
 
 const drops: IDropDictionary = <IDropDictionary>{};
 let dropIndex = 0;

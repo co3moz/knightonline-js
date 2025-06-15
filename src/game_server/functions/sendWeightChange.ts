@@ -1,5 +1,5 @@
-import type { IGameSocket } from "../game_socket";
-import { int } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { int } from "../../core/utils/unit.js";
 
 export function SendWeightChange(socket: IGameSocket): void {
   socket.send([

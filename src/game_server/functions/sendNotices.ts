@@ -1,5 +1,5 @@
-import type { IGameSocket } from "../game_socket";
-import { string, byte_string, short } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { string, byte_string, short } from "../../core/utils/unit.js";
 
 const notices = [["KO-JS", "Welcome to Knight Online Javascript Server"]];
 

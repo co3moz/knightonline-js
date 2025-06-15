@@ -1,6 +1,6 @@
-import { Queue } from "../core/utils/unit";
-import type { ILoginSocket } from "./login_socket";
-import * as Endpoints from './endpoints'
+import { Queue } from "../core/utils/unit.js";
+import type { ILoginSocket } from "./login_socket.js";
+import * as Endpoints from './endpoints/index.js'
 
 export enum LoginEndpointCodes {
   VERSION_REQ = 0x01,

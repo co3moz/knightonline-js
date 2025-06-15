@@ -1,6 +1,6 @@
-import { Queue } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
+import { Queue } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
 
 export const WAREHOUSE: IGameEndpoint = async function (
   socket: IGameSocket,

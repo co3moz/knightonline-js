@@ -1,7 +1,7 @@
-import type { IGameSocket } from "../game_socket";
-import { ItemSlot } from "../var/item_slot";
-import { int, short, byte_string, long } from "../../core/utils/unit";
-import { GetLevelUp } from "./getLevelUp";
+import type { IGameSocket } from "../game_socket.js";
+import { ItemSlot } from "../var/item_slot.js";
+import { int, short, byte_string, long } from "../../core/utils/unit.js";
+import { GetLevelUp } from "./getLevelUp.js";
 
 export function SendMyInfo(socket: IGameSocket) {
   let u = socket.user;

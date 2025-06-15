@@ -1,17 +1,17 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue } from "../../core/utils/unit";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue } from "../../core/utils/unit.js";
 import {
   SendUsageMessageForGM,
   GM_COMMANDS_HEADER,
   GM_COMMANDS,
-} from "../functions/GMController";
+} from "../functions/GMController.js";
 import {
   ChatMessageType,
   SendPlayerMessageToRegion,
   SendMessageToPlayerFromPlayer,
-} from "../functions/sendChatMessage";
-import { RUserMap } from "../region";
+} from "../functions/sendChatMessage.js";
+import { RUserMap } from "../region.js";
 
 export const CHAT: IGameEndpoint = async function (
   socket: IGameSocket,

@@ -1,6 +1,6 @@
-import type { IGameSocket } from "../game_socket";
-import { short } from "../../core/utils/unit";
-import { ZoneRules, ZoneFlags } from "../var/zone_rules";
+import type { IGameSocket } from "../game_socket.js";
+import { short } from "../../core/utils/unit.js";
+import { ZoneRules, ZoneFlags } from "../var/zone_rules.js";
 
 export function SendZoneAbility(socket: IGameSocket): void {
   let zoneRule = ZoneRules[socket.character.zone];

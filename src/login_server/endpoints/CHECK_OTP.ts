@@ -1,8 +1,8 @@
-import { Queue, byte_string } from "../../core/utils/unit";
-import { GenerateOTP } from "../../core/utils/otp";
-import type { ILoginSocket } from "../login_socket";
-import type { ILoginEndpoint } from "../endpoint";
-import { Account } from "../../core/database/models";
+import { Queue, byte_string } from "../../core/utils/unit.js";
+import { GenerateOTP } from "../../core/utils/otp.js";
+import type { ILoginSocket } from "../login_socket.js";
+import type { ILoginEndpoint } from "../endpoint.js";
+import { Account } from "../../core/database/models/index.js";
 
 export const CHECK_OTP: ILoginEndpoint = async function (
   socket: ILoginSocket,

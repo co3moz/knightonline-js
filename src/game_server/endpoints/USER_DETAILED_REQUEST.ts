@@ -1,7 +1,7 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue } from "../../core/utils/unit";
-import { SendRegionUserInDetailMultiple } from "../functions/sendRegionInOut";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue } from "../../core/utils/unit.js";
+import { SendRegionUserInDetailMultiple } from "../functions/sendRegionInOut.js";
 
 export const USER_DETAILED_REQUEST: IGameEndpoint = async function (
   socket: IGameSocket,

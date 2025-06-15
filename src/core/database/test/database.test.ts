@@ -1,5 +1,5 @@
-import { Spec } from 'nole';
-import { Database } from '..';
+import { Database } from "@/database";
+import { Spec } from "nole";
 
 export class DatabaseTest {
   @Spec(60000)

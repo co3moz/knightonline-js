@@ -1,9 +1,9 @@
-import type { IGameSocket } from "../game_socket";
-import { short } from "../../core/utils/unit";
-import { RSessionMap, RegionQuery, RegionQueryNPC } from "../region";
-import { BuildUserDetail } from "./buildUserDetail";
-import type { INPCInstance } from "../ai_system/declare";
-import { BuildNPCDetail } from "./buildNPCDetail";
+import type { IGameSocket } from "../game_socket.js";
+import { short } from "../../core/utils/unit.js";
+import { RSessionMap, RegionQuery, RegionQueryNPC } from "../region.js";
+import { BuildUserDetail } from "./buildUserDetail.js";
+import type { INPCInstance } from "../ai_system/declare.js";
+import { BuildNPCDetail } from "./buildNPCDetail.js";
 
 export function SendRegionUserOut(
   socket: IGameSocket,

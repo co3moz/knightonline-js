@@ -1,6 +1,6 @@
-import { Npc } from "../../core/database/models";
-import { NPCUUID, NPCMap } from "./uuid";
-import type { INPCInstance } from "./declare";
+import { Npc } from "@/models";
+import { NPCUUID, NPCMap } from "./uuid.js";
+import type { INPCInstance } from "./declare.js";
 
 let loaded = false;
 

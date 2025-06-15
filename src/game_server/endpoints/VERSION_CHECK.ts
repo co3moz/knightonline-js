@@ -1,8 +1,8 @@
 import config from "config";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short } from "../../core/utils/unit";
-import { Crypt } from "../../core/utils/crypt";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short } from "../../core/utils/unit.js";
+import { Crypt } from "../../core/utils/crypt.js";
 
 const clientExeVersion = <number>config.get("gameServer.clientExeVersion");
 

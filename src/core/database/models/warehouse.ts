@@ -1,5 +1,5 @@
 import { Schema, model, SchemaTypes } from "mongoose";
-import type { ICharacterItem } from "./character";
+import type { ICharacterItem } from "./character.js";
 
 export interface IWarehouse {
   money: number;

@@ -1,7 +1,7 @@
 import config from "config";
 import mongoose from "mongoose";
 
-import { ConnectToDatabase } from "./utils/connect";
+import { ConnectToDatabase } from "./utils/connect.js";
 import {
   SettingDefaults,
   ServerDefaults,
@@ -9,7 +9,7 @@ import {
   ItemDefaults,
   NpcDefaults,
   AccountDefaults,
-} from "./defaults";
+} from "./defaults/index.js";
 
 let connection: mongoose.Connection = null;
 

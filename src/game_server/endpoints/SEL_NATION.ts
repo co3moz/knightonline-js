@@ -1,16 +1,18 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue } from "../../core/utils/unit";
-import { Warehouse } from '../../core/database/models';
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue } from "../../core/utils/unit.js";
+import { Warehouse } from "@/models";
 
-export const SEL_NATION: IGameEndpoint = async function (socket: IGameSocket, body: Queue, opcode: number) {
+export const SEL_NATION: IGameEndpoint = async function (
+  socket: IGameSocket,
+  body: Queue,
+  opcode: number
+) {
   let nation = body.byte();
 
-  if (!(nation == 1 || nation == 2)) { // invalid
-    return socket.send([
-      opcode,
-      0
-    ]);
+  if (!(nation == 1 || nation == 2)) {
+    // invalid
+    return socket.send([opcode, 0]);
   }
 
   var result = 1;
@@ -29,12 +31,10 @@ export const SEL_NATION: IGameEndpoint = async function (socket: IGameSocket, bo
     await socket.user.save();
 
     result = nation;
-  } catch (e) { // if anything goes wrong
+  } catch (e) {
+    // if anything goes wrong
     result = 0;
   }
 
-  socket.send([
-    opcode,
-    result
-  ]);
-}
+  socket.send([opcode, result]);
+};

@@ -1,13 +1,13 @@
-import { Queue, int } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { type INPCInstance, NPCType } from "../ai_system/declare";
-import { NPCMap } from "../ai_system/uuid";
-import { GetItemDetail, PrepareItems } from "../../core/database/models";
-import { isUserDead } from "../functions/isDead";
-import { GenerateItem } from "../functions/generateItem";
-import { SendAbility } from "../functions/sendAbility";
-import { SendWeightChange } from "../functions/sendWeightChange";
+import { Queue, int } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { type INPCInstance, NPCType } from "../ai_system/declare.js";
+import { NPCMap } from "../ai_system/uuid.js";
+import { GetItemDetail, PrepareItems } from "@/models";
+import { isUserDead } from "../functions/isDead.js";
+import { GenerateItem } from "../functions/generateItem.js";
+import { SendAbility } from "../functions/sendAbility.js";
+import { SendWeightChange } from "../functions/sendWeightChange.js";
 
 export const ITEM_TRADE: IGameEndpoint = async function (
   socket: IGameSocket,

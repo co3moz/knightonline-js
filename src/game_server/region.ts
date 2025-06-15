@@ -1,6 +1,6 @@
-import type { IGameSocket } from "./game_socket";
-import type { INPCInstance } from "./ai_system/declare";
-import { OnRegionUpdate } from "./events/onRegionUpdate";
+import type { IGameSocket } from "./game_socket.js";
+import type { INPCInstance } from "./ai_system/declare.js";
+import { OnRegionUpdate } from "./events/onRegionUpdate.js";
 
 export const RRegionMap: IRegionDictionary = {};
 export const RUserMap: IUserDictionary = {};

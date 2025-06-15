@@ -1,10 +1,10 @@
 import config from "config";
-import { Database } from "../core/database";
-import { RedisConnect } from "../core/redis/connect";
-import { KOServerFactory, type IKOServer } from "../core/server";
-import { Queue } from "../core/utils/unit";
-import { LoginEndpointCodes, LoginEndpoint } from "./endpoint";
-import type { ILoginSocket } from "./login_socket";
+import { Database } from "../core/database/index.js";
+import { KOServerFactory, type IKOServer } from "../core/server.js";
+import { Queue } from "../core/utils/unit.js";
+import { LoginEndpointCodes, LoginEndpoint } from "./endpoint.js";
+import type { ILoginSocket } from "./login_socket.js";
+import { RedisConnect } from "@/redis";
 
 let loginServerCache: IKOServer[] = null;
 

@@ -1,7 +1,7 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, int, short } from "../../core/utils/unit";
-import { GetDrop } from "../drop";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, int, short } from "../../core/utils/unit.js";
+import { GetDrop } from "../drop.js";
 
 export const DROP_OPEN: IGameEndpoint = async function (
   socket: IGameSocket,

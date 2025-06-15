@@ -1,6 +1,6 @@
-import type { IGameSocket } from "../game_socket";
-import { RegionSend } from "../region";
-import { short, int } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { RegionSend } from "../region.js";
+import { short, int } from "../../core/utils/unit.js";
 
 export function SendStateChange(
   socket: IGameSocket,

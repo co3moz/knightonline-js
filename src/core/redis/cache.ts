@@ -1,4 +1,4 @@
-import { redisClient } from "./index";
+import { redisClient } from "./index.js";
 
 export async function RedisCaching(
   name: string,

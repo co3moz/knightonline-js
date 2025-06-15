@@ -1,8 +1,8 @@
-import { Queue, string, configString, short } from "../../core/utils/unit";
-import type { ILoginSocket } from "../login_socket";
-import type { ILoginEndpoint } from "../endpoint";
-import { Account, type IAccount } from "../../core/database/models";
-import { GenerateOTP } from "../../core/utils/otp";
+import { Queue, string, configString, short } from "../../core/utils/unit.js";
+import type { ILoginSocket } from "../login_socket.js";
+import type { ILoginEndpoint } from "../endpoint.js";
+import { Account, type IAccount } from "../../core/database/models/index.js";
+import { GenerateOTP } from "../../core/utils/otp.js";
 
 export const LOGIN_REQ: ILoginEndpoint = async function (
   socket: ILoginSocket,

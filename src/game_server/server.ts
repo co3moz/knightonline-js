@@ -1,14 +1,14 @@
 import config from "config";
-import { Database } from "../core/database";
-import { RedisConnect } from "../core/redis/connect";
-import { KOServerFactory, type IKOServer } from "../core/server";
-import { Queue } from "../core/utils/unit";
-import { GameEndpointCodes, GameEndpoint } from "./endpoint";
-import type { IGameSocket } from "./game_socket";
-import { UserMap, CharacterMap, LoadSetItems } from "./shared";
-import { RegionRemove } from "./region";
-import { AISystemStart } from "./ai_system/start";
-import { OnUserExit } from "./events/onUserExit";
+import { Database } from "@/database";
+import { KOServerFactory, type IKOServer } from "../core/server.js";
+import { Queue } from "../core/utils/unit.js";
+import { GameEndpointCodes, GameEndpoint } from "./endpoint.js";
+import type { IGameSocket } from "./game_socket.js";
+import { UserMap, CharacterMap, LoadSetItems } from "./shared.js";
+import { RegionRemove } from "./region.js";
+import { AISystemStart } from "./ai_system/start.js";
+import { OnUserExit } from "./events/onUserExit.js";
+import { RedisConnect } from "@/redis";
 
 let gameServerCache: IKOServer = null;
 export async function GameServer() {

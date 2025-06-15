@@ -1,5 +1,5 @@
-import { UniqueQueue } from "../../core/utils/unique_queue";
-import type { INPCInstance } from "./declare";
+import { UniqueQueue } from "../../core/utils/unique_queue.js";
+import type { INPCInstance } from "./declare.js";
 
 export const NPCUUID = UniqueQueue.from(30000, 10000);
 

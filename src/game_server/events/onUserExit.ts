@@ -1,6 +1,6 @@
-import type { IGameSocket } from "../game_socket";
-import { RSessionMap } from "../region";
-import { SendRegionUserOut } from "../functions/sendRegionInOut";
+import type { IGameSocket } from "../game_socket.js";
+import { RSessionMap } from "../region.js";
+import { SendRegionUserOut } from "../functions/sendRegionInOut.js";
 
 export function OnUserExit(socket: IGameSocket) {
   let leaveSocket = socket.session;

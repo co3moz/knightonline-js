@@ -1,15 +1,15 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short } from "../../core/utils/unit";
-import { RegionUpdate } from "../region";
-import { SendQuests } from "../functions/sendQuests";
-import { SendNotices } from "../functions/sendNotices";
-import { SendTime } from "../functions/sendTime";
-import { SendWeather } from "../functions/sendWeather";
-import { SendMyInfo } from "../functions/sendMyInfo";
-import { SendZoneAbility } from "../functions/sendZoneAbility";
-import { SendRegionUserInMultiple } from "../functions/sendRegionInOut";
-import { SendBlinkStart } from "../functions/sendBlink";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short } from "../../core/utils/unit.js";
+import { RegionUpdate } from "../region.js";
+import { SendQuests } from "../functions/sendQuests.js";
+import { SendNotices } from "../functions/sendNotices.js";
+import { SendTime } from "../functions/sendTime.js";
+import { SendWeather } from "../functions/sendWeather.js";
+import { SendMyInfo } from "../functions/sendMyInfo.js";
+import { SendZoneAbility } from "../functions/sendZoneAbility.js";
+import { SendRegionUserInMultiple } from "../functions/sendRegionInOut.js";
+import { SendBlinkStart } from "../functions/sendBlink.js";
 
 export const GAME_START: IGameEndpoint = async function (
   socket: IGameSocket,

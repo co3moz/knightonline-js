@@ -1,9 +1,9 @@
-import type { IGameSocket } from "../game_socket";
-import { ZoneCode } from "../var/zone_codes";
-import { ZoneStartPosition } from "../var/zone_start_position";
-import { short } from "../../core/utils/unit";
-import { RegionUpdate } from "../region";
-import { SendRegionUserOutForMe } from "./sendRegionInOut";
+import type { IGameSocket } from "../game_socket.js";
+import { ZoneCode } from "../var/zone_codes.js";
+import { ZoneStartPosition } from "../var/zone_start_position.js";
+import { short } from "../../core/utils/unit.js";
+import { RegionUpdate } from "../region.js";
+import { SendRegionUserOutForMe } from "./sendRegionInOut.js";
 
 export function SendWarp(socket: IGameSocket, zone: ZoneCode): boolean {
   let pos = FindStartPositionOfZoneForUser(socket, zone);

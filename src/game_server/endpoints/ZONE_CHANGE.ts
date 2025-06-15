@@ -1,8 +1,8 @@
-import { Queue } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { SendRegionUserInMultiple } from "../functions/sendRegionInOut";
-import { SendBlinkStart } from "../functions/sendBlink";
+import { Queue } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { SendRegionUserInMultiple } from "../functions/sendRegionInOut.js";
+import { SendBlinkStart } from "../functions/sendBlink.js";
 
 export const ZONE_CHANGE: IGameEndpoint = async function (
   socket: IGameSocket,

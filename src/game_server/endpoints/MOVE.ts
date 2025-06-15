@@ -1,7 +1,7 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short } from "../../core/utils/unit";
-import { RegionUpdate, RegionSend } from "../region";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short } from "../../core/utils/unit.js";
+import { RegionUpdate, RegionSend } from "../region.js";
 
 export const MOVE: IGameEndpoint = async function (
   socket: IGameSocket,

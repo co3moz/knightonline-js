@@ -1,7 +1,7 @@
-import { Queue } from "../../core/utils/unit";
-import type { ILoginSocket } from "../login_socket";
-import type { ILoginEndpoint } from "../endpoint";
-import { Crypt } from "../../core/utils/crypt";
+import { Queue } from "../../core/utils/unit.js";
+import type { ILoginSocket } from "../login_socket.js";
+import type { ILoginEndpoint } from "../endpoint.js";
+import { Crypt } from "../../core/utils/crypt.js";
 
 export const CRYPTION: ILoginEndpoint = async function (
   socket: ILoginSocket,

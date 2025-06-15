@@ -1,8 +1,8 @@
-import type { IGameSocket } from "../game_socket";
-import { SendAbility } from "./sendAbility";
-import { RegionSend } from "../region";
-import { short, long, int } from "../../core/utils/unit";
-import { GetLevelUp } from "./getLevelUp";
+import type { IGameSocket } from "../game_socket.js";
+import { SendAbility } from "./sendAbility.js";
+import { RegionSend } from "../region.js";
+import { short, long, int } from "../../core/utils/unit.js";
+import { GetLevelUp } from "./getLevelUp.js";
 
 export function SendLevelChange(socket: IGameSocket, newLevel: number) {
   if (newLevel < 1 || newLevel > 83) return;

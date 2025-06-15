@@ -1,10 +1,10 @@
-import type { IGameSocket, IVariables } from "../game_socket";
-import { ZoneCode } from "../var/zone_codes";
-import { Coefficient } from "../var/coefficient";
-import { type ISetItem, GetItemDetail } from "../../core/database/models";
-import { SetItems } from "../shared";
-import { ItemSlot } from "../var/item_slot";
-import { SendItemMove } from "./sendItemMove";
+import type { IGameSocket, IVariables } from "../game_socket.js";
+import { ZoneCode } from "../var/zone_codes.js";
+import { Coefficient } from "../var/coefficient.js";
+import { type ISetItem, GetItemDetail } from "@/models";
+import { SetItems } from "../shared.js";
+import { ItemSlot } from "../var/item_slot.js";
+import { SendItemMove } from "./sendItemMove.js";
 
 const ZONE_SNOW_BATTLE = ZoneCode.ZONE_SNOW_BATTLE;
 const ZONE_CHAOS_DUNGEON = ZoneCode.ZONE_CHAOS_DUNGEON;

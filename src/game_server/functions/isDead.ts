@@ -1,4 +1,4 @@
-import type { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket.js";
 
 export function isUserDead(socket: IGameSocket) {
   let c = socket.character;

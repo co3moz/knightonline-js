@@ -1,11 +1,11 @@
 import net from "net";
 import lzfjs from "lzfjs";
 import crc32 from "crc-32";
-import { Queue, short, readShort } from "./utils/unit";
+import { Queue, short, readShort } from "./utils/unit.js";
 import {
   CreateDeferredPromise,
   type IDeferredPromise,
-} from "./utils/deferred_promise";
+} from "./utils/deferred_promise.js";
 
 export function KOClientFactory(
   params: IClientConfiguration

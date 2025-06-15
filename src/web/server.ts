@@ -5,10 +5,10 @@ import {
   avgGC,
   avgDrop,
   tick,
-} from "../game_server/events/onServerTick";
-import { GameServer } from "../game_server/server";
-import { UserMap, CharacterMap } from "../game_server/shared";
-import { NPCUUID } from "../game_server/ai_system/uuid";
+} from "../game_server/events/onServerTick.js";
+import { GameServer } from "../game_server/server.js";
+import { UserMap, CharacterMap } from "../game_server/shared.js";
+import { NPCUUID } from "../game_server/ai_system/uuid.js";
 
 export async function WebServer() {
   const app = fastify({

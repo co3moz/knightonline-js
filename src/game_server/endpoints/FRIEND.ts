@@ -1,7 +1,7 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short, string, byte_string } from "../../core/utils/unit";
-import { CharacterMap } from "../shared";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short, string, byte_string } from "../../core/utils/unit.js";
+import { CharacterMap } from "../shared.js";
 
 export const FRIEND: IGameEndpoint = async function (
   socket: IGameSocket,

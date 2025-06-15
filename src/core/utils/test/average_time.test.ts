@@ -1,5 +1,5 @@
 import { Spec } from "nole";
-import { AverageTime } from "../average_time";
+import { AverageTime } from "../average_time.js";
 import { assert } from "chai";
 
 export class AverageTimeTest {
@@ -20,6 +20,6 @@ export class AverageTimeTest {
   @Spec()
   ExpectValueToBeValid() {
     assert.equal(this.averageTime.avg(), 5.5);
-    assert.equal(this.averageTime.values().length, 10)
+    assert.equal(this.averageTime.values().length, 10);
   }
 }

@@ -2,7 +2,7 @@
  * Average time calculator
  */
 export class AverageTime {
-  private array: number[]
+  private array: number[];
   private size: number;
   private total: number;
 
@@ -12,7 +12,6 @@ export class AverageTime {
     this.total = 0;
   }
 
-
   /**
    * Creates an instance for calculations
    * @param size How much data will be stored
@@ -20,7 +19,6 @@ export class AverageTime {
   public static instance(size: number) {
     return new AverageTime(size);
   }
-
 
   /**
    * Pushes new data to instance
@@ -36,14 +34,12 @@ export class AverageTime {
     this.total += time;
   }
 
-
   /**
    * Calculates average time.
    */
   public avg() {
-    return (this.total / this.array.length * 100 | 0) / 100;
+    return (((this.total / this.array.length) * 100) | 0) / 100;
   }
-
 
   /**
    * Fetches the stack

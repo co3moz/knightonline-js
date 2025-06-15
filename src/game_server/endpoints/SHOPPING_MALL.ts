@@ -1,8 +1,8 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, int, short, byte_string } from "../../core/utils/unit";
-import { Mail } from "../../core/database/models";
-import { ItemSlot } from "../var/item_slot";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, int, short, byte_string } from "../../core/utils/unit.js";
+import { Mail } from "@/models";
+import { ItemSlot } from "../var/item_slot.js";
 
 const INVENTORY_START = ItemSlot.INVENTORY_START;
 const INVENTORY_END = ItemSlot.INVENTORY_END;

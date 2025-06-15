@@ -1,6 +1,6 @@
 import { Spec } from "nole";
 import { assert } from "chai";
-import { CreateDeferredPromise } from "../deferred_promise";
+import { CreateDeferredPromise } from "../deferred_promise.js";
 
 export class DeferredPromiseTest {
   @Spec(10)
@@ -15,12 +15,10 @@ export class DeferredPromiseTest {
   @Spec(10)
   async ErrorCase() {
     let promise = CreateDeferredPromise();
-    promise.reject(<any> 1);
+    promise.reject(<any>1);
 
     try {
       await promise;
-    } catch(e) {
-
-    }
+    } catch (e) {}
   }
 }

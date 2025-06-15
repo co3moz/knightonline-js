@@ -1,6 +1,6 @@
-import { Queue } from "../../core/utils/unit";
-import type { ILoginSocket } from "../login_socket";
-import type { ILoginEndpoint } from "../endpoint";
+import { Queue } from "../../core/utils/unit.js";
+import type { ILoginSocket } from "../login_socket.js";
+import type { ILoginEndpoint } from "../endpoint.js";
 
 export const UNK_REQ: ILoginEndpoint = async function (
   socket: ILoginSocket,

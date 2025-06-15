@@ -1,9 +1,9 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue } from "../../core/utils/unit";
-import { SendMessageToPlayer } from "../functions/sendChatMessage";
-import { RNPCMap } from "../region";
-import { SendTargetHP } from "../functions/sendTargetHP";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue } from "../../core/utils/unit.js";
+import { SendMessageToPlayer } from "../functions/sendChatMessage.js";
+import { RNPCMap } from "../region.js";
+import { SendTargetHP } from "../functions/sendTargetHP.js";
 
 export const TARGET_HP: IGameEndpoint = async function (
   socket: IGameSocket,

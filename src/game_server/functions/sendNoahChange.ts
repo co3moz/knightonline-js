@@ -1,5 +1,5 @@
-import type { IGameSocket } from "../game_socket";
-import { int } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { int } from "../../core/utils/unit.js";
 
 const MAX_NOAH = 2100000000;
 export function SendNoahChange(

@@ -1,5 +1,5 @@
-import { KOClientFactory, type IKOClientSocket } from "../core/client";
-import { short, Queue } from "../core/utils/unit";
+import { KOClientFactory, type IKOClientSocket } from "../core/client.js";
+import { short, Queue } from "../core/utils/unit.js";
 
 export async function ConnectKOServerForLauncher(
   ip: string,

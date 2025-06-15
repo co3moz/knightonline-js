@@ -1,14 +1,13 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket, IVariables, IVisiblePlayers } from "../game_socket";
-import { Queue, short } from "../../core/utils/unit";
-import {
-  Character,
-  Warehouse,
-  Item,
-  PrepareItems,
-} from "../../core/database/models";
-import { CharacterMap } from "../shared";
-import { SendAbility } from "../functions/sendAbility";
+import type { IGameEndpoint } from "../endpoint.js";
+import type {
+  IGameSocket,
+  IVariables,
+  IVisiblePlayers,
+} from "../game_socket.js";
+import { Queue, short } from "../../core/utils/unit.js";
+import { Character, Warehouse, Item, PrepareItems } from "@/models";
+import { CharacterMap } from "../shared.js";
+import { SendAbility } from "../functions/sendAbility.js";
 
 export const SEL_CHAR: IGameEndpoint = async function (
   socket: IGameSocket,

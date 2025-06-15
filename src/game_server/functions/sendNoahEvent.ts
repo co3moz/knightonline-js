@@ -1,7 +1,7 @@
-import type { IGameSocket } from "../game_socket";
-import { RegionSend } from "../region";
-import { short } from "../../core/utils/unit";
-import { SendNoahChange, GoldGainType } from "./sendNoahChange";
+import type { IGameSocket } from "../game_socket.js";
+import { RegionSend } from "../region.js";
+import { short } from "../../core/utils/unit.js";
+import { SendNoahChange, GoldGainType } from "./sendNoahChange.js";
 
 export function SendNoahEvent(socket: IGameSocket, noah: number) {
   if (noah <= 0) return false; // this is event, not the punishment

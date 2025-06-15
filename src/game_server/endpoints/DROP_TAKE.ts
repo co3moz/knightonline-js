@@ -1,15 +1,15 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, int, short, byte_string } from "../../core/utils/unit";
-import { GetDrop, RemoveDrop } from "../drop";
-import { SendNoahChange } from "../functions/sendNoahChange";
-import { SendNoahEvent } from "../functions/sendNoahEvent";
-import { FindSlotForItem } from "../functions/findSlotForItem";
-import { ItemSlot } from "../var/item_slot";
-import { SendWeightChange } from "../functions/sendWeightChange";
-import { AllSend } from "../region";
-import { GenerateItem } from "../functions/generateItem";
-import { GetItemDetail } from "../../core/database/models";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, int, short, byte_string } from "../../core/utils/unit.js";
+import { GetDrop, RemoveDrop } from "../drop.js";
+import { SendNoahChange } from "../functions/sendNoahChange.js";
+import { SendNoahEvent } from "../functions/sendNoahEvent.js";
+import { FindSlotForItem } from "../functions/findSlotForItem.js";
+import { ItemSlot } from "../var/item_slot.js";
+import { SendWeightChange } from "../functions/sendWeightChange.js";
+import { AllSend } from "../region.js";
+import { GenerateItem } from "../functions/generateItem.js";
+import { GetItemDetail } from "@/models";
 
 export const DROP_TAKE: IGameEndpoint = async function (
   socket: IGameSocket,

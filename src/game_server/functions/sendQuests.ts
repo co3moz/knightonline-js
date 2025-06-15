@@ -1,5 +1,5 @@
-import type { IGameSocket } from "../game_socket";
-import { short } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { short } from "../../core/utils/unit.js";
 
 export function SendQuests(socket: IGameSocket) {
   let quests = socket.character.quests;

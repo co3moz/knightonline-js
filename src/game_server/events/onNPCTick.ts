@@ -1,13 +1,13 @@
-import type { INPCInstance } from "../ai_system/declare";
-import { NPCMap } from "../ai_system/uuid";
+import type { INPCInstance } from "../ai_system/declare.js";
+import { NPCMap } from "../ai_system/uuid.js";
 import {
   RegionUpdateNPC,
   RegionQueryUsersByNpc,
   RegionSendByNpc,
-} from "../region";
-import { SendRegionNpcIn } from "../functions/sendRegionInOut";
-import { short } from "../../core/utils/unit";
-import { WaitNextTick } from "../../core/utils/general";
+} from "../region.js";
+import { SendRegionNpcIn } from "../functions/sendRegionInOut.js";
+import { short } from "../../core/utils/unit.js";
+import { WaitNextTick } from "../../core/utils/general.js";
 
 let lock = 0;
 export async function OnNPCTick() {

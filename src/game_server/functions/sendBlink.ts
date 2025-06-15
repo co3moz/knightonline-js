@@ -1,7 +1,7 @@
-import type { IGameSocket } from "../game_socket";
-import { ZoneCode } from "../var/zone_codes";
-import { ZoneRules, ZoneFlags } from "../var/zone_rules";
-import { SendStateChange, AbnormalStates } from "./sendStateChange";
+import type { IGameSocket } from "../game_socket.js";
+import { ZoneCode } from "../var/zone_codes.js";
+import { ZoneRules, ZoneFlags } from "../var/zone_rules.js";
+import { SendStateChange, AbnormalStates } from "./sendStateChange.js";
 
 export function SendBlinkStart(socket: IGameSocket) {
   let v = socket.variables;

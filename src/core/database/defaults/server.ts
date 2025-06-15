@@ -1,18 +1,18 @@
-import { Server } from '../models';
+import { Server } from "@/models";
 
 export async function ServerDefaults() {
   let testServer = {
-    ip: '127.0.0.1',
-    lanip: '127.0.0.1',
-    name: 'TEST|SERVER 1',
-    karusKing: 'KARUS KING',
-    karusNotice: 'KARUS NOTICE',
-    elmoradKing: 'ELMORAD KING',
-    elmoradNotice: 'ELMORAD NOTICE'
-  }
+    ip: "127.0.0.1",
+    lanip: "127.0.0.1",
+    name: "TEST|SERVER 1",
+    karusKing: "KARUS KING",
+    karusNotice: "KARUS NOTICE",
+    elmoradKing: "ELMORAD KING",
+    elmoradNotice: "ELMORAD NOTICE",
+  };
 
   let data = await Server.findOne({
-    name: testServer.name
+    name: testServer.name,
   }).exec();
 
   if (data) {
@@ -23,5 +23,5 @@ export async function ServerDefaults() {
 
   await server.save();
 
-  console.log('[DB] A test server has been defined!')
+  console.log("[DB] A test server has been defined!");
 }

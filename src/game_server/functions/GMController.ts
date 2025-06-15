@@ -1,17 +1,17 @@
-import type { IGameSocket } from "../game_socket";
-import { SendMessageToPlayer, ChatMessageType } from "./sendChatMessage";
+import type { IGameSocket } from "../game_socket.js";
+import { SendMessageToPlayer, ChatMessageType } from "./sendChatMessage.js";
 import {
   AllSend,
   RegionQuery,
   RSessionMap,
   RNPCMap,
   RegionAllQuery,
-} from "../region";
-import { string, byte_string } from "../../core/utils/unit";
-import { SendWarp } from "./sendWarp";
-import { Npc } from "../../core/database/models";
-import { SendTargetHP } from "./sendTargetHP";
-import { SummonNPC } from "../ai_system/summon";
+} from "../region.js";
+import { string, byte_string } from "../../core/utils/unit.js";
+import { SendWarp } from "./sendWarp.js";
+import { Npc } from "@/models";
+import { SendTargetHP } from "./sendTargetHP.js";
+import { SummonNPC } from "../ai_system/summon.js";
 
 export const GM_COMMANDS_HEADER = "[GM CONTROLLER]";
 

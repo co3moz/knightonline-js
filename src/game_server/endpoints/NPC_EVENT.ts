@@ -1,8 +1,8 @@
-import { Queue, short, int } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { type INPCInstance, NPCType } from "../ai_system/declare";
-import { NPCMap } from "../ai_system/uuid";
+import { Queue, short, int } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { type INPCInstance, NPCType } from "../ai_system/declare.js";
+import { NPCMap } from "../ai_system/uuid.js";
 
 export const NPC_EVENT: IGameEndpoint = async function (
   socket: IGameSocket,

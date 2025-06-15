@@ -1,4 +1,4 @@
-import { rawLevelUp } from "../var/level_up";
+import { rawLevelUp } from "../var/level_up.js";
 
 export const INVALID_EXP = 10000000000;
 

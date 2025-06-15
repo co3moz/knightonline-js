@@ -1,7 +1,6 @@
-import type { INpc, ISpawn } from "../../core/database/models";
-import type { INPCInstance } from "./declare";
-import { NPCUUID, NPCMap } from "./uuid";
-import { RegionUpdateNPC } from "../region";
+import type { INpc, ISpawn } from "@/models";
+import type { INPCInstance } from "./declare.js";
+import { NPCUUID, NPCMap } from "./uuid.js";
 
 export function SummonNPC(npc: INpc, spawn: ISpawn) {
   let npcObj: INPCInstance = <any>{

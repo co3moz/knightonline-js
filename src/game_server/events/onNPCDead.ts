@@ -1,12 +1,16 @@
-import type { INPCInstance } from "../ai_system/declare";
-import { RegionRemoveNPC, RSessionMap, RegionQueryUsersByNpc } from "../region";
-import { short, int } from "../../core/utils/unit";
-import { SendExperienceChange } from "../functions/sendExperienceChange";
-import { ItemDropGroups } from "../var/item_drop_groups";
-import { PrepareItems } from "../../core/database/models";
-import { CreateDrop } from "../drop";
-import type { IGameSocket } from "../game_socket";
-import { NPCMap, NPCUUID } from "../ai_system/uuid";
+import type { INPCInstance } from "../ai_system/declare.js";
+import {
+  RegionRemoveNPC,
+  RSessionMap,
+  RegionQueryUsersByNpc,
+} from "../region.js";
+import { short, int } from "../../core/utils/unit.js";
+import { SendExperienceChange } from "../functions/sendExperienceChange.js";
+import { ItemDropGroups } from "../var/item_drop_groups.js";
+import { PrepareItems } from "@/models";
+import { CreateDrop } from "../drop.js";
+import type { IGameSocket } from "../game_socket.js";
+import { NPCMap, NPCUUID } from "../ai_system/uuid.js";
 
 const ARROW_MIN = 391010000;
 const ARROW_MAX = 392010000;

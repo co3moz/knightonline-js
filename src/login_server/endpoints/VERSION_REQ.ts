@@ -1,7 +1,7 @@
 import config from "config";
-import { short, Queue } from "../../core/utils/unit";
-import type { ILoginSocket } from "../login_socket";
-import type { ILoginEndpoint } from "../endpoint";
+import { short, Queue } from "../../core/utils/unit.js";
+import type { ILoginSocket } from "../login_socket.js";
+import type { ILoginEndpoint } from "../endpoint.js";
 
 let versions: any[] = config.get("loginServer.versions");
 let { version: serverVersion } = versions[versions.length - 1];

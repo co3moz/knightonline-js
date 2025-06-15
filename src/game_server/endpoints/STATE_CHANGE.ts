@@ -1,7 +1,7 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue } from "../../core/utils/unit";
-import { SendStateChange } from "../functions/sendStateChange";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue } from "../../core/utils/unit.js";
+import { SendStateChange } from "../functions/sendStateChange.js";
 
 export const STATE_CHANGE: IGameEndpoint = async function (
   socket: IGameSocket,

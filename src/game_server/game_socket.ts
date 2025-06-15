@@ -1,5 +1,5 @@
-import type { IKOSocket } from "../core/server";
-import type { ICharacter, IAccount, IWarehouse } from "../core/database/models";
+import type { IKOSocket } from "../core/server.js";
+import type { ICharacter, IAccount, IWarehouse } from "@/models";
 import type { HydratedDocument } from "mongoose";
 
 export interface IGameSocket extends IKOSocket {

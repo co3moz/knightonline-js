@@ -1,5 +1,5 @@
-import type { IGameSocket } from "../game_socket";
-import type { INPCInstance } from "../ai_system/declare";
+import type { IGameSocket } from "../game_socket.js";
+import type { INPCInstance } from "../ai_system/declare.js";
 
 export function GetDamageNPC(
   socket: IGameSocket,

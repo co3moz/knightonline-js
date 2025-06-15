@@ -1,7 +1,7 @@
-import type { IGameSocket } from "../game_socket";
-import { GetLevelUp } from "./getLevelUp";
-import { SendLevelChange } from "./sendLevelChange";
-import { long } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { GetLevelUp } from "./getLevelUp.js";
+import { SendLevelChange } from "./sendLevelChange.js";
+import { long } from "../../core/utils/unit.js";
 
 export function SendExperienceChange(socket: IGameSocket, experience: number) {
   if (experience <= 0) return; // TODO: handle this case later

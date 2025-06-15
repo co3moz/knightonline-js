@@ -1,6 +1,6 @@
-import type { IGameSocket } from "../game_socket";
-import { RSessionMap, RNPCMap } from "../region";
-import { short, int } from "../../core/utils/unit";
+import type { IGameSocket } from "../game_socket.js";
+import { RSessionMap, RNPCMap } from "../region.js";
+import { short, int } from "../../core/utils/unit.js";
 
 export function SendTargetHP(
   socket: IGameSocket,

@@ -1,6 +1,6 @@
-import type { IGameSocket } from "../game_socket";
-import type { IItem } from "../../core/database/models";
-import { ItemSlot } from "../var/item_slot";
+import type { IGameSocket } from "../game_socket.js";
+import type { IItem } from "@/models";
+import { ItemSlot } from "../var/item_slot.js";
 
 const INVENTORY_START = ItemSlot.INVENTORY_START;
 const INVENTORY_END = ItemSlot.INVENTORY_END;

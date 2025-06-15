@@ -1,19 +1,19 @@
-import type { IGameSocket } from "../game_socket";
+import type { IGameSocket } from "../game_socket.js";
 import {
   SendRegionUserOut,
   SendRegionNpcOut,
   SendRegionUserIn,
   SendRegionNpcIn,
   RegionInCase,
-} from "../functions/sendRegionInOut";
-import { BuildUserDetail } from "../functions/buildUserDetail";
+} from "../functions/sendRegionInOut.js";
+import { BuildUserDetail } from "../functions/buildUserDetail.js";
 import {
   RSessionMap,
   RegionQuery,
   RegionQueryNPC,
   RNPCMap,
   type IRegionNPC,
-} from "../region";
+} from "../region.js";
 
 export function OnRegionUpdate(socket: IGameSocket) {
   if (!socket.ingame) return;

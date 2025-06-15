@@ -1,8 +1,8 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, string } from "../../core/utils/unit";
-import { GM_COMMANDS_HEADER } from "../functions/GMController";
-import { RUserMap } from "../region";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, string } from "../../core/utils/unit.js";
+import { GM_COMMANDS_HEADER } from "../functions/GMController.js";
+import { RUserMap } from "../region.js";
 
 export const CHAT_TARGET: IGameEndpoint = async function (
   socket: IGameSocket,

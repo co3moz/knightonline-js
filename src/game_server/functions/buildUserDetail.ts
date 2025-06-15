@@ -1,6 +1,6 @@
-import type { IGameSocket } from "../game_socket";
-import { byte_string, short, int } from "../../core/utils/unit";
-import { ItemSlot } from "../var/item_slot";
+import type { IGameSocket } from "../game_socket.js";
+import { byte_string, short, int } from "../../core/utils/unit.js";
+import { ItemSlot } from "../var/item_slot.js";
 
 const UserDetailSlots = [
   ItemSlot.BREAST,

@@ -1,7 +1,7 @@
-import { assert } from 'chai';
-import { Spec, Dependency } from 'nole';
-import { LoginServerTest } from '../../login_server/test/server.test';
-import { ConnectLoginClient } from '../login-client';
+import { assert } from "chai";
+import { Spec, Dependency } from "nole";
+import { LoginServerTest } from "../../login_server/test/server.test.js";
+import { ConnectLoginClient } from "../login-client.js";
 
 export class ClientLoginTest {
   @Dependency(LoginServerTest)
@@ -12,8 +12,8 @@ export class ClientLoginTest {
   @Spec(80)
   async Connect() {
     let ports = this.loginServerTest.servers[0].params.ports;
-    let randomPort = ports[Math.random() * ports.length | 0];
-    this.data = await ConnectLoginClient('127.0.0.1', randomPort, 'test', '1');
+    let randomPort = ports[(Math.random() * ports.length) | 0];
+    this.data = await ConnectLoginClient("127.0.0.1", randomPort, "test", "1");
   }
 
   @Spec()

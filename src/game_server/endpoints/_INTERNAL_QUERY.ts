@@ -1,10 +1,10 @@
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { Queue, short, string } from "../../core/utils/unit";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { Queue, short, string } from "../../core/utils/unit.js";
 import crypto from "crypto";
 import config from "config";
-import { RUserMap } from "../region";
-import { UserMap } from "../shared";
+import { RUserMap } from "../region.js";
+import { UserMap } from "../shared.js";
 
 const internalCommunicationSecret = <string>(
   config.get("gameServer.internalCommunicationSecret")

@@ -1,8 +1,8 @@
-import { Queue, string } from "../../core/utils/unit";
-import type { ILoginSocket } from "../login_socket";
-import { News } from "../../core/database/models";
-import { RedisCaching } from "../../core/redis/cache";
-import type { ILoginEndpoint } from "../endpoint";
+import { Queue, string } from "../../core/utils/unit.js";
+import type { ILoginSocket } from "../login_socket.js";
+import { News } from "../../core/database/models/index.js";
+import { RedisCaching } from "../../core/redis/cache.js";
+import type { ILoginEndpoint } from "../endpoint.js";
 
 export const NEWS: ILoginEndpoint = async function (
   socket: ILoginSocket,

@@ -1,7 +1,7 @@
-import { Queue, short } from "../../core/utils/unit";
-import type { IGameEndpoint } from "../endpoint";
-import type { IGameSocket } from "../game_socket";
-import { SendAbility } from "../functions/sendAbility";
+import { Queue, short } from "../../core/utils/unit.js";
+import type { IGameEndpoint } from "../endpoint.js";
+import type { IGameSocket } from "../game_socket.js";
+import { SendAbility } from "../functions/sendAbility.js";
 
 export const POINT_CHANGE: IGameEndpoint = async function (
   socket: IGameSocket,

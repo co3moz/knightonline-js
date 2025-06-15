@@ -1,8 +1,8 @@
 import config from "config";
-import { KOClientFactory, type IKOClientSocket } from "../core/client";
-import { short, string, byte_string } from "../core/utils/unit";
-import { GameEndpointCodes } from "../game_server/endpoint";
-import { ConnectLoginClient } from "./login-client";
+import { KOClientFactory, type IKOClientSocket } from "../core/client.js";
+import { short, string, byte_string } from "../core/utils/unit.js";
+import { GameEndpointCodes } from "../game_server/endpoint.js";
+import { ConnectLoginClient } from "./login-client.js";
 
 export async function TestClient() {
   let connection: IKOClientSocket | null;
