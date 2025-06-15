@@ -1,7 +1,10 @@
 import type { IGameSocket, IVariables } from "../game_socket.js";
 import { ZoneCode } from "../var/zone_codes.js";
 import { Coefficient } from "../var/coefficient.js";
-import { type ISetItem, GetItemDetail } from "@/models";
+import {
+  type ISetItem,
+  GetItemDetail,
+} from "../../core/database/models/index.js";
 import { SetItems } from "../shared.js";
 import { ItemSlot } from "../var/item_slot.js";
 import { SendItemMove } from "./sendItemMove.js";

@@ -2,7 +2,7 @@ import type { IGameEndpoint } from "../endpoint.js";
 import type { IGameSocket } from "../game_socket.js";
 import { Queue, int, short, string } from "../../core/utils/unit.js";
 import { ItemSlot } from "../var/item_slot.js";
-import { Character } from "@/models";
+import { Character } from "../../core/database/models/index.js";
 
 const CHARACTER_ITEM_SLOTS = [
   ItemSlot.HEAD,

@@ -1,4 +1,4 @@
-import type { INpc, ISpawn } from "@/models";
+import type { INpc, ISpawn } from "../../core/database/models/index.js";
 
 export interface INPCInstance {
   npc: INpc;

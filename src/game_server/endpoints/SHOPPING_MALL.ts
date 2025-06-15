@@ -1,7 +1,7 @@
 import type { IGameEndpoint } from "../endpoint.js";
 import type { IGameSocket } from "../game_socket.js";
 import { Queue, int, short, byte_string } from "../../core/utils/unit.js";
-import { Mail } from "@/models";
+import { Mail } from "../../core/database/models/index.js";
 import { ItemSlot } from "../var/item_slot.js";
 
 const INVENTORY_START = ItemSlot.INVENTORY_START;

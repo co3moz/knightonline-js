@@ -1,5 +1,5 @@
 import { CSVLoader } from "../utils/csv_loader.js";
-import { SetItem } from "@/models";
+import { SetItem } from "../models/index.js";
 
 export async function SetItemDefaults() {
   await CSVLoader("set_items", SetItemTransferObjects, 1066, SetItem);

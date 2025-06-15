@@ -5,7 +5,7 @@ import type { IKOServer } from "./core/server.js";
 import { Database, DisconnectFromDatabase } from "./core/database/index.js";
 import { GarbageCollect } from "./core/utils/general.js";
 import { WebServer } from "./web/server.js";
-import { RedisConnect } from "@/redis";
+import { RedisConnect } from "./core/redis/index.js";
 
 async function main() {
   console.log("[MAIN] %s v%s", "ko-js", "1.0.0");

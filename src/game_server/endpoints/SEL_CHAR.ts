@@ -5,7 +5,11 @@ import type {
   IVisiblePlayers,
 } from "../game_socket.js";
 import { Queue, short } from "../../core/utils/unit.js";
-import { Character, Warehouse, Item, PrepareItems } from "@/models";
+import {
+  Character,
+  Warehouse,
+  PrepareItems,
+} from "../../core/database/models/index.js";
 import { CharacterMap } from "../shared.js";
 import { SendAbility } from "../functions/sendAbility.js";
 

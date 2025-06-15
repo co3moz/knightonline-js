@@ -1,5 +1,5 @@
 import { CSVReader } from "../utils/csv_reader.js";
-import { Npc, type IDrop } from "@/models";
+import { Npc, type IDrop } from "../models/index.js";
 
 export async function NpcDefaults() {
   if (await Npc.findOne({}).exec()) {

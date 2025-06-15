@@ -1,4 +1,7 @@
-import type { ICharacterItem, IItem } from "@/models";
+import type {
+  ICharacterItem,
+  IItem,
+} from "../../core/database/models/index.js";
 
 export function GenerateItem(
   detail: IItem,

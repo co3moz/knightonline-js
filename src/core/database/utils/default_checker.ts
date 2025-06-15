@@ -6,7 +6,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function DefaultChecker() {
   try {
-    const files = await glob(path.resolve(__dirname, "../defaults/**/*.ts"));
+    const files = await glob(
+      path.resolve(__dirname, "../defaults/**/*.{ts,js}")
+    );
 
     for (let file of files) {
       let lib = await (<any>import(file));

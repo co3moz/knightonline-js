@@ -7,7 +7,7 @@ import {
 import { short, int } from "../../core/utils/unit.js";
 import { SendExperienceChange } from "../functions/sendExperienceChange.js";
 import { ItemDropGroups } from "../var/item_drop_groups.js";
-import { PrepareItems } from "@/models";
+import { PrepareItems } from "../../core/database/models/index.js";
 import { CreateDrop } from "../drop.js";
 import type { IGameSocket } from "../game_socket.js";
 import { NPCMap, NPCUUID } from "../ai_system/uuid.js";

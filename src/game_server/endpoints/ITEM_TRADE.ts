@@ -3,7 +3,10 @@ import type { IGameEndpoint } from "../endpoint.js";
 import type { IGameSocket } from "../game_socket.js";
 import { type INPCInstance, NPCType } from "../ai_system/declare.js";
 import { NPCMap } from "../ai_system/uuid.js";
-import { GetItemDetail, PrepareItems } from "@/models";
+import {
+  GetItemDetail,
+  PrepareItems,
+} from "../../core/database/models/index.js";
 import { isUserDead } from "../functions/isDead.js";
 import { GenerateItem } from "../functions/generateItem.js";
 import { SendAbility } from "../functions/sendAbility.js";

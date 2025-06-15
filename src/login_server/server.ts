@@ -4,7 +4,7 @@ import { KOServerFactory, type IKOServer } from "../core/server.js";
 import { Queue } from "../core/utils/unit.js";
 import { LoginEndpointCodes, LoginEndpoint } from "./endpoint.js";
 import type { ILoginSocket } from "./login_socket.js";
-import { RedisConnect } from "@/redis";
+import { RedisConnect } from "../core/redis/index.js";
 
 let loginServerCache: IKOServer[] = null;
 

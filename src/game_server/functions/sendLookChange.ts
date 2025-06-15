@@ -1,7 +1,7 @@
 import type { IGameSocket } from "../game_socket.js";
 import { short, int } from "../../core/utils/unit.js";
 import { RegionSend } from "../region.js";
-import type { ICharacterItem } from "@/models";
+import type { ICharacterItem } from "../../core/database/models/index.js";
 
 export function SendLookChange(
   socket: IGameSocket,

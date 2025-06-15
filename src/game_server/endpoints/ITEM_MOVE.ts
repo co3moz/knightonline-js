@@ -4,7 +4,10 @@ import type { IGameSocket } from "../game_socket.js";
 import { SendAbility } from "../functions/sendAbility.js";
 import { SendWeightChange } from "../functions/sendWeightChange.js";
 import { SendItemMove } from "../functions/sendItemMove.js";
-import { type ICharacterItem, GetItemDetail } from "@/models";
+import {
+  type ICharacterItem,
+  GetItemDetail,
+} from "../../core/database/models/index.js";
 import { SendLookChange } from "../functions/sendLookChange.js";
 
 const EQUIP_MAX = 14;

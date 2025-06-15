@@ -1,4 +1,4 @@
-import { Account } from "@/models";
+import { Account } from "../models/index.js";
 
 export async function AccountDefaults() {
   let testUsers = [

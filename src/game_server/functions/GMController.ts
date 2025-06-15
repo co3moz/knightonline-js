@@ -9,7 +9,7 @@ import {
 } from "../region.js";
 import { string, byte_string } from "../../core/utils/unit.js";
 import { SendWarp } from "./sendWarp.js";
-import { Npc } from "@/models";
+import { Npc } from "../../core/database/models/index.js";
 import { SendTargetHP } from "./sendTargetHP.js";
 import { SummonNPC } from "../ai_system/summon.js";
 

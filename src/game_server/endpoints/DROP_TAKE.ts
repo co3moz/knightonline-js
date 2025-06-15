@@ -9,7 +9,7 @@ import { ItemSlot } from "../var/item_slot.js";
 import { SendWeightChange } from "../functions/sendWeightChange.js";
 import { AllSend } from "../region.js";
 import { GenerateItem } from "../functions/generateItem.js";
-import { GetItemDetail } from "@/models";
+import { GetItemDetail } from "../../core/database/models/index.js";
 
 export const DROP_TAKE: IGameEndpoint = async function (
   socket: IGameSocket,

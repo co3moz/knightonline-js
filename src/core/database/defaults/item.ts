@@ -1,5 +1,5 @@
 import { CSVLoader } from "../utils/csv_loader.js";
-import { Item } from "@/models";
+import { Item } from "../models/index.js";
 
 export async function ItemDefaults() {
   await CSVLoader("items", ItemTransferObject, 443267, Item);

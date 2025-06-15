@@ -1,7 +1,7 @@
 import type { IGameEndpoint } from "../endpoint.js";
 import type { IGameSocket } from "../game_socket.js";
 import { Queue, string } from "../../core/utils/unit.js";
-import { Account } from "@/models";
+import { Account } from "../../core/database/models/index.js";
 import { UserMap } from "../shared.js";
 
 export const LOGIN: IGameEndpoint = async function (

@@ -1,4 +1,4 @@
-import { Npc } from "@/models";
+import { Npc } from "../../core/database/models/index.js";
 import { NPCUUID, NPCMap } from "./uuid.js";
 import type { INPCInstance } from "./declare.js";
 

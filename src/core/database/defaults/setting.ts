@@ -1,4 +1,4 @@
-import { Setting } from "@/models";
+import { Setting } from "../models/index.js";
 
 export async function SettingDefaults() {
   let defaultSettings = {

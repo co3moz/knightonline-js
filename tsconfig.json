@@ -11,12 +11,7 @@
     "outDir": "build",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true,
-    "paths": {
-      "@/database": ["./src/core/database/index.js"],
-      "@/redis": ["./src/core/redis/index.js"],
-      "@/models": ["./src/core/database/models/index.js"]
-    }
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "build"]

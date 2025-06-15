@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function ModelLoader() {
   try {
-    const files = await glob(path.resolve(__dirname, "../models/**/*.ts"));
+    const files = await glob(path.resolve(__dirname, "../models/**/*.{ts,js}"));
 
     for (let file of files) {
       await import(file);

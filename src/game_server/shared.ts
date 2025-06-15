@@ -1,4 +1,4 @@
-import { SetItem, type ISetItem } from "@/models";
+import { SetItem, type ISetItem } from "../core/database/models/index.js";
 import type { IGameSocket } from "./game_socket.js";
 
 export const UserMap: { [name: string]: IGameSocket } = {};

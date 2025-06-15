@@ -1,4 +1,4 @@
-import { Server } from "@/models";
+import { Server } from "../models/index.js";
 
 export async function ServerDefaults() {
   let testServer = {
