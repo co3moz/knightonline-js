@@ -269,6 +269,7 @@ export interface IKOSocket extends net.Socket {
   terminate: (message?: string) => IDeferredPromise;
   terminatePromise: IDeferredPromise;
   cryption?: Crypt;
+  context?: any;
 }
 
 export interface IServerConfiguration {

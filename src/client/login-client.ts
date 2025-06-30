@@ -1,7 +1,7 @@
 import { KOClientFactory, type IKOClientSocket } from "../core/client.js";
 import { string, Queue } from "../core/utils/unit.js";
 import { PasswordHash } from "../core/utils/password_hash.js";
-import { AuthenticationCode } from "../login_server/endpoints/LOGIN_REQ.js";
+import { AuthenticationCode } from "../login-server/endpoints/LOGIN_REQ.js";
 
 export async function ConnectLoginClient(
   ip: string,

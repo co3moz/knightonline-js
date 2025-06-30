@@ -13,6 +13,6 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/login-server/endpoints/2-launcher-version-download.ts"],
   "exclude": ["node_modules", "build"]
 }

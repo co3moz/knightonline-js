@@ -1,20 +1,15 @@
-import { Queue, string, short } from "../../core/utils/unit.js";
-import type { ILoginSocket } from "../login_socket.js";
+import { string, short } from "../../core/utils/unit.js";
 import { Server } from "../../core/database/models/index.js";
 import { RedisCaching } from "../../core/redis/cache.js";
-import type { ILoginEndpoint } from "../endpoint.js";
+import { addLoginServerEndpoint, LoginEndpointCodes } from "../endpoint.js";
 
-export const SERVERLIST: ILoginEndpoint = async function (
-  socket: ILoginSocket,
-  body: Queue,
-  opcode: number
-) {
-  let echo = body.short();
+addLoginServerEndpoint(LoginEndpointCodes.SERVERLIST, async function () {
+  let echo = this.body.short();
 
   let servers = await RedisCaching("servers", ServersCache);
 
-  socket.send([opcode, ...short(echo), ...servers]);
-};
+  return [LoginEndpointCodes.SERVERLIST, ...short(echo), ...servers];
+});
 
 async function ServersCache() {
   let servers = await Server.find().lean().exec();

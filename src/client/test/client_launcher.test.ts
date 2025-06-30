@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Spec, Dependency } from "nole";
-import { LoginServerTest } from "../../login_server/test/server.test.js";
+import { LoginServerTest } from "../../login-server/test/server.test.js";
 import { ConnectKOServerForLauncher } from "../launcher-client.js";
 
 export class ClientLauncherTest {
